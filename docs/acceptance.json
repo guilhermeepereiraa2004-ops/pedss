@@ -1,0 +1,945 @@
+{
+  "floor": 188,
+  "items": [
+    {
+      "id": "AUTH-06",
+      "title": "sair limpa identidade mesmo quando falha a gravação compartilhada",
+      "source": "tests/auth.test.ts"
+    },
+    {
+      "id": "UI-07",
+      "title": "aplicação completa abre em StrictMode mesmo se scrollTo retornar Promise",
+      "source": "tests/ui.test.jsx"
+    },
+    {
+      "id": "UI-08",
+      "title": "moeda aceita vírgula e preserva centavos durante edição",
+      "source": "tests/ui.test.jsx"
+    },
+    {
+      "id": "UI-09",
+      "title": "configuração salva identidade e WhatsApp sem editar o frete",
+      "source": "tests/ui.test.jsx"
+    },
+    {
+      "id": "UI-10",
+      "title": "acompanhamento mostra somente o pedido do token e reage ao painel",
+      "source": "tests/ui.test.jsx"
+    },
+    {
+      "id": "AUTH-01",
+      "title": "senha é derivada, login valida e logout revoga sessão",
+      "source": "tests/auth.test.ts"
+    },
+    {
+      "id": "AUTH-02",
+      "title": "recuperação tem uso único e encerra sessões anteriores",
+      "source": "tests/auth.test.ts"
+    },
+    {
+      "id": "AUTH-03",
+      "title": "convite cria atendente da loja e não pode ser reutilizado",
+      "source": "tests/auth.test.ts"
+    },
+    {
+      "id": "AUTH-04",
+      "title": "gestor não convida administrador nem acessa outra loja",
+      "source": "tests/auth.test.ts"
+    },
+    {
+      "id": "AUTH-05",
+      "title": "sessão expirada e conta desativada perdem autorização",
+      "source": "tests/auth.test.ts"
+    },
+    {
+      "id": "ORDER-01",
+      "title": "calcula catálogo oficial, adicionais, retirada e nome oficial",
+      "source": "tests/domain.test.ts"
+    },
+    {
+      "id": "ORDER-02",
+      "title": "grava uma única vez com cliques concorrentes e requestId repetido",
+      "source": "tests/domain.test.ts"
+    },
+    {
+      "id": "ORDER-03",
+      "title": "recusa total desatualizado sem perder sacola nem criar pedido",
+      "source": "tests/domain.test.ts"
+    },
+    {
+      "id": "ORDER-04",
+      "title": "impede produto indisponível, quantidade e adicionais inválidos",
+      "source": "tests/domain.test.ts"
+    },
+    {
+      "id": "ORDER-05",
+      "title": "valida endereço, área, telefone, troco e forma de pagamento",
+      "source": "tests/domain.test.ts"
+    },
+    {
+      "id": "ORDER-06",
+      "title": "retirada usa endereço da loja e não cobra entrega",
+      "source": "tests/domain.test.ts"
+    },
+    {
+      "id": "CATALOG-01",
+      "title": "editar preserva ID e excluir preserva snapshot no pedido",
+      "source": "tests/domain.test.ts"
+    },
+    {
+      "id": "HOURS-01",
+      "title": "central, fechamento manual e horário usam a mesma regra",
+      "source": "tests/domain.test.ts"
+    },
+    {
+      "id": "HOURS-02",
+      "title": "horário após meia-noite respeita o dia anterior",
+      "source": "tests/domain.test.ts"
+    },
+    {
+      "id": "ORDER-07",
+      "title": "exige sequência, cancelamento com motivo e guarda histórico",
+      "source": "tests/domain.test.ts"
+    },
+    {
+      "id": "PAY-01",
+      "title": "entregar não confirma pagamento; estorno exige cancelamento e motivo",
+      "source": "tests/domain.test.ts"
+    },
+    {
+      "id": "TENANT-01",
+      "title": "IDs imutáveis impedem reutilizar slug e mistura de dados",
+      "source": "tests/domain.test.ts"
+    },
+    {
+      "id": "TENANT-02",
+      "title": "atendente não altera preço, configuração, financeiro ou outra loja",
+      "source": "tests/domain.test.ts"
+    },
+    {
+      "id": "ARCH-01",
+      "title": "aceita dependência permitida e rejeita violação com exit code 1",
+      "source": "tests/layers.test.ts"
+    },
+    {
+      "id": "DATA-01",
+      "title": "recupera arrays malformados e mantém cópia do original",
+      "source": "tests/repository.test.ts"
+    },
+    {
+      "id": "DATA-02",
+      "title": "falha de armazenamento mantém o estado anterior sem sucesso falso",
+      "source": "tests/repository.test.ts"
+    },
+    {
+      "id": "DATA-03",
+      "title": "migra status legado, preço e pedidos sem inferir pagamento",
+      "source": "tests/repository.test.ts"
+    },
+    {
+      "id": "DATA-04",
+      "title": "preserva gravações concorrentes no mesmo adaptador",
+      "source": "tests/repository.test.ts"
+    },
+    {
+      "id": "UI-01",
+      "title": "logo cadastrado é usado na loja e sacola permite personalizar",
+      "source": "tests/ui.test.jsx"
+    },
+    {
+      "id": "UI-02",
+      "title": "corrigir foto inválida remove fallback sem recarregar",
+      "source": "tests/ui.test.jsx"
+    },
+    {
+      "id": "UI-03",
+      "title": "atendente não recebe controles de catálogo, equipe ou financeiro",
+      "source": "tests/ui.test.jsx"
+    },
+    {
+      "id": "UI-04",
+      "title": "pausa pela central aparece no painel e bloqueia reabertura",
+      "source": "tests/ui.test.jsx"
+    },
+    {
+      "id": "UI-05",
+      "title": "checkout informa validação e retirada altera taxa e endereço",
+      "source": "tests/ui.test.jsx"
+    },
+    {
+      "id": "UI-06",
+      "title": "usuário muda status e pagamento pelos detalhes do pedido",
+      "source": "tests/ui.test.jsx"
+    },
+    {
+      "id": "COUPON-01",
+      "title": "desconto usa subtotal oficial, mantém frete e guarda snapshot",
+      "source": "tests/business.test.ts"
+    },
+    {
+      "id": "COUPON-02",
+      "title": "rejeita vencimento, mínimo, inatividade e limita valor fixo ao subtotal",
+      "source": "tests/business.test.ts"
+    },
+    {
+      "id": "COUPON-03",
+      "title": "limite total é transacional, repetição não consome duas vezes e cancelamento libera",
+      "source": "tests/business.test.ts"
+    },
+    {
+      "id": "COUPON-04",
+      "title": "limite por telefone, código único e alteração de total exigem revisão",
+      "source": "tests/business.test.ts"
+    },
+    {
+      "id": "BUSINESS-01",
+      "title": "custos ficam no snapshot e ausência de custo impede ranking de margem",
+      "source": "tests/business.test.ts"
+    },
+    {
+      "id": "BUSINESS-02",
+      "title": "despesas validam valor, data, autorização e arquivo reversível",
+      "source": "tests/business.test.ts"
+    },
+    {
+      "id": "BUSINESS-03",
+      "title": "receita respeita recebimento, estorno e timezone; meses vazios aparecem",
+      "source": "tests/business.test.ts"
+    },
+    {
+      "id": "BUSINESS-04",
+      "title": "rankings somam opções por produto, incluem zero e ignoram exemplos",
+      "source": "tests/business.test.ts"
+    },
+    {
+      "id": "DATA-05",
+      "title": "dados v2 anteriores ganham campos sem apagar pedidos nem inventar custos",
+      "source": "tests/business.test.ts"
+    },
+    {
+      "id": "MENU-01",
+      "title": "cardápio presencial funciona com delivery fechado e exibe detalhes sem sacola",
+      "source": "tests/menu-business-ui.test.jsx"
+    },
+    {
+      "id": "MENU-02",
+      "title": "loja inexistente não mostra o catálogo de outro estabelecimento",
+      "source": "tests/menu-business-ui.test.jsx"
+    },
+    {
+      "id": "QR-01",
+      "title": "link e QR pertencem à loja e exportação SVG cria arquivo vetorial",
+      "source": "tests/menu-business-ui.test.jsx"
+    },
+    {
+      "id": "QR-02",
+      "title": "prévia local informa limite de acesso e permite pedir impressão da placa",
+      "source": "tests/menu-business-ui.test.jsx"
+    },
+    {
+      "id": "COUPON-UI-01",
+      "title": "gestor cadastra oferta, cliente a aplica e checkout envia total com desconto",
+      "source": "tests/menu-business-ui.test.jsx"
+    },
+    {
+      "id": "EXPENSE-UI-01",
+      "title": "lançamento pela tela atualiza despesa e arquivo pode ser restaurado",
+      "source": "tests/menu-business-ui.test.jsx"
+    },
+    {
+      "id": "BUSINESS-UI-01",
+      "title": "visão geral exibe receita real, ticket, rankings e histórico",
+      "source": "tests/menu-business-ui.test.jsx"
+    },
+    {
+      "id": "IMPORT-01",
+      "title": "lê o modelo distribuído com três produtos, adicionais e centavos",
+      "source": "tests/catalog-import.test.ts"
+    },
+    {
+      "id": "IMPORT-02",
+      "title": "aceita números e moeda brasileira e distingue custo zero de desconhecido",
+      "source": "tests/catalog-import.test.ts"
+    },
+    {
+      "id": "IMPORT-03",
+      "title": "relata linha e coluna para valores inválidos e códigos repetidos",
+      "source": "tests/catalog-import.test.ts"
+    },
+    {
+      "id": "IMPORT-04",
+      "title": "bloqueia referências, repetições e excesso de opções ou produtos",
+      "source": "tests/catalog-import.test.ts"
+    },
+    {
+      "id": "IMPORT-05",
+      "title": "exige atualização explícita e preserva IDs e adicionais quando a aba está ausente",
+      "source": "tests/catalog-import.test.ts"
+    },
+    {
+      "id": "IMPORT-06",
+      "title": "grava o lote inteiro e preserva pedidos e produtos fora do arquivo",
+      "source": "tests/catalog-import.test.ts"
+    },
+    {
+      "id": "IMPORT-07",
+      "title": "impede acesso de atendente, outra loja e prévia desatualizada",
+      "source": "tests/catalog-import.test.ts"
+    },
+    {
+      "id": "IMPORT-08",
+      "title": "rejeita fórmulas, arquivos corrompidos e arquivos grandes",
+      "source": "tests/catalog-import.test.ts"
+    },
+    {
+      "id": "IMPORT-09",
+      "title": "valida o arquivo antes da leitura e encerra o worker ao cancelar",
+      "source": "tests/catalog-import.test.ts"
+    },
+    {
+      "id": "UI-IMPORT-01",
+      "title": "painel oferece modelo e importa somente após revisar e confirmar",
+      "source": "tests/catalog-import-ui.test.jsx"
+    },
+    {
+      "id": "UI-IMPORT-02",
+      "title": "erros por linha bloqueiam todo o lote sem chamar a gravação",
+      "source": "tests/catalog-import-ui.test.jsx"
+    },
+    {
+      "id": "UI-IMPORT-03",
+      "title": "atualização exige opção explícita e mudança de catálogo exige nova prévia",
+      "source": "tests/catalog-import-ui.test.jsx"
+    },
+    {
+      "id": "EXPORT-06",
+      "title": "bloqueia duas linhas que tentam atualizar o mesmo produto legado",
+      "source": "tests/catalog-export.test.ts"
+    },
+    {
+      "id": "EXPORT-01",
+      "title": "atribui códigos persistentes sem alterar IDs, pedidos ou dados de outra loja",
+      "source": "tests/catalog-export.test.ts"
+    },
+    {
+      "id": "EXPORT-02",
+      "title": "exporta campos e opções e reimporta nomes/preços editados sem duplicar produtos",
+      "source": "tests/catalog-export.test.ts"
+    },
+    {
+      "id": "EXPORT-03",
+      "title": "conserva códigos e nomes iguais, campos literais e catálogo vazio sem exemplos",
+      "source": "tests/catalog-export.test.ts"
+    },
+    {
+      "id": "EXPORT-04",
+      "title": "exportação exige gestor autorizado para a loja",
+      "source": "tests/catalog-export.test.ts"
+    },
+    {
+      "id": "EXPORT-05",
+      "title": "divide catálogo completo em partes reimportáveis sem perder produtos ou adicionais",
+      "source": "tests/catalog-export.test.ts"
+    },
+    {
+      "id": "UI-EXPORT-01",
+      "title": "exporta a loja inteira com busca ativa e informa falha para tentar novamente",
+      "source": "tests/catalog-import-ui.test.jsx"
+    },
+    {
+      "id": "CROP-01",
+      "title": "recorte respeita proporção, limites e posição em imagens largas e altas",
+      "source": "tests/image-crop.test.ts"
+    },
+    {
+      "id": "CROP-UI-01",
+      "title": "mostra prévia, permite zoom e só altera o campo ao aplicar",
+      "source": "tests/image-crop-ui.test.jsx"
+    },
+    {
+      "id": "CROP-UI-02",
+      "title": "cancelar mantém imagem e formulário não salva enquanto o recorte está pendente",
+      "source": "tests/image-crop-ui.test.jsx"
+    },
+    {
+      "id": "CROP-UI-03",
+      "title": "erro de recorte preserva original e redefinir restaura o enquadramento",
+      "source": "tests/image-crop-ui.test.jsx"
+    },
+    {
+      "id": "CROP-UI-04",
+      "title": "logo e capa usam formatos próprios e bloqueiam salvar configurações",
+      "source": "tests/image-crop-ui.test.jsx"
+    },
+    {
+      "id": "CROP-02",
+      "title": "valida tipo/tamanho, aplica a área do canvas e reduz o arquivo final",
+      "source": "tests/image-crop-ui.test.jsx"
+    },
+    {
+      "id": "CROP-03",
+      "title": "falhas de leitura, dimensão e permissão não geram imagem inválida",
+      "source": "tests/image-crop-ui.test.jsx"
+    },
+    {
+      "id": "TRIAL-01",
+      "title": "Cadastro cria gestor isolado, loja vazia e sete dias exatos",
+      "source": "tests/trial.test.ts"
+    },
+    {
+      "id": "TRIAL-02",
+      "title": "Cadastro público não aceita privilégios nem prazo do cliente",
+      "source": "tests/trial.test.ts"
+    },
+    {
+      "id": "TRIAL-03",
+      "title": "E-mail, endereço reservado e histórico impedem duplicação",
+      "source": "tests/trial.test.ts"
+    },
+    {
+      "id": "TRIAL-04",
+      "title": "Cadastro concorrente reserva conta e loja uma única vez",
+      "source": "tests/trial.test.ts"
+    },
+    {
+      "id": "TRIAL-05",
+      "title": "Expiração bloqueia gravações e pedidos sem apagar dados; só central ativa",
+      "source": "tests/trial.test.ts"
+    },
+    {
+      "id": "TRIAL-06",
+      "title": "Configuração da marca não altera identidade, plano ou trial",
+      "source": "tests/trial.test.ts"
+    },
+    {
+      "id": "TRIAL-API-01",
+      "title": "Cadastro por API emite sessão HttpOnly de owner sem vazar credenciais",
+      "source": "tests/server.test.ts"
+    },
+    {
+      "id": "TRIAL-API-02",
+      "title": "Servidor aplica vencimento sem confiar em prazo enviado pelo cliente",
+      "source": "tests/server.test.ts"
+    },
+    {
+      "id": "TRIAL-API-03",
+      "title": "API limita cadastros públicos antes de gravar dados",
+      "source": "tests/server.test.ts"
+    },
+    {
+      "id": "TRIAL-UI-01",
+      "title": "Landing conduz cadastro e configuração existente da nova loja",
+      "source": "tests/trial-ui.test.jsx"
+    },
+    {
+      "id": "TRIAL-UI-02",
+      "title": "Painel vencido preserva dados e orienta planos sem liberar gestão",
+      "source": "tests/trial-ui.test.jsx"
+    },
+    {
+      "id": "FREIGHT-01",
+      "title": "taxa única funciona sem áreas e retirada permanece gratuita",
+      "source": "tests/shipping.test.ts"
+    },
+    {
+      "id": "FREIGHT-02",
+      "title": "cálculo usa metros sem arredondar km exibidos, mínimo e limite",
+      "source": "tests/shipping.test.ts"
+    },
+    {
+      "id": "FREIGHT-03",
+      "title": "cotação assinada rejeita adulteração, outra loja, CEP, regras e expiração",
+      "source": "tests/shipping.test.ts"
+    },
+    {
+      "id": "FREIGHT-04",
+      "title": "servidor exige cotação e reconfere o total na compra",
+      "source": "tests/shipping.test.ts"
+    },
+    {
+      "id": "FREIGHT-05",
+      "title": "autorização e configurações antigas preservadas; configurações gerais não sobrescrevem frete",
+      "source": "tests/shipping.test.ts"
+    },
+    {
+      "id": "FREIGHT-06",
+      "title": "consulta somente CEPs e coordenadas, com cache e sem aceitar coordenada ausente",
+      "source": "tests/shipping.test.ts"
+    },
+    {
+      "id": "LIVE-01",
+      "title": "eventos atualizam a projeção sem refresh, com recuperação por polling e limpeza",
+      "source": "tests/live-updates.test.jsx"
+    },
+    {
+      "id": "LIVE-02",
+      "title": "leitura atrasada não desfaz uma gravação e atualização concorrente não descarta a confirmação",
+      "source": "tests/live-updates.test.jsx"
+    },
+    {
+      "id": "LIVE-03",
+      "title": "stream envia somente invalidação, sem pedidos, tokens ou dados pessoais",
+      "source": "tests/live-updates.test.jsx"
+    },
+    {
+      "id": "LIVE-04",
+      "title": "snapshot atualizado por evento preserva a sacola local e deduplica leituras",
+      "source": "tests/live-updates.test.jsx"
+    },
+    {
+      "id": "OPS-01",
+      "title": "adicionar mostra confirmação e ícone da sacola com contador",
+      "source": "tests/operations-ui.test.jsx"
+    },
+    {
+      "id": "OPS-02",
+      "title": "pedidos podem avançar direto na lista sem alterar pagamento",
+      "source": "tests/operations-ui.test.jsx"
+    },
+    {
+      "id": "OPS-03",
+      "title": "acompanhamento não mostra status de pagamento, preservando o financeiro interno",
+      "source": "tests/operations-ui.test.jsx"
+    },
+    {
+      "id": "OPS-04",
+      "title": "despesas ficam no financeiro e link antigo abre a aba correta",
+      "source": "tests/operations-ui.test.jsx"
+    },
+    {
+      "id": "OPS-05",
+      "title": "módulo Frete salva taxa única decimal e permite entrega sem áreas",
+      "source": "tests/operations-ui.test.jsx"
+    },
+    {
+      "id": "OPS-06",
+      "title": "checkout exige cotação, invalida ao mudar CEP e mantém retirada sem taxa",
+      "source": "tests/operations-ui.test.jsx"
+    },
+    {
+      "id": "FREIGHT-API-01",
+      "title": "cotação e checkout remotos validam assinatura e valor sem confiar no cliente",
+      "source": "tests/server.test.ts"
+    },
+    {
+      "id": "COLOR-01",
+      "title": "a cor da loja mantém contraste legível em tons claros, médios e escuros",
+      "source": "tests/store-colors.test.ts"
+    },
+    {
+      "id": "REST-01",
+      "title": "Catálogo vinculado sincroniza preços nos dois sentidos sem apagar fotos",
+      "source": "tests/restaurant.test.ts"
+    },
+    {
+      "id": "REST-02",
+      "title": "Proporções e personalizações por sabor têm preço e resumo validados",
+      "source": "tests/restaurant.test.ts"
+    },
+    {
+      "id": "REST-03",
+      "title": "Mistura doce/salgada e compatibilidade de massas e bordas são validadas",
+      "source": "tests/restaurant.test.ts"
+    },
+    {
+      "id": "REST-04",
+      "title": "Estoque baixa atomicamente e cancelamento anterior ao preparo devolve saldo",
+      "source": "tests/restaurant.test.ts"
+    },
+    {
+      "id": "REST-05",
+      "title": "Consumo após preparo e custo com ficha completa preservados",
+      "source": "tests/restaurant.test.ts"
+    },
+    {
+      "id": "REST-06",
+      "title": "Permissões protegem estoque, caixa e configurações",
+      "source": "tests/restaurant.test.ts"
+    },
+    {
+      "id": "REST-07",
+      "title": "Combos validam grupos, referências e preço",
+      "source": "tests/restaurant.test.ts"
+    },
+    {
+      "id": "REST-08",
+      "title": "Pedido de balcão é idempotente e não altera sacola pública nem pagamento",
+      "source": "tests/restaurant.test.ts"
+    },
+    {
+      "id": "REST-09",
+      "title": "Caixa separa movimentos, pagamentos e estornos",
+      "source": "tests/restaurant.test.ts"
+    },
+    {
+      "id": "REST-10",
+      "title": "Comandas exigem conclusão e pagamento antes do fechamento",
+      "source": "tests/restaurant.test.ts"
+    },
+    {
+      "id": "REST-11",
+      "title": "Agendamento valida janela, horário, intervalo e capacidade",
+      "source": "tests/restaurant.test.ts"
+    },
+    {
+      "id": "REST-12",
+      "title": "Repetição revalida catálogo atual e preserva pedido anterior",
+      "source": "tests/restaurant.test.ts"
+    },
+    {
+      "id": "REST-13",
+      "title": "Campos novos são opcionais e custos desconhecidos continuam explícitos",
+      "source": "tests/restaurant.test.ts"
+    },
+    {
+      "id": "REST-14",
+      "title": "Projeções públicas removem receitas, estoque, caixa e custos",
+      "source": "tests/restaurant-security.test.ts"
+    },
+    {
+      "id": "REST-15",
+      "title": "Combos consomem quantidades dos componentes e embalagem",
+      "source": "tests/restaurant-security.test.ts"
+    },
+    {
+      "id": "REST-16",
+      "title": "Editores e fichas compartilham dados vinculados sem reversão silenciosa",
+      "source": "tests/restaurant-security.test.ts"
+    },
+    {
+      "id": "REST-17",
+      "title": "Fechamento de caixa fica congelado e recebimento é associado ao turno",
+      "source": "tests/restaurant-security.test.ts"
+    },
+    {
+      "id": "REST-18",
+      "title": "Mínimo anunciado considera quartos e pedido preserva agendamento",
+      "source": "tests/restaurant-security.test.ts"
+    },
+    {
+      "id": "REST-UI-01",
+      "title": "Tela do caixa envia centavos sem registrar pagamento automático",
+      "source": "tests/restaurant-ui.test.jsx"
+    },
+    {
+      "id": "REST-UI-02",
+      "title": "Estoque converte custo unitário e oferece editor de ficha",
+      "source": "tests/restaurant-ui.test.jsx"
+    },
+    {
+      "id": "REST-UI-03",
+      "title": "Cliente preenche grupos do combo com IDs validados",
+      "source": "tests/restaurant-ui.test.jsx"
+    },
+    {
+      "id": "REST-UI-04",
+      "title": "Prévia fotográfica acompanha metade/quartos e personalizações",
+      "source": "tests/restaurant-ui.test.jsx"
+    },
+    {
+      "id": "REST-UI-05",
+      "title": "Agendamento configura capacidade sem serviço externo",
+      "source": "tests/restaurant-ui.test.jsx"
+    },
+    {
+      "id": "REST-UI-06",
+      "title": "Listas de ingredientes e alergênicos preservam digitação",
+      "source": "tests/restaurant-ui.test.jsx"
+    },
+    {
+      "id": "REFINE-01",
+      "title": "reimporta produto rico sem perder receita, alergênicos, combo ou ficha do adicional",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-02",
+      "title": "exporta XLSX com preço por tamanho e reimporta sincronizando os sabores vinculados",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-03",
+      "title": "impede preço de pizza inválido e alteração de categoria sem mudar o cadastro",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-04",
+      "title": "vínculo preserva opções legadas e bloqueia cobrança duplicada de tamanho e borda",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-05",
+      "title": "anúncio e seleção do combo ignoram tamanho desativado e opções incompatíveis",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-06",
+      "title": "combo monta vários sabores e cobra adicionais por unidade, sem repetir preço-base",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-07",
+      "title": "edita linha na sacola preservando chave e recalculando o preço atual",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-08",
+      "title": "permite montar fora do horário somente para agenda habilitada, respeitando fechamento manual",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-09",
+      "title": "capacidade conta pizzas e quantidades de combos, cancelamento libera horário",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-10",
+      "title": "balcão e mesa aceitam cliente sem telefone, canal telefone exige identificação",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-11",
+      "title": "ficha do adicional geral calcula custo e baixa quantidade sem duplicação",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-12",
+      "title": "recebe em dinheiro e Pix por partes, evita duplicidade e confere caixa e receita",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-13",
+      "title": "estorna recebimento parcial somente após cancelar e com motivo, sem alterar caixa fechado",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-14",
+      "title": "divide pagamento por pedidos e transfere sem duplicar consumo ou recebimentos",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-15",
+      "title": "atendente não registra pagamentos nem configura receitas",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-16",
+      "title": "importação conjunta mantém nome individual editado e preço do montador, independente da ordem das linhas",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-17",
+      "title": "recebimento parcial de comanda quita saldos mais antigos, fechamento exige entrega e não duplica ao repetir",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-UI-01",
+      "title": "edição recupera montagem, quantidade e observações e salva nova seleção",
+      "source": "tests/pizza-refinements-ui.test.jsx"
+    },
+    {
+      "id": "REFINE-UI-02",
+      "title": "checkout presencial permite telefone vazio e oferece editar a linha",
+      "source": "tests/pizza-refinements-ui.test.jsx"
+    },
+    {
+      "id": "REFINE-UI-03",
+      "title": "combo abre montador, inclui sabores e mantém escolha ao editar",
+      "source": "tests/pizza-refinements-ui.test.jsx"
+    },
+    {
+      "id": "REFINE-UI-04",
+      "title": "recibo conserva token após falha e impede valor maior que o saldo",
+      "source": "tests/pizza-refinements-ui.test.jsx"
+    },
+    {
+      "id": "REFINE-UI-05",
+      "title": "estoque permite escolher ficha de adicional comum",
+      "source": "tests/pizza-refinements-ui.test.jsx"
+    },
+    {
+      "id": "REFINE-18",
+      "title": "recebimento em meses diferentes registra receita em cada data e venda somente na quitação",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "REFINE-19",
+      "title": "Estornos novos preservam recebimentos legados e turnos sem caixa",
+      "source": "tests/pizza-refinements.test.ts"
+    },
+    {
+      "id": "COMBO-VISUAL-01",
+      "title": "Card mostra componentes, quantidades e tamanhos do combo",
+      "source": "tests/combo-presentation.test.jsx"
+    },
+    {
+      "id": "COMBO-VISUAL-02",
+      "title": "Galeria respeita fotos próprias, disponibilidade e consulta sem pedido",
+      "source": "tests/combo-presentation.test.jsx"
+    },
+    {
+      "id": "COMBO-VISUAL-03",
+      "title": "Resumo unificado acompanha escolhas e prévia montada",
+      "source": "tests/combo-presentation.test.jsx"
+    },
+    {
+      "id": "PHOTO-LOAD-01",
+      "title": "Foto transparente já em cache aparece sem depender do evento load",
+      "source": "tests/product-photo-loading.test.jsx"
+    },
+    {
+      "id": "PHOTO-LOAD-02",
+      "title": "Restauração da página recupera foto concluída sem evento de carga",
+      "source": "tests/product-photo-loading.test.jsx"
+    },
+    {
+      "id": "PHOTO-LOAD-03",
+      "title": "Ilustrações versionadas de pizza permanecem visíveis sem canvas",
+      "source": "tests/product-photo-loading.test.jsx"
+    },
+    {
+      "id": "PHOTO-LOAD-04",
+      "title": "Erro de imagem em cache mostra estado explícito e nova foto recupera exibição",
+      "source": "tests/product-photo-loading.test.jsx"
+    },
+    {
+      "id": "PHOTO-LOAD-05",
+      "title": "Foto própria opaca em cache não expõe fundo no cardápio",
+      "source": "tests/product-photo-loading.test.jsx"
+    },
+    {
+      "id": "AMEND-01",
+      "title": "cancela uma unidade, preserva outra pizza e audita devolução histórica sem reprecificar",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "AMEND-02",
+      "title": "edita montagem com catálogo autoritativo e troca somente a baixa do item alterado",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "AMEND-03",
+      "title": "altera tamanho, sabores, massa e borda usando o montador completo",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "AMEND-04",
+      "title": "estoque insuficiente, preço desatualizado e concorrência não fazem alterações parciais",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "AMEND-05",
+      "title": "após preparo permite cancelar com perda mas bloqueia edição e devolução fictícia ao estoque",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "AMEND-06",
+      "title": "pedido pago mantém recebimentos originais e só devolve o excesso explicitamente",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "AMEND-07",
+      "title": "converte recebimento legado antes de alterar valor e cancela último item com entrega zerada",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "AMEND-08",
+      "title": "cupom usa condições da venda e alteração paga exige permissão financeira",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "AMEND-09",
+      "title": "histórico privado não vaza por projeção pública e legado sem baixa por item é preservado",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "AMEND-10",
+      "title": "agenda não conta o próprio pedido duas vezes nem permite aumentar além do limite",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "COMBO-DRAFT-01",
+      "title": "transforma alternativas em todos incluídos sem perder quantidade, tamanho ou acréscimo",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "AMEND-11",
+      "title": "perda de um item não volta ao estoque quando o restante do pedido é cancelado",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "AMEND-12",
+      "title": "combo altera quantidade e cancela como conjunto, mantendo baixa e capacidade por pizza",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "AMEND-13",
+      "title": "cancelar produto removido usa a venda histórica; outra loja não autoriza alteração",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "AMEND-14",
+      "title": "desconto percentual segue a venda original sem depender de cupom ainda cadastrado",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "AMEND-15",
+      "title": "soma ingrediente compartilhado no combo e não permite consumir estoque por partes isoladas",
+      "source": "tests/order-amendments.test.ts"
+    },
+    {
+      "id": "AMEND-UI-01",
+      "title": "painel edita quantidade, revisa diferença e mantém histórico ao confirmar",
+      "source": "tests/order-amendments-ui.test.jsx"
+    },
+    {
+      "id": "AMEND-UI-02",
+      "title": "cancelar item pago mostra saldo a devolver e registra estorno separado",
+      "source": "tests/order-amendments-ui.test.jsx"
+    },
+    {
+      "id": "AMEND-UI-03",
+      "title": "revisão desatualizada exige reabrir e não troca o pedido silenciosamente",
+      "source": "tests/order-amendments-ui.test.jsx"
+    },
+    {
+      "id": "COMBO-UI-01",
+      "title": "cadastro distingue itens juntos de alternativas e só persiste ao salvar",
+      "source": "tests/order-amendments-ui.test.jsx"
+    },
+    {
+      "id": "OPEN-01",
+      "title": "frete sem áreas explica pendência mesmo com atendimento habilitado",
+      "source": "tests/store-opening.test.ts"
+    },
+    {
+      "id": "OPEN-02",
+      "title": "entrega ou retirada bastam para liberar atendimento",
+      "source": "tests/store-opening.test.ts"
+    },
+    {
+      "id": "OPEN-03",
+      "title": "horário automático é explicado sem ignorar agenda",
+      "source": "tests/store-opening.test.ts"
+    },
+    {
+      "id": "OPEN-04",
+      "title": "pausa e frete incompleto são apresentados juntos",
+      "source": "tests/store-opening.test.ts"
+    },
+    {
+      "id": "OPEN-UI-01",
+      "title": "tentativa bloqueada orienta, leva ao Frete e permite abrir após salvar",
+      "source": "tests/store-opening-ui.test.jsx"
+    },
+    {
+      "id": "OPEN-UI-02",
+      "title": "erro ao salvar continua visível sem indicar abertura falsa",
+      "source": "tests/store-opening-ui.test.jsx"
+    },
+    {
+      "id": "OPEN-UI-03",
+      "title": "atendimento programado não desliga silenciosamente ao clicar",
+      "source": "tests/store-opening-ui.test.jsx"
+    }
+  ]
+}

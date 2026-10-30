@@ -1,0 +1,19 @@
+# Remoção automática do fundo
+
+## Produtos ainda sem foto — 22/10/2026
+
+Com autorização explícita do usuário, o cardápio usa recorte ilustrativo da categoria se image e cutoutImage estiverem vazios. É apenas apresentação: nada é gravado no produto. Card/alt identificam Imagem ilustrativa, e detalhes avisam que a aparência pode variar. Ao cadastrar uma foto/recorte próprio, ele tem prioridade e a identificação genérica desaparece. Falhas de foto própria não passam a mostrar outra comida genérica. Essa ilustração não executa o removedor de fundo e não substitui o fluxo de upload automático descrito abaixo.
+
+Implementada em 22/10/2026. Ao escolher um arquivo na foto principal de qualquer produto (todas as categorias) e aplicar o recorte, o formulário gera também a versão sem fundo para os cards e detalhes do cardápio. A capa recortada e o recorte transparente são confirmados juntos no formulário; só o botão Salvar produto persiste os dados. A remoção usa a foto original para evitar perder partes do produto pelo enquadramento da capa. No campo Foto sem fundo do produto também é possível enviar JPEG/PNG/WebP diretamente, processar a foto já cadastrada e ajustar a prévia. Fotos anteriormente transparentes mantêm seu alpha.
+
+O processo roda em Web Worker, com ONNX Runtime Web 1.24.3 (WASM, uma thread, sem exigir headers COOP/COEP), modelo U²-Net compacto de 4.574.861 bytes, hospedado junto da aplicação. Arquivos e fotos não são enviados a serviços de remoção. O runtime/modelo só são requisitados ao processar uma foto; catálogo, hero, logos e capas não carregam a inferência. O cache HTTP do navegador pode reaproveitar os assets.
+
+Entrada: PNG/JPEG/WebP até 10 MB, até 40 MP. Processamento usa RGB 320×320 com normalização upstream; máscara redimensionada e combinada com o alpha original, saída limitada a 1600 px no maior lado e corte de margens vazias com respiro de 5%. WebP final até 500 KB pelo adaptador existente. O runtime WASM tem aproximadamente 12,36 MB antes de compressão, separado do bundle principal.
+
+Cancelamento termina o worker; timeout de 120 s, falha de carga/modelo/navegador e imagens sem produto geram erro recuperável. Durante o processo, Salvar produto e o outro campo de foto ficam bloqueados. Falhas do upload principal conservam as duas fotos anteriores. Nada é salvo automaticamente. A comparação Foto do cardápio/Sem fundo ajuda a revisar o resultado.
+
+Modelo de saliência não identifica semanticamente todos os ingredientes/objetos. Fotos com vários objetos podem preservar acompanhamentos, papel ou outras partes em primeiro plano; isso foi observado na foto de QA com hambúrguer, fritas e papel. Recomenda-se foto focada no produto, revisão de bordas e ajuste do recorte. Não há editor de pincel/máscara manual. Imagens de planilha não são processadas em lote: para fotos já cadastradas, use Gerar da foto do produto. Não se promete segmentação perfeita em qualquer cenário ou performance de celular físico.
+
+Fontes e licenças: [U²-Net](https://github.com/xuebinqin/U-2-Net), [normalização e checksum do modelo no rembg](https://github.com/danielgatis/rembg/blob/main/rembg/sessions/u2netp.py), [deploy do ONNX Runtime](https://onnxruntime.ai/docs/tutorials/web/deploy.html). As licenças e os avisos ficam em public/models/ junto do modelo; o binário não foi alterado. Modelo Apache-2.0, runtime MIT. Não usa IMG.LY ou modelos BRIA nem requer chave ou serviço pago por foto.
+
+Login: localhost:5176 está em modo de demonstração, separado das contas de produção. Administrador da plataforma abre uma sessão demo sem senha; contas locais cadastradas podem usar /recuperar no mesmo navegador e origem. O usuário confirmou que o acesso de produção funciona. Nenhuma senha/conta de produção foi alterada e a recuperação remota por e-mail continua fora desta entrega.

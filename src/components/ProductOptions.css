@@ -1,0 +1,81 @@
+.product-options {
+  display: grid;
+  gap: 23px;
+}
+.product-options-body {
+  display: grid;
+  gap: 23px;
+  min-width: 0;
+  container: pizza-options / inline-size;
+}
+.product-option-actions {
+  display: grid;
+  gap: 10px;
+}
+.product-options > img,
+.product-options > .food-placeholder {
+  height: 190px;
+  width: 100%;
+  object-fit: cover;
+  object-position: 50% 65%;
+  border-radius: 10px;
+}
+.product-options fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 15px;
+}
+.product-options legend {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+.option-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  font-size: 12px;
+}
+.option-row > span {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.option-row input {
+  accent-color: var(--green);
+}
+.option-row strong,
+.option-row small {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.product-option-footer {
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  align-items: center;
+}
+.product-option-footer .quantity-control {
+  margin-top: 0;
+}
+.product-option-footer .quantity-control button {
+  width: 30px;
+  height: 30px;
+}
+.product-option-footer .button {
+  font-size: 12px;
+}
+
+@media (max-width: 550px) {
+  .product-option-footer {
+    flex-wrap: wrap;
+  }
+  .product-option-footer .button {
+    flex: 1;
+    font-size: 11px;
+  }
+}

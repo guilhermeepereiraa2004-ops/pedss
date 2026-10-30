@@ -1,0 +1,211 @@
+.image-field {
+  min-width: 0;
+}
+.image-field .image-field-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 8px;
+}
+.image-field-actions .text-link,
+.image-crop-actions .text-link {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 11px;
+}
+.image-field-preview {
+  margin: 8px 0 0;
+  max-width: 320px;
+}
+.image-field-preview img {
+  width: 100%;
+  object-fit: cover;
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: repeating-conic-gradient(#eef0e9 0% 25%, #fff 0% 50%) 50% / 16px 16px;
+}
+.image-preview-logo {
+  max-width: 140px;
+}
+.image-preview-cutout img {
+  object-fit: contain;
+  padding: 12px;
+}
+.image-preview-comparison {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  max-width: 460px;
+}
+.image-preview-comparison > div {
+  min-width: 0;
+}
+.image-preview-comparison small {
+  display: block;
+  font-size: 10px;
+  margin-top: 7px;
+  color: var(--muted);
+}
+.image-preview-comparison figcaption {
+  grid-column: 1 / -1;
+}
+.image-preview-cover {
+  max-width: 460px;
+}
+.image-field-preview figcaption {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 7px;
+}
+.image-preview-error,
+.image-reading {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 12px 0;
+}
+.image-reading {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.image-crop-editor {
+  background: #f6f7f0;
+  border: 1px solid #dce3cd;
+  padding: 18px;
+  border-radius: 12px;
+  display: grid;
+  gap: 14px;
+  margin-top: 8px;
+  min-width: 0;
+}
+.image-crop-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.image-crop-heading > span {
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.image-crop-heading > small {
+  font-size: 10px;
+  color: var(--muted);
+}
+.image-crop-viewport {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  justify-self: center;
+  overflow: hidden;
+  border-radius: 7px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  background: repeating-conic-gradient(#e4e8dc 0% 25%, #fff 0% 50%) 50% / 16px 16px;
+  box-shadow: 0 0 0 1px #26302224;
+}
+.image-crop-viewport:active {
+  cursor: grabbing;
+}
+.image-crop-viewport img {
+  position: absolute;
+  max-width: none;
+  object-fit: fill;
+  pointer-events: none;
+}
+.image-crop-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to right,
+      transparent calc(33.333% - 0.5px),
+      #ffffff65 33.333%,
+      transparent calc(33.333% + 0.5px),
+      transparent calc(66.666% - 0.5px),
+      #ffffff65 66.666%,
+      transparent calc(66.666% + 0.5px)
+    ),
+    linear-gradient(
+      to bottom,
+      transparent calc(33.333% - 0.5px),
+      #ffffff65 33.333%,
+      transparent calc(33.333% + 0.5px),
+      transparent calc(66.666% - 0.5px),
+      #ffffff65 66.666%,
+      transparent calc(66.666% + 0.5px)
+    );
+}
+.image-crop-help {
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.image-crop-control {
+  display: grid;
+  gap: 8px;
+  font-size: 11px;
+  min-width: 0;
+}
+.image-crop-control > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.image-crop-control output {
+  margin-left: auto;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.image-crop-control input[type="range"] {
+  width: 100%;
+  height: 28px;
+  min-height: 28px;
+  padding: 0;
+  accent-color: #5f7535;
+  cursor: pointer;
+}
+.image-crop-position {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.image-crop-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.image-crop-actions > .text-link {
+  margin-right: auto;
+}
+@media (max-width: 550px) {
+  .image-crop-editor {
+    padding: 13px;
+    gap: 12px;
+  }
+  .image-crop-actions .button {
+    flex: 1;
+    font-size: 10px;
+    padding: 11px 10px;
+  }
+  .image-crop-actions > .text-link {
+    width: 100%;
+  }
+  .image-crop-position {
+    gap: 12px;
+  }
+  .image-field-actions .button {
+    font-size: 10px;
+  }
+}

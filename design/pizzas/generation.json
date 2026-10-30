@@ -1,0 +1,87 @@
+{
+  "method": "built-in image_gen",
+  "date": "2026-10-27",
+  "purpose": "AI-generated illustrative pizza catalog photographs; not photos of actual store products",
+  "images": [
+    {
+      "key": "mussarela",
+      "sourcePath": "C:\\Users\\Mara Rubia\\.codex\\generated_images\\01a15a55-8448-7ec2-804c-0f95a9f0ebf7\\exec-4acfe25f-d7ab-4af5-8a16-8aad8baf3f16.png",
+      "prompt": "Product-mockup, photorealistic professional food catalog photograph, square 1024x1024. ONE whole Brazilian MUSSARELA CHEESE PIZZA, perfectly circular, photographed EXACTLY overhead at 90 degrees, orthographic flat lay, no perspective or tilt. Golden thin-medium Brazilian-style baked crust, approximately 5% of pizza radius, authentic porous blistered baked dough. Entire surface generously covered in glossy melted mozzarella with natural uneven caramelized cheese blisters, very subtle tomato sauce underneath and finely scattered dried oregano. No basil, no tomato slices, no pepperoni, no onions, no meat. Fill the entire round pizza evenly with these toppings. Pizza centered at exact canvas center, diameter 96% of canvas width and height, entire circumference visible with 2% margin all sides. True transparent background outside the pizza, no plate, no board, no table, no props, no cast shadow outside the pizza, no hands, no text, no slices removed, no cut marks, no graphics. Soft uniform neutral studio lighting, crisp natural food textures, appetizing actual baked pizza photograph, absolutely NOT an illustration/cartoon/3D render. This image will be clipped into radial sectors in an interactive pizza composer; circular alignment and consistent scale matter."
+    },
+    {
+      "key": "calabresa",
+      "sourcePath": "C:\\Users\\Mara Rubia\\.codex\\generated_images\\01a15a55-8448-7ec2-804c-0f95a9f0ebf7\\exec-e17f48d9-4af6-4e0f-be3b-25752c50267c.png",
+      "prompt": "Precise product-photo edit. Reference is the exact base pizza. Preserve the round outer baked crust geometry, diameter, exact centered 90-degree overhead viewpoint, canvas size, transparent alpha background, lighting and photographic detail of the reference. Replace only the pizza toppings inside the crust to create a photorealistic Brazilian pizza of this flavor: CALABRESA: generous evenly scattered thin browned Brazilian smoked calabresa sausage rounds and fine translucent onion rings over melted mozzarella, dried oregano. No basil, tomato slices or other meat. Cover the whole pizza uniformly with the specified flavor; this is NOT a mixed-flavor pizza and NOT a collage. Whole pizza diameter 96% of canvas, 2% transparent margin each side, no plate, no board, no props, no shadows beyond crust, no text, no cut marks, no missing slices. Looks like a genuine crisp food photograph, not an illustration, no vector shapes. Keep cheese and topping textures naturally appetizing and recognizable.",
+      "workspaceSource": "design/pizzas/onion-correction/calabresa.png",
+      "correction": "onion-correction-2026-10-28.json"
+    },
+    {
+      "key": "frango-requeijao",
+      "sourcePath": "C:\\Users\\Mara Rubia\\.codex\\generated_images\\01a15a55-8448-7ec2-804c-0f95a9f0ebf7\\exec-b711ebe9-c6e4-45e4-88d2-6e6ec852437b.png",
+      "prompt": "Precise product-photo edit. Reference is the exact base pizza. Preserve the round outer baked crust geometry, diameter, exact centered 90-degree overhead viewpoint, canvas size, transparent alpha background, lighting and photographic detail of the reference. Replace only the pizza toppings inside the crust to create a photorealistic Brazilian pizza of this flavor: FRANGO COM REQUEIJÃO: abundant moist finely shredded roasted chicken with pale creamy requeijão cheese piped in modest irregular thin ribbons, small yellow corn kernels over melted mozzarella. No sausage, tomato, basil, olives or ham. Cover the whole pizza uniformly with the specified flavor; this is NOT a mixed-flavor pizza and NOT a collage. Whole pizza diameter 96% of canvas, 2% transparent margin each side, no plate, no board, no props, no shadows beyond crust, no text, no cut marks, no missing slices. Looks like a genuine crisp food photograph, not an illustration, no vector shapes. Keep cheese and topping textures naturally appetizing and recognizable."
+    },
+    {
+      "key": "margherita",
+      "sourcePath": "C:\\Users\\Mara Rubia\\.codex\\generated_images\\01a15a55-8448-7ec2-804c-0f95a9f0ebf7\\exec-6972a726-a1c3-43d5-94b6-96b54d11530e.png",
+      "prompt": "Precise product-photo edit. Reference is the exact base pizza. Preserve the round outer baked crust geometry, diameter, exact centered 90-degree overhead viewpoint, canvas size, transparent alpha background, lighting and photographic detail of the reference. Replace only the pizza toppings inside the crust to create a photorealistic Brazilian pizza of this flavor: MARGHERITA: glossy melted mozzarella, evenly scattered thin fresh red tomato rounds, fresh green basil leaves and a touch of oregano. No sausage, ham or onions. Cover the whole pizza uniformly with the specified flavor; this is NOT a mixed-flavor pizza and NOT a collage. Whole pizza diameter 96% of canvas, 2% transparent margin each side, no plate, no board, no props, no shadows beyond crust, no text, no cut marks, no missing slices. Looks like a genuine crisp food photograph, not an illustration, no vector shapes. Keep cheese and topping textures naturally appetizing and recognizable."
+    },
+    {
+      "key": "portuguesa",
+      "sourcePath": "C:\\Users\\Mara Rubia\\.codex\\generated_images\\01a15a55-8448-7ec2-804c-0f95a9f0ebf7\\exec-ca833a31-b642-4ec0-815f-a108ea4ca173.png",
+      "prompt": "Precise product-photo edit. Reference is the exact base pizza. Preserve the round outer baked crust geometry, diameter, exact centered 90-degree overhead viewpoint, canvas size, transparent alpha background, lighting and photographic detail of the reference. Replace only the pizza toppings inside the crust to create a photorealistic Brazilian pizza of this flavor: PORTUGUESA: melted mozzarella topped evenly with diced pink cooked ham, thin slices of hard boiled egg with visible yolks, thin onion rings, a few green bell pepper strips and black olives, oregano. No pepperoni or basil. Cover the whole pizza uniformly with the specified flavor; this is NOT a mixed-flavor pizza and NOT a collage. Whole pizza diameter 96% of canvas, 2% transparent margin each side, no plate, no board, no props, no shadows beyond crust, no text, no cut marks, no missing slices. Looks like a genuine crisp food photograph, not an illustration, no vector shapes. Keep cheese and topping textures naturally appetizing and recognizable.",
+      "workspaceSource": "design/pizzas/onion-correction/portuguesa.png",
+      "correction": "onion-correction-2026-10-28.json"
+    },
+    {
+      "key": "quatro-queijos",
+      "sourcePath": "C:\\Users\\Mara Rubia\\.codex\\generated_images\\01a15a55-8448-7ec2-804c-0f95a9f0ebf7\\exec-1c1966fa-4774-4649-a88e-a6a0d54f8b37.png",
+      "prompt": "Precise product-photo edit. Reference is the exact base pizza. Preserve the round outer baked crust geometry, diameter, exact centered 90-degree overhead viewpoint, canvas size, transparent alpha background, lighting and photographic detail of the reference. Replace only the pizza toppings inside the crust to create a photorealistic Brazilian pizza of this flavor: QUATRO QUEIJOS: rich glossy melted mozzarella, provolone, finely grated parmesan and creamy requeijão, appetizing irregular golden and pale ivory melted cheese textures and a little dried oregano. No blue cheese, no tomato slices, no basil or meat. Cover the whole pizza uniformly with the specified flavor; NOT a mixed-flavor pizza or collage. Whole pizza diameter 96% of canvas, 2% transparent margin each side, no plate, board, props, shadows beyond crust, text, cut marks or missing slices. Genuine crisp appetizing baked food photograph, not an illustration or render."
+    },
+    {
+      "key": "bacon-milho",
+      "sourcePath": "C:\\Users\\Mara Rubia\\.codex\\generated_images\\01a15a55-8448-7ec2-804c-0f95a9f0ebf7\\exec-ad6fde23-a1bf-4a08-bfef-c731182be3c0.png",
+      "prompt": "Precise product-photo edit. Reference is the exact base pizza. Preserve the round outer baked crust geometry, diameter, exact centered 90-degree overhead viewpoint, canvas size, transparent alpha background, lighting and photographic detail of the reference. Replace only the pizza toppings inside the crust to create a photorealistic Brazilian pizza of this flavor: BACON COM MILHO: melted mozzarella topped generously with real crispy browned bacon pieces and strips and sweet golden corn kernels evenly spread over the entire pizza, dried oregano. No sausage, onion, basil or tomato slices. Cover the whole pizza uniformly with the specified flavor; NOT a mixed-flavor pizza or collage. Whole pizza diameter 96% of canvas, 2% transparent margin each side, no plate, board, props, shadows beyond crust, text, cut marks or missing slices. Genuine crisp appetizing baked food photograph, not an illustration or render."
+    },
+    {
+      "key": "pepperoni",
+      "sourcePath": "C:\\Users\\Mara Rubia\\.codex\\generated_images\\01a15a55-8448-7ec2-804c-0f95a9f0ebf7\\exec-cf65dfeb-ff42-451f-bea8-1310440b42cc.png",
+      "prompt": "Precise product-photo edit. Reference is the exact base pizza. Preserve the round outer baked crust geometry, diameter, exact centered 90-degree overhead viewpoint, canvas size, transparent alpha background, lighting and photographic detail of the reference. Replace only the pizza toppings inside the crust to create a photorealistic Brazilian pizza of this flavor: PEPPERONI: generously scattered small red pepperoni salami rounds with slightly cupped crispy dark edges and glistening natural fat on melted mozzarella, dried oregano. No onions, ham or basil. Cover the whole pizza uniformly with the specified flavor; NOT a mixed-flavor pizza or collage. Whole pizza diameter 96% of canvas, 2% transparent margin each side, no plate, board, props, shadows beyond crust, text, cut marks or missing slices. Genuine crisp appetizing baked food photograph, not an illustration or render."
+    },
+    {
+      "key": "toscana",
+      "sourcePath": "C:\\Users\\Mara Rubia\\.codex\\generated_images\\01a15a55-8448-7ec2-804c-0f95a9f0ebf7\\exec-b832e269-85d2-4883-bd3c-831b51a2870a.png",
+      "prompt": "Precise product-photo edit. Reference is the exact base pizza. Preserve the round outer baked crust geometry, diameter, exact centered 90-degree overhead viewpoint, canvas size, transparent alpha background, lighting and photographic detail of the reference. Replace only the pizza toppings inside the crust to create a photorealistic Brazilian pizza of this flavor: TOSCANA: rustic browned fresh Tuscan pork sausage slices, thin purple red onion strips and scattered black olives on melted mozzarella. Dried oregano. No pepperoni, corn, eggs or basil. Cover the whole pizza uniformly with the specified flavor; NOT a mixed-flavor pizza or collage. Whole pizza diameter 96% of canvas, 2% transparent margin each side, no plate, board, props, shadows beyond crust, text, cut marks or missing slices. Genuine crisp appetizing baked food photograph, not an illustration or render.",
+      "workspaceSource": "design/pizzas/onion-correction/toscana.png",
+      "correction": "onion-correction-2026-10-28.json"
+    },
+    {
+      "key": "atum",
+      "sourcePath": "C:\\Users\\Mara Rubia\\.codex\\generated_images\\01a15a55-8448-7ec2-804c-0f95a9f0ebf7\\exec-d669b94a-27f7-4706-adf3-c7eeda683bff.png",
+      "prompt": "Precise product-photo edit. Reference is the exact base pizza. Preserve the round outer baked crust geometry, diameter, exact centered 90-degree overhead viewpoint, canvas size, transparent alpha background, lighting and photographic detail of the reference. Replace only the pizza toppings inside the crust to create a photorealistic Brazilian pizza of this flavor: ATUM: tender flaky pale tuna, translucent onion rings and scattered black olives on melted mozzarella, dried oregano. No sausage, corn, ham or basil. Cover the whole pizza uniformly with the specified flavor; NOT a mixed-flavor pizza or collage. Whole pizza diameter 96% of canvas, 2% transparent margin each side, no plate, board, props, shadows beyond crust, text, cut marks or missing slices. Genuine crisp appetizing baked food photograph, not an illustration or render.",
+      "workspaceSource": "design/pizzas/onion-correction/atum.png",
+      "correction": "onion-correction-2026-10-28.json"
+    },
+    {
+      "key": "carne-seca-requeijao",
+      "sourcePath": "C:\\Users\\Mara Rubia\\.codex\\generated_images\\01a15a55-8448-7ec2-804c-0f95a9f0ebf7\\exec-78ee0a07-e161-4fab-b2a1-46d281b9bf4e.png",
+      "prompt": "Precise product-photo edit. Reference is the exact base pizza. Preserve the round outer baked crust geometry, diameter, exact centered 90-degree overhead viewpoint, canvas size, transparent alpha background, lighting and photographic detail of the reference. Replace the pizza toppings inside the crust to create a photorealistic Brazilian pizza of this flavor: CARNE SECA COM REQUEIJÃO: abundant moist dark brown shredded Brazilian dried beef, creamy white requeijão ribbons and a few thin purple red onion strips on melted mozzarella, oregano. No sausage, tomato slices or corn. Cover the whole pizza uniformly with the specified flavor; NOT a mixed-flavor pizza or collage. Whole pizza diameter 96% of canvas, 2% transparent margin each side, no plate, board, props, shadows beyond crust, text, cut marks or missing slices. Genuine crisp appetizing food photograph, not an illustration or render.",
+      "workspaceSource": "design/pizzas/onion-correction/carne-seca-requeijao.png",
+      "correction": "onion-correction-2026-10-28.json"
+    },
+    {
+      "key": "vegetariana",
+      "sourcePath": "C:\\Users\\Mara Rubia\\.codex\\generated_images\\01a15a55-8448-7ec2-804c-0f95a9f0ebf7\\exec-d9a7ffe8-a50a-4940-b90c-e46e732caae3.png",
+      "prompt": "Precise product-photo edit. Reference is the exact base pizza. Preserve the round outer baked crust geometry, diameter, exact centered 90-degree overhead viewpoint, canvas size, transparent alpha background, lighting and photographic detail of the reference. Replace the pizza toppings inside the crust to create a photorealistic Brazilian pizza of this flavor: VEGETARIANA: roasted broccoli florets, golden corn kernels, small fresh red tomato pieces, thin green bell pepper strips and scattered black olives on melted mozzarella, oregano. No meat, ham, sausage or eggs. Cover the whole pizza uniformly with the specified flavor; NOT a mixed-flavor pizza or collage. Whole pizza diameter 96% of canvas, 2% transparent margin each side, no plate, board, props, shadows beyond crust, text, cut marks or missing slices. Genuine crisp appetizing food photograph, not an illustration or render."
+    },
+    {
+      "key": "chocolate-morango",
+      "sourcePath": "C:\\Users\\Mara Rubia\\.codex\\generated_images\\01a15a55-8448-7ec2-804c-0f95a9f0ebf7\\exec-80a1f284-dd67-4eee-b0f3-07020954807c.png",
+      "prompt": "Precise product-photo edit. Reference is the exact base pizza. Preserve the round outer baked crust geometry, diameter, exact centered 90-degree overhead viewpoint, canvas size, transparent alpha background, lighting and photographic detail of the reference. Replace the pizza toppings inside the crust to create a photorealistic Brazilian pizza of this flavor: CHOCOLATE COM MORANGO sweet dessert pizza: REMOVE ALL tomato sauce, mozzarella and oregano. Smooth glossy real melted milk chocolate covers the whole center, fresh ripe red strawberry halves and slices evenly scattered, subtle thin condensed milk drizzle. The outside baked bread crust remains the same circular geometry. No savory toppings, no herbs. Cover the whole pizza uniformly with the specified flavor; NOT a mixed-flavor pizza or collage. Whole pizza diameter 96% of canvas, 2% transparent margin each side, no plate, board, props, shadows beyond crust, text, cut marks or missing slices. Genuine crisp appetizing food photograph, not an illustration or render."
+    },
+    {
+      "key": "banana-canela",
+      "sourcePath": "C:\\Users\\Mara Rubia\\.codex\\generated_images\\01a15a55-8448-7ec2-804c-0f95a9f0ebf7\\exec-4f0641e6-89fa-4157-85d3-f042a3c9acbe.png",
+      "prompt": "Precise product-photo edit. Reference is the exact base pizza. Preserve the round outer baked crust geometry, diameter, exact centered 90-degree overhead viewpoint, canvas size, transparent alpha background, lighting and photographic detail of the reference. Replace the pizza toppings inside the crust to create a photorealistic Brazilian pizza of this flavor: BANANA COM CANELA sweet dessert pizza: REMOVE ALL tomato sauce, mozzarella and oregano. Generous thin overlapping pale golden ripe banana slices, cinnamon lightly sprinkled and glossy delicate condensed milk drizzle over a sweet cream base. The outside baked bread crust remains the same circular geometry. No chocolate, savory toppings or herbs. Cover the whole pizza uniformly with the specified flavor; NOT a mixed-flavor pizza or collage. Whole pizza diameter 96% of canvas, 2% transparent margin each side, no plate, board, props, shadows beyond crust, text, cut marks or missing slices. Genuine crisp appetizing food photograph, not an illustration or render."
+    }
+  ]
+}

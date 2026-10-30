@@ -1,0 +1,246 @@
+body:has(.trial-signup-page) {
+  min-width: 0;
+}
+.trial-signup-page {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+  min-height: 100dvh;
+  background: #fbfaf5;
+  color: #252820;
+}
+.trial-signup-story {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 40px clamp(28px, 5vw, 76px);
+  background: #d5f36b;
+}
+.trial-signup-story > .landing-brand {
+  width: 166px;
+}
+.trial-signup-story > div {
+  position: relative;
+  z-index: 1;
+  margin-top: 54px;
+}
+.trial-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #536d3030;
+  background: #f9fce580;
+  border-radius: 100px;
+  padding: 9px 13px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.trial-signup-story h1 {
+  font-size: clamp(44px, 5vw, 72px);
+  font-weight: 850;
+  letter-spacing: -0.055em;
+  line-height: 1.02;
+  margin: 25px 0 18px;
+}
+.trial-signup-story h1 em {
+  font-style: normal;
+  color: #536d30;
+}
+.trial-signup-story p {
+  font-size: 14px;
+  line-height: 1.8;
+  max-width: 350px;
+}
+.trial-signup-story ul {
+  list-style: none;
+  padding: 0;
+  margin: 24px 0;
+  display: grid;
+  gap: 12px;
+  font-size: 12px;
+}
+.trial-signup-story li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.trial-signup-story > img {
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  align-self: flex-end;
+  margin-top: auto;
+  filter: drop-shadow(0 10px 10px #536d3020);
+}
+.trial-signup-content {
+  padding: 36px clamp(24px, 5vw, 72px);
+  min-width: 0;
+}
+.trial-signup-card {
+  max-width: 480px;
+  margin: 40px auto;
+}
+.trial-signup-card > h2 {
+  font-size: 38px;
+  letter-spacing: -1.7px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 28px 0 12px;
+}
+.trial-signup-card > p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #7b806e;
+  margin-bottom: 24px;
+}
+.trial-signup-card .notice {
+  margin: 20px 0;
+}
+.trial-signup-card .field small {
+  line-height: 1.6;
+  font-size: 11px;
+  color: #7b806e;
+}
+.trial-signup-card .button-full {
+  margin-top: 10px;
+}
+.trial-signup-steps {
+  display: flex;
+  gap: 25px;
+  padding: 0;
+  list-style: none;
+}
+.trial-signup-steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #8a917c;
+  font-size: 11px;
+}
+.trial-signup-steps li[aria-current] {
+  color: #536d30;
+  font-weight: 750;
+}
+.trial-signup-steps b {
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+  background: #eaf0dd;
+  border-radius: 50%;
+  font-size: 11px;
+}
+.trial-signup-steps li[aria-current] b {
+  background: #d5f36b;
+  color: #252820;
+}
+.trial-slug-field {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  min-width: 0;
+}
+.trial-slug-field > span {
+  padding-left: 12px;
+  font-size: 12px;
+  color: #7b806e;
+}
+.trial-slug-field input {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+}
+.trial-color-controls {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 10px;
+}
+.trial-color-controls > input[type="color"] {
+  width: 64px;
+  height: 44px;
+  cursor: pointer;
+}
+.trial-signup-summary {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  border: 1px solid #dee7cc;
+  border-radius: 12px;
+  background: #f0f5e5;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.trial-signup-summary > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #536d30;
+}
+.trial-signup-summary small {
+  display: block;
+  margin-top: 5px;
+  color: #7b806e;
+  font-size: 10px;
+}
+.trial-login-link {
+  text-align: center;
+  margin-top: 24px;
+}
+.trial-login-link a {
+  font-weight: 700;
+  color: #536d30;
+}
+@media (max-width: 800px) {
+  .trial-signup-page {
+    grid-template-columns: 1fr;
+  }
+  .trial-signup-story {
+    padding: 24px;
+  }
+  .trial-signup-story > .landing-brand {
+    width: 130px;
+  }
+  .trial-signup-story > div {
+    margin-top: 22px;
+  }
+  .trial-signup-story h1 {
+    font-size: 42px;
+  }
+  .trial-signup-story > img {
+    position: absolute;
+    right: 12px;
+    bottom: 14px;
+    width: 110px;
+    height: 110px;
+    opacity: 0.2;
+  }
+  .trial-signup-story p {
+    max-width: 390px;
+  }
+  .trial-signup-story ul {
+    margin-bottom: 0;
+  }
+  .trial-signup-content {
+    padding: 24px;
+  }
+  .trial-signup-card {
+    margin: 26px auto;
+  }
+}
+@media (max-width: 360px) {
+  .trial-signup-story,
+  .trial-signup-content {
+    padding: 20px;
+  }
+  .trial-signup-story h1 {
+    font-size: 38px;
+  }
+  .trial-signup-card > h2 {
+    font-size: 32px;
+  }
+  .trial-signup-steps {
+    gap: 18px;
+  }
+}

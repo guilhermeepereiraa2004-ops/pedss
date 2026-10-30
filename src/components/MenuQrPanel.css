@@ -1,0 +1,243 @@
+.menu-qr-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 60px;
+  margin-top: 32px;
+  align-items: start;
+}
+.qr-editor-copy {
+  padding-top: 18px;
+}
+.qr-editor-copy > h2 {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 500;
+  font-size: 45px;
+  letter-spacing: -2px;
+  line-height: 1.1;
+  margin: 18px 0 23px;
+}
+.qr-editor-copy > p:not(.notice):not(.form-error) {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.9;
+  max-width: 480px;
+}
+.qr-feature {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin: 30px 0;
+  padding: 20px;
+  background: #eef1e5;
+  border-radius: 10px;
+}
+.qr-feature > svg {
+  color: #798c55;
+  flex-shrink: 0;
+}
+.qr-feature strong {
+  display: block;
+  font-size: 13px;
+}
+.qr-feature span {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-top: 6px;
+}
+.qr-editor-copy .field {
+  font-size: 12px;
+}
+.qr-editor-copy .field input {
+  font-size: 12px;
+}
+.qr-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 18px 0 24px;
+}
+.qr-editor-copy .notice {
+  line-height: 1.8;
+  margin-bottom: 15px;
+}
+.qr-preview-column {
+  min-width: 0;
+}
+.qr-placard {
+  border: 1px solid #dde2d1;
+  background: #fffef9;
+  border-radius: 15px;
+  padding: 30px 25px;
+  text-align: center;
+  box-shadow: 0 18px 45px #2830170a;
+}
+.qr-placard-brand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 32px;
+}
+.qr-placard-brand .store-brand-mark {
+  height: 28px;
+  width: 28px;
+  border-radius: 8px;
+  background: var(--store-accent, #d5f36b);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.qr-placard-brand .store-brand-mark > svg {
+  width: 18px;
+}
+.qr-placard-brand img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.qr-placard-brand > strong {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 17px;
+  letter-spacing: -0.5px;
+  overflow-wrap: anywhere;
+}
+.qr-placard .section-kicker {
+  font-size: 8px;
+  color: #7e8a69;
+}
+.qr-placard h3 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 42px;
+  font-weight: 500;
+  line-height: 1.03;
+  letter-spacing: -2px;
+  margin: 15px 0 22px;
+}
+.qr-code-frame {
+  background: white;
+  border: 1px solid #e4e8db;
+  border-radius: 10px;
+  display: inline-flex;
+  max-width: 100%;
+  padding: 4px;
+}
+.qr-code-frame svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.qr-placard > p {
+  font-size: 12px;
+  color: #6a765b;
+  line-height: 1.7;
+  margin: 20px 0 12px;
+}
+.qr-placard > small {
+  display: block;
+  font-size: 9px;
+  line-height: 1.8;
+  color: #879177;
+  overflow-wrap: anywhere;
+}
+.qr-placard .qr-preview-label {
+  margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 8px;
+}
+.qr-downloads {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+.qr-file-note {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.8;
+  text-align: center;
+  margin-top: 13px;
+}
+.qr-print-area {
+  display: none;
+}
+@media (max-width: 1100px) {
+  .menu-qr-panel {
+    grid-template-columns: minmax(0, 1fr) 310px;
+    gap: 30px;
+  }
+  .qr-editor-copy > h2 {
+    font-size: 37px;
+  }
+  .qr-placard {
+    padding: 25px 20px;
+  }
+}
+@media (max-width: 800px) {
+  .menu-qr-panel {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .qr-preview-column {
+    max-width: 360px;
+    width: 100%;
+    justify-self: center;
+  }
+  .qr-editor-copy {
+    padding-top: 0;
+  }
+  .qr-editor-copy > h2 {
+    font-size: 36px;
+  }
+}
+@media print {
+  body:has(.qr-print-area) #root {
+    display: none !important;
+  }
+  .qr-print-area,
+  .qr-print-area * {
+    visibility: visible !important;
+  }
+  .qr-print-area {
+    display: block !important;
+    width: 148mm;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 10mm 0;
+  }
+  .qr-print-area .qr-placard {
+    border: 1px solid #000;
+    border-radius: 0;
+    box-shadow: none;
+    background: #fff;
+    color: #000;
+    padding: 14mm 10mm;
+    break-inside: avoid;
+  }
+  .qr-print-area .qr-placard-brand > strong {
+    font-size: 18pt;
+  }
+  .qr-print-area .qr-placard h3 {
+    font-size: 35pt;
+  }
+  .qr-print-area .qr-code-frame {
+    border: 0;
+    border-radius: 0;
+  }
+  .qr-print-area .qr-code-frame svg {
+    width: 65mm;
+    height: 65mm;
+  }
+  .qr-print-area .qr-placard > small {
+    color: #000;
+    font-size: 8pt;
+  }
+  .qr-print-area .qr-placard > p {
+    color: #000;
+    font-size: 12pt;
+  }
+}

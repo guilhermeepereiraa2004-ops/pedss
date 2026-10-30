@@ -1,0 +1,108 @@
+.shipping-panel {
+  max-width: 980px;
+  padding: clamp(20px, 3vw, 38px);
+}
+.shipping-panel-heading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+.shipping-panel-heading > span {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  background: var(--lime);
+  border-radius: 18px;
+  flex-shrink: 0;
+}
+.shipping-panel-heading p,
+.shipping-simulator p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+  margin-top: 7px;
+}
+.shipping-modes {
+  border: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+.shipping-modes legend {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+.shipping-modes label {
+  padding: 20px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  display: grid;
+  gap: 11px;
+  cursor: pointer;
+}
+.shipping-modes .selected {
+  border-color: var(--olive);
+  background: #f0f6df;
+}
+.shipping-modes strong {
+  font-size: 14px;
+}
+.shipping-modes small {
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.shipping-simulator {
+  border-top: 1px solid var(--line);
+  padding-top: 25px;
+  margin-top: 30px;
+  display: grid;
+  gap: 15px;
+}
+.shipping-simulator h3 {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+.shipping-simulator > small {
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.shipping-result {
+  background: #eff5e1;
+  padding: 20px;
+  border-radius: 15px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.shipping-result strong {
+  font-size: 23px;
+  display: block;
+}
+.shipping-result span {
+  font-size: 12px;
+  display: block;
+  margin-top: 6px;
+}
+@media (max-width: 600px) {
+  .shipping-modes {
+    grid-template-columns: 1fr;
+  }
+  .shipping-modes label {
+    grid-template-columns: 20px 1fr;
+    padding: 15px;
+  }
+  .shipping-modes small {
+    grid-column: 2;
+  }
+  .shipping-modes input {
+    grid-row: 1/3;
+  }
+}

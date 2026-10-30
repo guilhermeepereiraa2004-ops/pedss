@@ -1,0 +1,86 @@
+{
+  "mussarela": {
+    "src": "/images/pizzas/mussarela-768-565b6128c109.webp",
+    "width": 768,
+    "height": 768,
+    "bytes": 258604
+  },
+  "calabresa": {
+    "src": "/images/pizzas/calabresa-768-cc895096f6bc.webp",
+    "width": 768,
+    "height": 768,
+    "bytes": 209378
+  },
+  "frango-requeijao": {
+    "src": "/images/pizzas/frango-requeijao-768-f7908c3f139d.webp",
+    "width": 768,
+    "height": 768,
+    "bytes": 234190
+  },
+  "margherita": {
+    "src": "/images/pizzas/margherita-768-7d36f3d8bb5f.webp",
+    "width": 768,
+    "height": 768,
+    "bytes": 252132
+  },
+  "portuguesa": {
+    "src": "/images/pizzas/portuguesa-768-e91afc1ae846.webp",
+    "width": 768,
+    "height": 768,
+    "bytes": 194186
+  },
+  "quatro-queijos": {
+    "src": "/images/pizzas/quatro-queijos-768-c46b69548b27.webp",
+    "width": 768,
+    "height": 768,
+    "bytes": 250296
+  },
+  "bacon-milho": {
+    "src": "/images/pizzas/bacon-milho-768-ada9a32b0045.webp",
+    "width": 768,
+    "height": 768,
+    "bytes": 249818
+  },
+  "pepperoni": {
+    "src": "/images/pizzas/pepperoni-768-efaba9020e2d.webp",
+    "width": 768,
+    "height": 768,
+    "bytes": 248444
+  },
+  "toscana": {
+    "src": "/images/pizzas/toscana-768-573526561ae0.webp",
+    "width": 768,
+    "height": 768,
+    "bytes": 206660
+  },
+  "atum": {
+    "src": "/images/pizzas/atum-768-0b64be01d335.webp",
+    "width": 768,
+    "height": 768,
+    "bytes": 213756
+  },
+  "carne-seca-requeijao": {
+    "src": "/images/pizzas/carne-seca-requeijao-768-f0a5fb53f5b3.webp",
+    "width": 768,
+    "height": 768,
+    "bytes": 201510
+  },
+  "vegetariana": {
+    "src": "/images/pizzas/vegetariana-768-0b1550f6f1fd.webp",
+    "width": 768,
+    "height": 768,
+    "bytes": 237634
+  },
+  "chocolate-morango": {
+    "src": "/images/pizzas/chocolate-morango-768-6559cc51f12d.webp",
+    "width": 768,
+    "height": 768,
+    "bytes": 221262
+  },
+  "banana-canela": {
+    "src": "/images/pizzas/banana-canela-768-c5b0becec4c0.webp",
+    "width": 768,
+    "height": 768,
+    "bytes": 237784
+  }
+}

@@ -1,0 +1,14 @@
+Pedss background removal assets
+
+U²-Net small (u2netp), by the U²-Net authors.
+Upstream: https://github.com/xuebinqin/U-2-Net
+Model distributed by rembg: https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2netp.onnx
+Original model license: Apache License 2.0; see U2NET-LICENSE.txt.
+Model file is unmodified. MD5: 8e83ca70e441ab06c318d82300c84806
+SHA-256: 309c8469258dda742793dce0ebea8e6dd393174f89934733ecc8b14c76f4ddd8
+
+ONNX Runtime Web 1.24.3, Copyright (c) Microsoft Corporation.
+MIT License; see ONNXRUNTIME-LICENSE.txt and ONNXRUNTIME-THIRD-PARTY-NOTICES.txt.
+Upstream: https://github.com/microsoft/onnxruntime
+
+These files are served with the app. Product photos are processed on-device.

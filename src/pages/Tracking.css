@@ -1,0 +1,227 @@
+.tracking-page {
+  min-height: 100dvh;
+  background: #f5f7ee;
+  padding: 0 24px 35px;
+}
+.tracking-header {
+  width: min(900px, 100%);
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100px;
+  gap: 20px;
+}
+.tracking-header .text-link {
+  font-size: 11px;
+}
+.tracking-card {
+  width: min(560px, 100%);
+  margin: 15px auto 35px;
+  padding: 37px;
+  background: #fffefb;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  display: grid;
+  gap: 22px;
+}
+.tracking-card > svg {
+  color: #8ca16d;
+}
+.tracking-card h1 {
+  font-size: 33px;
+  font-weight: 500;
+  letter-spacing: -1.4px;
+  line-height: 1.12;
+}
+.tracking-card > p {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.tracking-symbol {
+  height: 65px;
+  width: 65px;
+  background: var(--lime);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+.tracking-symbol.cancelled {
+  background: #f7e7db;
+  color: #b26f53;
+}
+.tracking-card .section-kicker {
+  font-size: 10px;
+}
+.tracking-badges {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.tracking-card > .notice {
+  font-size: 11px;
+}
+.tracking-timeline {
+  display: grid;
+  gap: 22px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 25px 0;
+}
+.tracking-timeline > div {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.tracking-timeline > div > span {
+  width: 9px;
+  height: 9px;
+  background: #cfd8bf;
+  border-radius: 50%;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+.tracking-timeline > div.current > span {
+  background: #7f9d53;
+  box-shadow: 0 0 0 4px #ecf2df;
+}
+.tracking-timeline strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+.tracking-timeline small {
+  font-size: 10px;
+  color: var(--muted);
+  display: block;
+  margin-top: 5px;
+}
+.tracking-timeline p {
+  font-size: 11px;
+  color: #8e9b7b;
+  line-height: 1.8;
+  margin-top: 6px;
+}
+.tracking-summary h2 {
+  font-size: 23px;
+  font-weight: 500;
+  margin-bottom: 22px;
+}
+.tracking-summary > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  margin-bottom: 17px;
+}
+.tracking-summary small {
+  display: block;
+  width: 100%;
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.tracking-summary > p {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.9;
+  margin-top: 10px;
+}
+.tracking-total {
+  padding-top: 15px;
+  border-top: 1px solid var(--line);
+  font-size: 17px !important;
+}
+.tracking-privacy {
+  font-size: 10px !important;
+}
+.tracking-footer {
+  font-size: 10px;
+  color: #8d9c78;
+  text-align: center;
+}
+.cart-product small {
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--muted);
+  display: block;
+  margin-top: 4px;
+}
+.delivery-options > label {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  padding: 12px;
+  font-size: 12px;
+  color: #9da98b;
+}
+.delivery-options > label.selected {
+  background: #eef4df;
+  color: #728a50;
+  border-color: #d5e4ba;
+}
+.delivery-options input {
+  accent-color: var(--green);
+}
+.checkout-form .field small[role="alert"] {
+  color: #b65b46;
+}
+.store-header-actions {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.store-header-actions > .text-link {
+  font-size: 10px;
+}
+.store-logo > span {
+  color: var(--store-on-accent);
+}
+.store-bag b {
+  color: var(--store-on-accent);
+}
+@media (max-width: 550px) {
+  .tracking-page {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .tracking-header {
+    height: 85px;
+  }
+  .tracking-header .text-link {
+    font-size: 9px;
+  }
+  .tracking-card {
+    padding: 25px 21px;
+    gap: 20px;
+  }
+  .tracking-card h1 {
+    font-size: 29px;
+  }
+  .tracking-card > p {
+    font-size: 12px;
+  }
+  .store-header-actions {
+    gap: 9px;
+  }
+  .store-header-actions > .text-link {
+    font-size: 8px;
+    max-width: 60px;
+    line-height: 1.4;
+  }
+  .store-logo {
+    font-size: 18px;
+    max-width: 190px;
+  }
+  .cart-product > img,
+  .cart-product > .food-placeholder {
+    width: 60px;
+    height: 70px;
+  }
+}

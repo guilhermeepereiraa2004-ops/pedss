@@ -1,0 +1,13 @@
+# Foto da hero de hamburgueria
+
+Arquivo atual consumido pelo projeto: `public/images/hero-burger-crisp.png`. PNG de 1254×1254, alpha RGBA transparente, 2.967.083 bytes. Refinado com a ferramenta nativa `image_gen`, sem CLI ou chave própria. Foto ilustrativa fixa; identidade, texto, ornamentos, CTA e selo são componentes reais de interface. Não foi recortada uma imagem da marca Point. Os arquivos anteriores `hero-burger.png` e `brasa-burger.png` permanecem preservados. A dimensão real do primeiro arquivo também era 1254×1254; os atributos HTML anteriores indicavam incorretamente 1280, agora corrigidos. O refinamento melhora detalhe e foco; a ferramenta não aumentou a resolução nativa solicitada.
+
+Prompt final:
+
+> Use case: product-mockup. Create ONE premium photorealistic hamburger cutout asset for a responsive restaurant website hero. Actual transparent alpha background. Three-quarter nearly frontal camera at burger middle height, entire burger visible and centered, fills 90% of square canvas, compact tall silhouette. Glossy golden sesame brioche bun, vibrant ruffled green lettuce, two ripe tomato slices, crisp bacon, two grilled beef patties with melted cheddar between, toasted bottom bun. Warm appetizing studio light, realistic food detail, clean crisp cutout edges. No plate, no fries, no board, no paper, no props, no text, no logo, no badge, no background, no decorative graphics. Similar visual intent to an upscale Brazilian build-your-burger landing page. This is an illustrative burger photo, not a screenshot or UI.
+
+## Refinamento de nitidez
+
+Alvo de edição: `public/images/hero-burger.png`. Prompt da versão atual:
+
+> Use case: precise-object-edit. Edit target: the supplied hamburger PNG. Improve true photographic sharpness and fine resolved detail significantly. Reconstruct crisp natural sesame seeds, tiny brioche pores, distinct crinkled lettuce edges and veins, crisp bacon texture, charred beef crust, clean cheese edges. Full depth of field, focus stacking, commercial studio food photography; the entire burger from front to rear in tack-sharp focus. Preserve the same compact double-beef cheeseburger silhouette, composition, angle, ingredients and warm appetizing light. Produce at the highest native output resolution available, ideally 3072 by 3072 or larger, for a large hero on high-density screens. This is NOT a blurred upscale: render new real microdetail. Actual transparent alpha background; clean antialiased cutout with no blurry fringe. No bloom, no depth of field blur, no soft focus, no noise, no exaggerated oversharpening halo, no white/black matte, no floor or baked shadow, no text, logos, props or decorations.

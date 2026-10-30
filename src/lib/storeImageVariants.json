@@ -1,0 +1,204 @@
+{
+  "/images/hero-burger-crisp.png": [
+    {
+      "src": "/images/optimized/hero-burger-crisp-640-22fd4811682d.webp",
+      "width": 640
+    },
+    {
+      "src": "/images/optimized/hero-burger-crisp-1254-6100f2a8e81f.webp",
+      "width": 1254
+    }
+  ],
+  "/images/hero-pizza.png": [
+    {
+      "src": "/images/optimized/hero-pizza-640-c10c70beaaa0.webp",
+      "width": 640
+    },
+    {
+      "src": "/images/optimized/hero-pizza-1254-78fecb5e7488.webp",
+      "width": 1254
+    }
+  ],
+  "/images/hero-pizza-v2.png": [
+    {
+      "src": "/images/optimized/hero-pizza-v2-640-7264a92e070b.webp",
+      "width": 640
+    },
+    {
+      "src": "/images/optimized/hero-pizza-v2-1254-b32b40c8c160.webp",
+      "width": 1254
+    }
+  ],
+  "/images/hero-pizza-v3.png": [
+    {
+      "src": "/images/optimized/hero-pizza-v3-640-38457b985e0c.webp",
+      "width": 640
+    },
+    {
+      "src": "/images/optimized/hero-pizza-v3-1254-1fbba8967543.webp",
+      "width": 1254
+    }
+  ],
+  "/images/hero-acai.png": [
+    {
+      "src": "/images/optimized/hero-acai-640-c6531697ba0b.webp",
+      "width": 640
+    },
+    {
+      "src": "/images/optimized/hero-acai-1219-3c494fc663ba.webp",
+      "width": 1219
+    }
+  ],
+  "/images/hero-icecream.png": [
+    {
+      "src": "/images/optimized/hero-icecream-640-305d11cb401e.webp",
+      "width": 640
+    },
+    {
+      "src": "/images/optimized/hero-icecream-1254-8116c7ba11f1.webp",
+      "width": 1254
+    }
+  ],
+  "/images/hero-snacks.png": [
+    {
+      "src": "/images/optimized/hero-snacks-640-eb4df38dcacd.webp",
+      "width": 640
+    },
+    {
+      "src": "/images/optimized/hero-snacks-1254-234e010d76cb.webp",
+      "width": 1254
+    }
+  ],
+  "/images/hero-pastel.png": [
+    {
+      "src": "/images/optimized/hero-pastel-640-99b4493fe169.webp",
+      "width": 640
+    },
+    {
+      "src": "/images/optimized/hero-pastel-1254-8cd8342defbb.webp",
+      "width": 1254
+    }
+  ],
+  "/images/brasa-burger.png": [
+    {
+      "src": "/images/optimized/brasa-burger-640-6ac163b53d75.webp",
+      "width": 640
+    },
+    {
+      "src": "/images/optimized/brasa-burger-1122-e23b293db1ac.webp",
+      "width": 1122
+    }
+  ],
+  "/images/menu-brasa-only.png": [
+    {
+      "src": "/images/optimized/menu-brasa-only-480-56a19166d52f.webp",
+      "width": 480
+    },
+    {
+      "src": "/images/optimized/menu-brasa-only-800-f2fc545075d2.webp",
+      "width": 800
+    },
+    {
+      "src": "/images/optimized/menu-brasa-only-1122-45efbe2aefa4.webp",
+      "width": 1122
+    }
+  ],
+  "/images/menu-brasa-only.webp": [
+    {
+      "src": "/images/optimized/menu-brasa-only-480-56a19166d52f.webp",
+      "width": 480
+    },
+    {
+      "src": "/images/optimized/menu-brasa-only-800-f2fc545075d2.webp",
+      "width": 800
+    },
+    {
+      "src": "/images/optimized/menu-brasa-only-1122-45efbe2aefa4.webp",
+      "width": 1122
+    }
+  ],
+  "/images/menu-fries-cutout.png": [
+    {
+      "src": "/images/optimized/menu-fries-cutout-480-5e80f6c2e057.webp",
+      "width": 480
+    },
+    {
+      "src": "/images/optimized/menu-fries-cutout-800-8358816aebb2.webp",
+      "width": 800
+    },
+    {
+      "src": "/images/optimized/menu-fries-cutout-1024-67f9e924673f.webp",
+      "width": 1024
+    }
+  ],
+  "/images/menu-fries-cutout.webp": [
+    {
+      "src": "/images/optimized/menu-fries-cutout-480-5e80f6c2e057.webp",
+      "width": 480
+    },
+    {
+      "src": "/images/optimized/menu-fries-cutout-800-8358816aebb2.webp",
+      "width": 800
+    },
+    {
+      "src": "/images/optimized/menu-fries-cutout-1024-67f9e924673f.webp",
+      "width": 1024
+    }
+  ],
+  "/images/menu-drink-cutout.png": [
+    {
+      "src": "/images/optimized/menu-drink-cutout-480-04b712d1d052.webp",
+      "width": 480
+    },
+    {
+      "src": "/images/optimized/menu-drink-cutout-800-d2df48dbce11.webp",
+      "width": 800
+    },
+    {
+      "src": "/images/optimized/menu-drink-cutout-1200-119986968595.webp",
+      "width": 1200
+    }
+  ],
+  "/images/menu-drink-cutout.webp": [
+    {
+      "src": "/images/optimized/menu-drink-cutout-480-04b712d1d052.webp",
+      "width": 480
+    },
+    {
+      "src": "/images/optimized/menu-drink-cutout-800-d2df48dbce11.webp",
+      "width": 800
+    },
+    {
+      "src": "/images/optimized/menu-drink-cutout-1200-119986968595.webp",
+      "width": 1200
+    }
+  ],
+  "/images/menu-dessert-cutout.png": [
+    {
+      "src": "/images/optimized/menu-dessert-cutout-480-81099537ffe9.webp",
+      "width": 480
+    },
+    {
+      "src": "/images/optimized/menu-dessert-cutout-800-be207c0e65cb.webp",
+      "width": 800
+    },
+    {
+      "src": "/images/optimized/menu-dessert-cutout-1024-864b8bcd19dc.webp",
+      "width": 1024
+    }
+  ],
+  "/images/menu-dessert-cutout.webp": [
+    {
+      "src": "/images/optimized/menu-dessert-cutout-480-81099537ffe9.webp",
+      "width": 480
+    },
+    {
+      "src": "/images/optimized/menu-dessert-cutout-800-be207c0e65cb.webp",
+      "width": 800
+    },
+    {
+      "src": "/images/optimized/menu-dessert-cutout-1024-864b8bcd19dc.webp",
+      "width": 1024
+    }
+  ]
+}

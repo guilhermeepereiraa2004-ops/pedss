@@ -1,0 +1,180 @@
+.product-artwork {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  padding: 42px 26px 38px;
+  background: transparent;
+}
+.product-artwork::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--store-accent, #ff6825) 18%, #e5dfd4);
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse at 50% 24%, #fff 0 18%, transparent 68%),
+    radial-gradient(
+      ellipse at 50% 92%,
+      color-mix(in srgb, var(--store-accent, #ff6825) 7%, #f7f4ef),
+      transparent 68%
+    ),
+    linear-gradient(145deg, #fffefa, #f5f1ea);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 8px 20px #5b4a3508;
+}
+.product-artwork[data-cutout="true"]::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  bottom: 20px;
+  width: 52%;
+  height: 15px;
+  border-radius: 50%;
+  background: #60432b23;
+  filter: blur(12px);
+}
+.product-artwork .product-cutout {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: 360px;
+  object-fit: contain;
+  transform-origin: 50% 55%;
+}
+.product-artwork[data-cutout="true"] .product-cutout {
+  filter: drop-shadow(0 12px 10px #60432b14);
+}
+.product-artwork .product-cutout[data-verified="false"] {
+  opacity: 0;
+}
+.product-artwork[data-ready="false"]::after {
+  display: none;
+}
+.product-artwork[data-motion="on"] .product-cutout {
+  animation: catalog-product-float 7.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.product-artwork[data-motion="on"]::after {
+  animation: catalog-product-shadow 7.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes catalog-product-float {
+  0%,
+  100% {
+    transform: translate(-16px, 0) rotate(-2.5deg);
+  }
+  50% {
+    transform: translate(16px, -8px) rotate(2.5deg);
+  }
+}
+@keyframes catalog-product-shadow {
+  0%,
+  100% {
+    transform: translateX(-16px) scaleX(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateX(16px) scaleX(0.94);
+    opacity: 0.8;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Keep the requested catalog movement slower and smaller on devices asking for reduction. */
+  .product-artwork[data-motion="on"] .product-cutout {
+    animation: catalog-product-float-reduced 10s cubic-bezier(0.45, 0, 0.55, 1) infinite !important;
+  }
+  .product-artwork[data-motion="on"]::after {
+    animation: catalog-product-shadow-reduced 10s cubic-bezier(0.45, 0, 0.55, 1) infinite !important;
+  }
+}
+@keyframes catalog-product-float-reduced {
+  0%,
+  100% {
+    transform: translate(-8px, 0) rotate(-1.25deg);
+  }
+  50% {
+    transform: translate(8px, -4px) rotate(1.25deg);
+  }
+}
+@keyframes catalog-product-shadow-reduced {
+  0%,
+  100% {
+    transform: translateX(-8px) scaleX(1);
+    opacity: 0.92;
+  }
+  50% {
+    transform: translateX(8px) scaleX(0.97);
+    opacity: 0.86;
+  }
+}
+.product-artwork[data-cutout="false"] .product-cutout {
+  border-radius: 16px;
+}
+.product-cutout-empty {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 12px;
+  height: 100%;
+  text-align: center;
+  color: #847868;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.product-photo-loading {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  text-align: center;
+  color: #796e60;
+  font-size: 10px;
+  line-height: 1.5;
+  pointer-events: none;
+}
+.product-photo-note {
+  display: block;
+  margin: 8px 0;
+  line-height: 1.6;
+}
+.catalog-photo-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 24px;
+}
+.catalog-photo-controls p {
+  margin: 0;
+  color: #806c5c;
+  font-size: 12px;
+}
+.product-options .product-option-cutout,
+.digital-product-detail .product-artwork {
+  height: 300px;
+  border-radius: 16px;
+}
+@media (max-width: 550px) {
+  .product-artwork {
+    padding: 44px 24px 32px;
+    min-height: 160px;
+  }
+  .catalog-photo-controls {
+    align-items: flex-start;
+  }
+  .catalog-photo-controls p {
+    font-size: 11px;
+    line-height: 1.6;
+    max-width: 190px;
+  }
+  .product-options .product-option-cutout,
+  .digital-product-detail .product-artwork {
+    height: 250px;
+  }
+}

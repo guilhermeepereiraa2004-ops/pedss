@@ -1,0 +1,12 @@
+.env*
+.agents
+.quality
+plan
+log
+outputs
+docs/screenshots
+design
+node_modules
+dist
+tests
+supabase
