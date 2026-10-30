@@ -1,5 +1,12 @@
 # API — Pedss
 
+## Contrato remoto de pizzaria e operação — 30/10/2026
+
+src/application/remoteCommands.js é a lista explícita compartilhada pelo proxy e pela API. Os métodos de gestão de restaurantServices.ts e amendOrderItem passam por autenticação, autorização por loja e validações do domínio no servidor, dentro da transação existente. repeatOrder usa {kind:"cart",command:"repeatOrder",args:[storeId,trackingToken]}: revalida seleções no catálogo atual e devolve somente linhas para a sacola privada do navegador. Nenhum preço enviado pelo cliente é fonte da verdade.
+
+GET por escopo inclui agendamento público; estoque, movimentos e caixa somente para gestão, mesas/comandas somente para a própria equipe. Mudanças operacionais invalidam a partição de operações, preservando fotos e agendamento do catálogo. Testes REMOTE-PIZZA-01 a 06 cobrem gravação/leitura SQL, preços, isolamento, caixa/comandas, repetição e alteração auditada/idempotente de itens.
+
+
 A API implementada nesta etapa usa GET/POST /api/app. GET retorna projeções públicas ou de gestão conforme a sessão; POST recebe {kind, command, args}. As rotas REST abaixo continuam sendo uma proposta futura, não endpoints ativos. `src/core/api.ts` contém os tipos de leitura e os comandos de pedido. O restante dos casos de uso é definido em `services.ts`; a implementação remota deve preservar suas regras.
 
 ## Rotas propostas

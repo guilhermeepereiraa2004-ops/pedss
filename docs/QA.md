@@ -1,5 +1,14 @@
 # Verificação — 22/10/2026
 
+## Publicação integral em preparação — 30/10/2026
+
+Pedido explícito para atualizar toda a versão da Vercel. Fonte canônica: guilhermeepereiraa2004-ops/pedss, main. Contrato único de comandos agora conecta os módulos de pizzaria e operação à API: vínculo de sabores, estoque/fichas, agendamento, caixa, pagamentos parciais, mesas/comandas, balcão e alterações de itens. Repetição de pedido usa token opaco e mantém a sacola somente no navegador. A API reaplica permissões e preços do domínio; resultados de pedidos para atendentes são sanitizados.
+
+Leitura SQL por loja agora inclui scheduling no catálogo e estoque/caixa/mesas nas operações, respeitando o papel da sessão. Cache parcial restaura cada partição corretamente; mudanças operacionais não reenviam fotos. Nenhuma migração, seed, troca de banco, variável privada ou mudança operacional das lojas é necessária. Testes novos executam os fluxos HTTP com SQL real em PostgreSQL/WASM descartável, sem acessar o banco publicado.
+
+A promoção depende do gate completo, comparação dos seis cardápios, API/SSE da versão preparada e inspeção da interface. O resultado e o deployment serão registrados após a conclusão; esta seção não afirma publicação antecipada. Dados de demonstração do navegador local não são copiados para produção.
+
+
 ## Repositório principal transferido — 30/10/2026
 
 Por solicitação explícita, o destino oficial agora é https://github.com/guilhermeepereiraa2004-ops/pedss.git, branch main. O destino estava vazio. Git foi inicializado nesta pasta, origin e upstream main definidos para o novo repositório, e o Git Credential Manager já autenticado do computador realizou o envio. O conector GitHub tinha somente leitura; não foi necessário alterar permissões ou obter senhas/chaves. O repositório DiegoMicaelvs/pedss permanece preservado e não deve receber novos envios deste projeto.

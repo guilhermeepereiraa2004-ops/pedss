@@ -1,6 +1,6 @@
 # Pedss — Seu delivery, aceso.
 
-Repositório principal: [guilhermeepereiraa2004-ops/pedss](https://github.com/guilhermeepereiraa2004-ops/pedss). Esta pasta acompanha a versão integral do projeto, incluindo os módulos locais de pizzaria. A conexão Git da Vercel é independente do `origin` local e precisa ser configurada e validada antes da publicação automática.
+Repositório principal: [guilhermeepereiraa2004-ops/pedss](https://github.com/guilhermeepereiraa2004-ops/pedss). Esta pasta acompanha a versão integral do projeto, incluindo os módulos de pizzaria e seus contratos remotos de gestão. A conexão Git da Vercel é independente do `origin` local e precisa ser configurada e validada antes da publicação automática.
 
 Aplicação React/Vite de delivery com cardápio, operação da loja e central de estabelecimentos. O modo remoto usa API na Vercel, PostgreSQL atualmente no Supabase e sessões validadas no servidor. O Neon anterior foi preservado. O modo local legado continua disponível. Pagamentos online e e-mails não estão integrados.
 

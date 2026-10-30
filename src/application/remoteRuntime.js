@@ -4,6 +4,7 @@ import { cartStorage } from "../adapters/cartStorage.js";
 import { cartSchema } from "../core/model.ts";
 import { startLiveUpdates } from "./liveUpdates";
 import { viewScope } from "./viewScope";
+import { remoteServiceCommands } from "./remoteCommands.js";
 
 const CART_KEY = "pedss.carts.v1";
 /** Only carts persist in this browser. All authoritative state comes from sanitized API projections. */
@@ -88,6 +89,17 @@ export function createRemoteRuntime({ storage = cartStorage(), fetcher = fetch }
           const previous = state.tenants[id];
           if (previous) for (const field of ["orders", "expenses"]) tenant[field] = previous[field];
         }
+      }
+      for (const [id, tenant] of Object.entries(next.tenants)) {
+        const previous = state.tenants[id]?.restaurant;
+        if (!previous) continue;
+        if (payload.unchanged?.operations) {
+          tenant.restaurant = { ...tenant.restaurant };
+          for (const field of ["inventory", "movements", "cashSessions", "tables", "tabs"])
+            if (previous[field] !== undefined) tenant.restaurant[field] = previous[field];
+        }
+        if (payload.unchanged?.catalog)
+          tenant.restaurant = { ...tenant.restaurant, scheduling: previous.scheduling };
       }
       state = next;
     }
@@ -226,31 +238,24 @@ export function createRemoteRuntime({ storage = cartStorage(), fetcher = fetch }
     changeCart: local.changeCart,
     clearCart: local.clearCart,
     updateCartLine: local.updateCartLine,
+    validateCombo: local.validateCombo,
   };
   services.validateCoupon = (...args) => request({ kind: "coupon", command: "validate", args });
   services.quoteShipping = (...args) => request({ kind: "shipping", command: "quote", args });
-  for (const command of [
-    "saveCompany",
-    "activatePlan",
-    "archiveCompany",
-    "restoreCompany",
-    "saveProduct",
-    "removeProduct",
-    "exportCatalog",
-    "importCatalog",
-    "saveCoupon",
-    "saveExpense",
-    "voidExpense",
-    "saveSettings",
-    "saveShipping",
-    "configureStore",
-    "setOnline",
-    "savePlatform",
-    "changeOrder",
-    "changePayment",
-  ]) {
+  for (const command of remoteServiceCommands) {
     services[command] = (...args) => request({ kind: "service", command, args });
   }
+  services.repeatOrder = async (id, token) => {
+    const lines = await request({ kind: "cart", command: "repeatOrder", args: [id, token] });
+    await repository.transact((next) => {
+      const tenant = next.tenants[id];
+      if (!tenant) throw new DomainError("Estabelecimento não encontrado.");
+      tenant.cart = cartSchema.parse({
+        ...tenant.cart,
+        lines: [...tenant.cart.lines, ...lines],
+      });
+    });
+  };
   services.checkout = async (id, requestId, input) => {
     const cart = state.tenants[id]?.cart;
     if (!cart || cart.requestId !== requestId)

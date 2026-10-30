@@ -144,7 +144,15 @@ async function selectView(
           WHEN $7 AND $1 IN ('store', 'legacy') THEN coalesce((SELECT jsonb_agg(c.value) FROM jsonb_array_elements(tenant->'coupons') c
             WHERE (c.value->>'active')::boolean AND (c.value->>'advertised')::boolean), '[]'::jsonb) ELSE '[]'::jsonb END,
         'expenses', CASE WHEN $8 AND $1 IN ('dashboard', 'legacy') AND own AND $2 IN ('admin', 'owner') THEN coalesce(tenant->'expenses', '[]'::jsonb) ELSE '[]'::jsonb END
-      )) FROM selected), '{}'::jsonb),
+      ) || CASE WHEN jsonb_typeof(tenant->'restaurant') = 'object' AND $1 IN ('store', 'dashboard', 'legacy')
+        THEN jsonb_build_object('restaurant',
+          CASE WHEN $7 THEN jsonb_strip_nulls(jsonb_build_object('scheduling', tenant->'restaurant'->'scheduling')) ELSE '{}'::jsonb END ||
+          CASE WHEN $8 AND own AND $1 IN ('dashboard', 'legacy') THEN
+            CASE WHEN $2 IN ('admin', 'owner') THEN (tenant->'restaurant') - 'scheduling'
+              ELSE jsonb_build_object('tables', coalesce(tenant->'restaurant'->'tables', '[]'::jsonb),
+                'tabs', coalesce(tenant->'restaurant'->'tabs', '[]'::jsonb)) END
+            ELSE '{}'::jsonb END)
+        ELSE '{}'::jsonb END) FROM selected), '{}'::jsonb),
       'users', coalesce((SELECT jsonb_agg(u.value || '{"passwordHash":"","salt":""}'::jsonb) FROM jsonb_array_elements(data->'users') u
         WHERE $8 AND $1 IN ('central', 'dashboard', 'legacy') AND $2 IN ('admin', 'owner')
           AND (($2 = 'admin' AND $1 IN ('central', 'legacy')) OR u.value->>'storeId' IN (SELECT company->>'id' FROM selected))
@@ -159,9 +167,11 @@ async function selectView(
       manifest
         ? `SELECT (data->>'revision')::bigint AS revision,
       md5(jsonb_build_object('companies', data->'companies', 'platform', data->'platform',
-        'catalog', (SELECT jsonb_object_agg(t.key, t.value - 'orders' - 'expenses' - 'cart') FROM jsonb_each(data->'tenants') t))::text) AS catalog,
+        'catalog', (SELECT jsonb_object_agg(t.key, (t.value - 'orders' - 'expenses' - 'cart' - 'restaurant') ||
+          jsonb_build_object('scheduling', t.value->'restaurant'->'scheduling')) FROM jsonb_each(data->'tenants') t))::text) AS catalog,
       md5(jsonb_build_object('users', data->'users', 'invitations', data->'invitations',
-        'operations', (SELECT jsonb_object_agg(t.key, jsonb_build_object('orders', t.value->'orders', 'expenses', t.value->'expenses')) FROM jsonb_each(data->'tenants') t))::text) AS operations
+        'operations', (SELECT jsonb_object_agg(t.key, jsonb_build_object('orders', t.value->'orders', 'expenses', t.value->'expenses',
+          'restaurant', (t.value->'restaurant') - 'scheduling')) FROM jsonb_each(data->'tenants') t))::text) AS operations
       FROM view WHERE $9::bigint IS NULL OR (data->>'revision')::bigint = $9`
         : `SELECT data FROM view WHERE $9::bigint IS NULL OR (data->>'revision')::bigint = $9`
     }`,
@@ -219,6 +229,7 @@ export function scopeState(state, identity, scope, tracking) {
               : tenant.orders.filter((o) => tracking && o.trackingToken === tracking),
           expenses: scope.kind === "dashboard" && own ? tenant.expenses : [],
           coupons: ["store", "dashboard"].includes(scope.kind) ? tenant.coupons : [],
+          restaurant: ["store", "dashboard"].includes(scope.kind) ? tenant.restaurant : undefined,
           settings:
             scope.kind === "central"
               ? { ...defaultsSettings(), heroSegment: tenant.settings.heroSegment }

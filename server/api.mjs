@@ -10,6 +10,7 @@ import { createShippingGateway } from "./shipping.mjs";
 import { createPostgresStore } from "./database.mjs";
 import { projectState, publicOrder } from "./projection.mjs";
 import { requestScope, scopeState } from "./read-model.mjs";
+import { remoteServiceCommands, operationCommands } from "../src/application/remoteCommands.js";
 
 const digest = (value) => createHash("sha256").update(value).digest("hex");
 const ephemeralViewKey = randomBytes(32);
@@ -22,26 +23,7 @@ const equalSecret = (a, b) =>
   typeof b === "string" &&
   a.length > 20 &&
   timingSafeEqual(Buffer.from(digest(a)), Buffer.from(digest(b)));
-const commands = new Set([
-  "saveCompany",
-  "activatePlan",
-  "archiveCompany",
-  "restoreCompany",
-  "saveProduct",
-  "removeProduct",
-  "exportCatalog",
-  "importCatalog",
-  "saveCoupon",
-  "saveExpense",
-  "voidExpense",
-  "saveSettings",
-  "saveShipping",
-  "configureStore",
-  "setOnline",
-  "savePlatform",
-  "changeOrder",
-  "changePayment",
-]);
+const commands = new Set(remoteServiceCommands);
 const authCommands = new Set([
   "signIn",
   "registerTrial",
@@ -211,8 +193,7 @@ export function createHandler({
         (kind === "checkout" ||
           kind === "shipping" ||
           kind === "coupon" ||
-          (kind === "service" &&
-            ["changeOrder", "changePayment", "saveExpense", "voidExpense"].includes(command)));
+          (kind === "service" && operationCommands.includes(command)));
       if (!Array.isArray(args) || args.length > 6) throw httpError("Comando inválido.", 400);
       if (!(await store.limit(`write:${digest(String(ip))}`, 90)))
         throw httpError("Muitas solicitações. Aguarde.", 429);
@@ -269,6 +250,17 @@ export function createHandler({
           } else if (kind === "service" && commands.has(command)) {
             if (!ctx.auth.current()) throw httpError("Entre na sua conta para continuar.", 401);
             result = await ctx.services[command](...args);
+            if (
+              result?.trackingToken &&
+              result?.lines &&
+              !["admin", "owner"].includes(ctx.auth.current().role)
+            )
+              result = publicOrder(result);
+          } else if (kind === "cart" && command === "repeatOrder") {
+            if (typeof args[0] !== "string" || typeof args[1] !== "string" || args[1].length > 100)
+              throw httpError("Pedido inválido.", 400);
+            await ctx.services.repeatOrder(args[0], args[1]);
+            result = ctx.repo.getSnapshot().tenants[args[0]].cart.lines;
           } else if (kind === "checkout" && command === "create") {
             const [storeId, cartInput, customer] = args;
             const cart = cartSchema.parse(cartInput);

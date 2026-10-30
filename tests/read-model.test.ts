@@ -5,6 +5,8 @@ import { createHandler } from "../server/api.mjs";
 import { fixture, cartLine, checkout } from "./fixtures.ts";
 import { tokenDigest } from "../src/adapters/localAuth.ts";
 import { isDeepStrictEqual } from "node:util";
+import { pizzaProduct } from "./pizza-fixture.ts";
+import { orderFixture, changeInput } from "./order-amendment-fixture.ts";
 
 // Execute the real SQL in PostgreSQL/WASM. Never load .env or contact Neon.
 let db: PGlite, store: ReturnType<typeof createPostgresStore>, seed: any, token: string, order: any;
@@ -435,4 +437,191 @@ it("DATA-18 shipping quotes omit media without clearing the customer's catalog",
   expect(result.body.unchanged.catalog).toBe(true);
   const saved: any = (await db.query("SELECT data FROM pedss.workspace WHERE id = 1")).rows[0].data;
   expect(saved.tenants["store-one"].products[0].image).toBe("/photo-to-retain.webp");
+});
+
+it("REMOTE-PIZZA-01 HTTP persists sizes, prices and linked flavors through scoped PostgreSQL reads", async () => {
+  const scope = { kind: "dashboard", store: "demo" };
+  for (const [command, args] of [
+    ["saveProduct", ["store-one", pizzaProduct]],
+    ["linkPizzaCatalog", ["store-one", pizzaProduct.id]],
+  ] as const) {
+    const saved = await request(scope, token, "", store, { kind: "service", command, args });
+    expect(saved.statusCode, saved.body.error?.message).toBe(200);
+  }
+  const owner = await request(scope, token);
+  const builder = owner.body.state.tenants["store-one"].products.find((p: any) => p.id === "pizza");
+  expect(builder.pizza.sizes).toHaveLength(2);
+  expect(builder.pizza.flavors.every((f: any) => f.sourceProductId)).toBe(true);
+  expect(builder.pizza.flavors[1].prices.medium).toBe(4001);
+  const saved: any = (await db.query("SELECT data FROM pedss.workspace WHERE id = 1")).rows[0].data;
+  expect(saved.tenants["store-two"]).toEqual(seed.tenants["store-two"]);
+});
+
+it("REMOTE-PIZZA-02 stock and cash updates refresh operations without retransmitting catalog photos", async () => {
+  const scope = { kind: "dashboard", store: "demo" };
+  const item = {
+    id: "flour",
+    name: "Farinha privada",
+    unit: "g",
+    stock: 1000,
+    costPerUnitCents: 2,
+    minimum: 10,
+  };
+  expect(
+    (
+      await request(scope, token, "", store, {
+        kind: "service",
+        command: "saveInventoryItem",
+        args: ["store-one", item],
+      })
+    ).statusCode,
+  ).toBe(200);
+  const first = await request(scope, token);
+  const known = {
+    "x-pedss-catalog": first.body.versions.catalog,
+    "x-pedss-operations": first.body.versions.operations,
+  };
+  for (const [command, args] of [
+    ["adjustStock", ["store-one", "flour", -100, "Conferência"]],
+    ["openCash", ["store-one", 10000]],
+    ["moveCash", ["store-one", { kind: "withdrawal", amountCents: 1000, reason: "Sangria" }]],
+  ]) {
+    const result = await request(
+      scope,
+      token,
+      "",
+      store,
+      { kind: "service", command, args },
+      known,
+    );
+    expect(result.statusCode, result.body.error?.message).toBe(200);
+  }
+  const next = await request(scope, token, first.headers.ETag, store, undefined, known);
+  expect(next.body.unchanged).toEqual({ catalog: true, operations: false });
+  expect(next.body.state.tenants["store-one"].products).toEqual([]);
+  expect(next.body.state.tenants["store-one"].restaurant.inventory[0].stock).toBe(900);
+  expect(
+    next.body.state.tenants["store-one"].restaurant.cashSessions[0].movements[0].amountCents,
+  ).toBe(1000);
+  const publicView = await request({ kind: "store", store: "demo" });
+  expect(JSON.stringify(publicView.body)).not.toMatch(
+    /Farinha privada|costPerUnitCents|cashSessions/,
+  );
+  const unrelated = await request({ kind: "dashboard", store: "demo" }, "other-owner-token");
+  expect(JSON.stringify(unrelated.body)).not.toContain("Farinha privada");
+  const saved: any = (await db.query("SELECT data FROM pedss.workspace WHERE id = 1")).rows[0].data;
+  expect(saved.tenants["store-two"]).toEqual(seed.tenants["store-two"]);
+});
+
+it("REMOTE-PIZZA-03 scheduling is public, private operations are isolated and cross-store writes roll back", async () => {
+  const scope = { kind: "dashboard", store: "demo" };
+  const config = {
+    enabled: true,
+    leadMinutes: 90,
+    slotMinutes: 30,
+    capacity: 4,
+    days: 7,
+    pizzaCapacity: 8,
+  };
+  const save = await request(scope, token, "", store, {
+    kind: "service",
+    command: "saveScheduling",
+    args: ["store-one", config],
+  });
+  expect(save.statusCode).toBe(200);
+  const publicView = await request({ kind: "store", store: "demo" });
+  expect(publicView.body.state.tenants["store-one"].restaurant).toEqual({ scheduling: config });
+  const before = (await db.query("SELECT data FROM pedss.workspace WHERE id = 1")).rows[0].data;
+  for (const cookie of ["", token]) {
+    const denied = await request({ kind: "dashboard", store: "outra" }, cookie, "", store, {
+      kind: "service",
+      command: "openCash",
+      args: ["store-two", 1],
+    });
+    expect(denied.statusCode).not.toBe(200);
+  }
+  expect((await db.query("SELECT data FROM pedss.workspace WHERE id = 1")).rows[0].data).toEqual(
+    before,
+  );
+});
+
+it("REMOTE-PIZZA-04 table orders and payments use server prices and survive a fresh read", async () => {
+  const scope = { kind: "dashboard", store: "demo" };
+  const call = async (command: string, args: any[]) => {
+    const result = await request(scope, token, "", store, { kind: "service", command, args });
+    expect(result.statusCode, result.body.error?.message).toBe(200);
+    return result.body.result;
+  };
+  await call("saveTable", ["store-one", { id: "table-1", name: "Mesa 1", enabled: true }]);
+  const tab = await call("openTab", ["store-one", "table-1", "Cliente de teste"]);
+  await call("openCash", ["store-one", 0]);
+  const input = {
+    requestId: "staff-http-test",
+    channel: "table",
+    tabId: tab.id,
+    lines: [{ ...cartLine, key: "staff-line" }],
+    checkout: { ...checkout, fulfillment: "pickup", expectedTotalCents: 6780 },
+  };
+  const staffOrder = await call("createStaffOrder", ["store-one", input]);
+  expect(staffOrder.totalCents).toBe(6780);
+  expect(staffOrder.paymentStatus).toBe("Pendente");
+  expect((await call("createStaffOrder", ["store-one", input])).id).toBe(staffOrder.id);
+  await call("payTab", [
+    "store-one",
+    tab.id,
+    { requestId: "tab-payment", amountCents: 6780, method: "Dinheiro" },
+  ]);
+  const fresh = await request(scope, token);
+  const tenant = fresh.body.state.tenants["store-one"];
+  expect(tenant.restaurant.tabs[0].id).toBe(tab.id);
+  expect(tenant.orders.find((o: any) => o.id === staffOrder.id).paymentStatus).toBe("Pago");
+  expect(tenant.orders.filter((o: any) => o.requestId === input.requestId)).toHaveLength(1);
+});
+
+it("REMOTE-PIZZA-05 repeat order requires its token, returns selections without private data and never persists a shared cart", async () => {
+  const scope = { kind: "tracking", tracking: order.trackingToken };
+  const result = await request(scope, "", "", store, {
+    kind: "cart",
+    command: "repeatOrder",
+    args: ["store-one", order.trackingToken],
+  });
+  expect(result.statusCode).toBe(200);
+  expect(result.body.result[0].productId).toBe("burger");
+  expect(result.body.result[0]).not.toHaveProperty("unitPriceCents");
+  expect(result.body.state.tenants["store-one"].products).toEqual([]);
+  expect(result.body.state.tenants["store-one"].cart.lines).toEqual([]);
+  const saved: any = (await db.query("SELECT data FROM pedss.workspace WHERE id = 1")).rows[0].data;
+  expect(saved.tenants["store-one"].cart.lines).toEqual([]);
+  expect(saved.tenants["store-one"].orders).toEqual(seed.tenants["store-one"].orders);
+  const denied = await request(scope, "", "", store, {
+    kind: "cart",
+    command: "repeatOrder",
+    args: ["store-one", "wrong-token"],
+  });
+  expect(denied.statusCode).not.toBe(200);
+});
+
+it("REMOTE-PIZZA-06 item amendments persist their audit and historical stock return atomically", async () => {
+  const f = await orderFixture();
+  await db.query("UPDATE pedss.workspace SET data = $1 WHERE id = 1", [
+    JSON.stringify(f.repo.getSnapshot()),
+  ]);
+  const scope = { kind: "dashboard", store: "demo" },
+    cookie = f.auth.getToken()!;
+  const command = {
+    kind: "service",
+    command: "amendOrderItem",
+    args: ["store-one", f.order.id, changeInput(f.order)],
+  };
+  const changed = await request(scope, cookie, "", store, command);
+  expect(changed.statusCode, changed.body.error?.message).toBe(200);
+  expect(changed.body.result.totalCents).toBe(7000);
+  const again = await request(scope, cookie, "", store, command);
+  expect(again.statusCode).toBe(200);
+  const fresh = await request(scope, cookie),
+    tenant = fresh.body.state.tenants["store-one"];
+  expect(tenant.orders[0].amendments).toHaveLength(1);
+  expect(tenant.restaurant.inventory[0].stock).toBe(750);
+  const tracking = await request({ kind: "tracking", tracking: f.order.trackingToken });
+  expect(tracking.body.state.tenants["store-one"].orders[0]).not.toHaveProperty("amendments");
 });
