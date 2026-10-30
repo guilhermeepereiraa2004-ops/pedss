@@ -1,5 +1,13 @@
 # Pendências — Pedss
 
+## Repositório principal transferido — 30/10/2026
+
+Por solicitação explícita, o destino oficial agora é https://github.com/guilhermeepereiraa2004-ops/pedss.git, branch main. O destino estava vazio. Git foi inicializado nesta pasta, origin e upstream main definidos para o novo repositório, e o Git Credential Manager já autenticado do computador realizou o envio. O conector GitHub tinha somente leitura; não foi necessário alterar permissões ou obter senhas/chaves. O repositório DiegoMicaelvs/pedss permanece preservado e não deve receber novos envios deste projeto.
+
+Primeiro commit ed95d01c297480b7fb4f869501161bf82f11adf1, árvore cf628cd6c061ffafcfd8824819d952ee23ff7d1d:384 arquivos/116.033.805 bytes, incluindo o código integral, módulos/preços/montador/combos de pizzaria, imagens, testes, documentação e migrações. Arquivos remotos conferidos por hash com o snapshot local, sem diferenças. Apenas .env.example foi incluído; env reais, credenciais, .vercel, plan/log/.quality, outputs e ferramentas locais ficaram ignorados. README e AGENTS apontam para o novo destino.
+
+Gate npm run check aprovado novamente:340 testes/48 arquivos e188/188 critérios, lint/tipos/camadas/build. Log .quality/new-origin-gate-2026-10-30.log. GitHub Quality inicial41122293452 iniciado; estado final será registrado em .quality/new-repository-transfer-state.json. Nenhum código funcional ou dado de negócio alterado nesta transferência. Sem deploy ou conexão Git na Vercel: ela continua no projeto Diego Projects/Pedss, com a versão parcial publicada antes. Publicação integral ainda exige validar os contratos remotos dos módulos locais e configurar explicitamente a integração desejada.
+
 ## Confirmação de identidade da pasta e vínculos — 30/10/2026
 
 Nova conferência: a pasta Saas Hamburgueria não é um repositório Git (git rev-parse confirmou ausência de .git também nos ancestrais). Ela tem vínculo de CLI .vercel/project.json para Pedss/Diego Projects, mas a API Vercel confirmou gitConnected=false. São vínculos diferentes. GitHub DiegoMicaelvs/pedss contém os mesmos arquivos: hashes de PizzaManagement.jsx, storeOpening.ts e restaurantServices.ts idênticos à pasta local na árvore84d3b481304410e0d8d6151f87cd564306e8eda6. Envios anteriores ocorreram pelo conector GitHub, sem remote Git na pasta. Nome local não determina nome/conta do repositório. Nenhum vínculo ou estado externo alterado.
