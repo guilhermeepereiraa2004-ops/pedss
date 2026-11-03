@@ -5,7 +5,7 @@ import { nextStatuses } from "../src/core/domain.ts";
 import { pizzaWorkItems } from "../src/core/pizzeriaOperations.ts";
 
 it.each(["delivery", "pickup", "table"] as const)(
-  "SIMPLE-ORDER-01 %s conclui sem cozinha e preserva histórico/pagamento",
+  "SIMPLE-ORDER-01 %s segue os status de 30/10 sem depender da cozinha",
   async (kind) => {
     const f = await orderFixture();
     const current = () => f.repo.getSnapshot().tenants[company.id].orders[0];
@@ -29,8 +29,11 @@ it.each(["delivery", "pickup", "table"] as const)(
         },
       ];
     });
-    expect(nextStatuses(current())).toEqual(["Entregue", "Cancelado"]);
+    const ready = kind === "delivery" ? "A caminho" : "Pronto para retirada";
+    expect(nextStatuses(current())).toEqual([ready, "Cancelado"]);
     const history = structuredClone(current().production);
+    await expect(f.services.changeOrder(company.id, f.order.id, "Entregue")).rejects.toThrow();
+    await f.services.changeOrder(company.id, f.order.id, ready, "", current().updatedAt);
     await f.services.changeOrder(company.id, f.order.id, "Entregue", "", current().updatedAt);
     expect(current().status).toBe("Entregue");
     expect(current().paymentStatus).toBe("Pendente");
@@ -39,7 +42,7 @@ it.each(["delivery", "pickup", "table"] as const)(
       current()
         .history.filter((e) => e.kind === "order")
         .map((e) => e.to),
-    ).toEqual(["Pendente", "Aceito", "Preparando", "Entregue"]);
+    ).toEqual(["Pendente", "Aceito", "Preparando", ready, "Entregue"]);
   },
 );
 

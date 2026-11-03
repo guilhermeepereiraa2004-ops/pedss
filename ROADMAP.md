@@ -1,5 +1,19 @@
 # Roadmap — Pedss
 
+## Publicação autorizada da restauração de status — 03/11/2026
+
+Usuário autorizou enviar ao GitHub e publicar na Vercel a restauração de botões/status de Pedidos conforme15fe3a8 (30/10). Fonte atual mantém Cozinha removida, sem trava de produção individual; Financeiro e demais módulos preservados. Gate388 testes/55 arquivos e224/224 critérios aprovado; código funcional não mudou desde o gate. Comparação histórica e QA desktop/mobile registradas na seção abaixo. Nenhuma alteração de cadastro, migração ou DNS faz parte desta publicação. Resultado do envio, deployment e conferências posteriores ficará nos registros locais plan/STATUS.md e log/devlog.md, conforme preferência do usuário. Esta seção registra a autorização e validação prévia, sem antecipar sucesso do deploy.
+
+
+## Botões e status de Pedidos restaurados conforme 30/10 — 03/11/2026
+
+Por pedido explícito, restaurados somente botões, filtros, status e sequência de Pedidos conforme15fe3a8ea95290857b2e210a213240da18ca227d (30/10, versão integral então publicada em dpl_3fi667sKPZyRj9nfvjLHbNitf5BW). Retirada: Pendente → Aceito → Preparando → Pronto para retirada → Entregue. Entrega: Pendente → Aceito → Preparando → A caminho → Entregue. Botões Aceitar pedido, Iniciar preparo, Pronto para retirada/Saiu para entrega e Concluir entrega; mesa mantém Pronto para servir/Marcar como servido. Filtros separados para todos os status, inclusive retirada. Removidos os nomes simplificados Recebido/Em preparo/Concluído e agrupamento de filtros. Acompanhamento do cliente usa novamente os status originais.
+
+Comparação automatizada confirmou igualdade integral com30/10 de orderActions.js, Tracking.jsx, OrdersTable.jsx e funções nextStatuses/transition. UI de Cozinha e exigência de produção individual continuam removidas, como solicitado anteriormente. Prova de regressão inclui pedido com histórico individual incompleto e confirma que chega a Pronto para retirada sem a antiga trava. Financeiro, montador, impressão Cliente/Entrega, autorização, histórico e separação de pagamento preservados. Nenhum pedido ou cadastro antigo migrado/reaberto/alterado; testes usam memória e PostgreSQL descartável.
+
+Gate npm run check aprovado:388 testes/55 arquivos,224/224 critérios, lint/tipos/camadas/build. Log .quality/oct30-order-status-gate.log. Testes cobrem entrega, retirada e mesa, ordem obrigatória, filtros e ações na lista, conclusão de pedidos antigos e pagamento pendente preservado. Inspeção desktop e390x844 com pedidos fictícios confirmou botões diferentes por modalidade e transição de retirada bem-sucedida. Evidências .quality/oct30-order-status-desktop.png e .quality/oct30-order-status-mobile.png; viewport restaurado. Sem commit, push, deploy, DNS ou escrita em banco real nesta tarefa. Versão publicada ainda é b4eafb3 até novo pedido de publicação. Este registro substitui a simplificação anterior apenas para botões/status, mantendo a remoção da Cozinha.
+
+
 ## Versão de Pedidos e Financeiro pronta para publicação — 03/11/2026
 
 Envio autorizado ao GitHub canônico guilhermeepereiraa2004-ops/pedss/main e ao projeto Vercel Pedss/Diego Projects. Versão inclui remoção da UI Cozinha/trava individual, fluxo Aceitar → Preparar → Concluir, vias Cliente/Entrega e Financeiro → Custos e margem. Código de subdomínios incluído como preparação compatível com URLs atuais; ativação DNS/HTTPS e geração global de novos links continuam adiadas pelo usuário. Nenhuma migração ou alteração de cadastro é necessária para esta publicação.

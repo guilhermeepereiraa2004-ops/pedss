@@ -1108,12 +1108,12 @@
     },
     {
       "id": "SIMPLE-ORDER-01",
-      "title": "fluxo direto por entrega/retirada/mesa e conclusão de pedidos antigos sem dependência da cozinha",
+      "title": "status de entrega, retirada e mesa de 30/10, preservando histórico e sem trava por pizza",
       "source": "tests/simple-order-flow.test.ts"
     },
     {
       "id": "SIMPLE-ORDER-02",
-      "title": "aceitar, preparar e concluir na lista sem confirmar pagamento nem expor Cozinha",
+      "title": "botões e filtros de retirada/entrega de 30/10, sem confirmar pagamento nem expor Cozinha",
       "source": "tests/operations-ui.test.jsx"
     },
     {

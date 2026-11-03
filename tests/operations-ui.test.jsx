@@ -96,43 +96,59 @@ it("OPS-01 adicionar mostra confirmação e ícone da sacola com contador", asyn
   expect(await screen.findByRole("dialog")).toHaveTextContent("Coisa boa na sua sacola.");
   expect(f.repo.getSnapshot().tenants[company.id].cart.lines).toHaveLength(1);
 });
-it("OPS-02 SIMPLE-ORDER-02 pedidos são aceitos, preparados e concluídos na lista sem alterar pagamento", async () => {
-  const f = await fixture();
-  await f.services.addToCart(company.id, cartLine);
-  const order = await f.services.checkout(
-    company.id,
-    f.repo.getSnapshot().tenants[company.id].cart.requestId,
-    checkout,
-  );
-  render(
-    <ApplicationProvider runtime={{ ...f, repository: f.repo }}>
-      <MemoryRouter initialEntries={["/dashboard?store=demo&tab=orders"]}>
-        <Dashboard />
-      </MemoryRouter>
-    </ApplicationProvider>,
-  );
-  await userEvent.click(
-    await screen.findByRole("button", { name: `Aceitar pedido ${order.number}` }),
-  );
-  await waitFor(() =>
-    expect(f.repo.getSnapshot().tenants[company.id].orders[0].status).toBe("Aceito"),
-  );
-  expect(f.repo.getSnapshot().tenants[company.id].orders[0].paymentStatus).toBe("Pendente");
-  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  expect(
-    screen.getByRole("button", { name: `Preparar pedido ${order.number}` }),
-  ).toBeInTheDocument();
-  expect(screen.queryByRole("button", { name: "Cozinha", exact: true })).not.toBeInTheDocument();
-  await userEvent.click(screen.getByRole("button", { name: `Preparar pedido ${order.number}` }));
-  await userEvent.click(
-    await screen.findByRole("button", { name: `Concluir pedido ${order.number}` }),
-  );
-  await waitFor(() =>
-    expect(f.repo.getSnapshot().tenants[company.id].orders[0].status).toBe("Entregue"),
-  );
-  expect(f.repo.getSnapshot().tenants[company.id].orders[0].paymentStatus).toBe("Pendente");
-  expect(screen.getByText("Concluído", { selector: ".tag" })).toBeInTheDocument();
-});
+it.each(["delivery", "pickup"])(
+  "OPS-02 SIMPLE-ORDER-02 %s usa os botões de 30/10 sem alterar pagamento",
+  async (fulfillment) => {
+    const f = await fixture();
+    await f.services.addToCart(company.id, cartLine);
+    const order = await f.services.checkout(
+      company.id,
+      f.repo.getSnapshot().tenants[company.id].cart.requestId,
+      { ...checkout, fulfillment, expectedTotalCents: fulfillment === "pickup" ? 6780 : 7280 },
+    );
+    render(
+      <ApplicationProvider runtime={{ ...f, repository: f.repo }}>
+        <MemoryRouter initialEntries={["/dashboard?store=demo&tab=orders"]}>
+          <Dashboard />
+        </MemoryRouter>
+      </ApplicationProvider>,
+    );
+    await userEvent.click(
+      await screen.findByRole("button", { name: `Aceitar pedido ${order.number}` }),
+    );
+    await waitFor(() =>
+      expect(f.repo.getSnapshot().tenants[company.id].orders[0].status).toBe("Aceito"),
+    );
+    expect(f.repo.getSnapshot().tenants[company.id].orders[0].paymentStatus).toBe("Pendente");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: `Iniciar preparo ${order.number}` }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Cozinha", exact: true })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: `Iniciar preparo ${order.number}` }));
+    const readyAction = fulfillment === "pickup" ? "Pronto para retirada" : "Saiu para entrega";
+    const readyStatus = fulfillment === "pickup" ? "Pronto para retirada" : "A caminho";
+    await userEvent.click(
+      await screen.findByRole("button", { name: `${readyAction} ${order.number}` }),
+    );
+    await waitFor(() =>
+      expect(f.repo.getSnapshot().tenants[company.id].orders[0].status).toBe(readyStatus),
+    );
+    await userEvent.click(screen.getByRole("button", { name: readyStatus, exact: true }));
+    expect(
+      screen.getByRole("button", { name: `Detalhes do pedido ${order.number}` }),
+    ).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Todos", exact: true }));
+    await userEvent.click(
+      await screen.findByRole("button", { name: `Concluir entrega ${order.number}` }),
+    );
+    await waitFor(() =>
+      expect(f.repo.getSnapshot().tenants[company.id].orders[0].status).toBe("Entregue"),
+    );
+    expect(f.repo.getSnapshot().tenants[company.id].orders[0].paymentStatus).toBe("Pendente");
+    expect(screen.getByText("Entregue", { selector: ".tag" })).toBeInTheDocument();
+  },
+);
 
 it("SIMPLE-ORDER-03 endereço antigo da cozinha abre Pedidos sem controles de produção", async () => {
   const f = await fixture();

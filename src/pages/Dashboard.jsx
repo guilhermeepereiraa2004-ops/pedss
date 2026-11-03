@@ -52,7 +52,6 @@ import useApplication, { useAction, useStore } from "../hooks/useApplication";
 import { trialState } from "../core/trials.ts";
 import useToast from "../hooks/useToast";
 import { finance } from "../core/domain.ts";
-import { orderStatusLabel, orderStatusGroup } from "../lib/orderActions";
 import { currentStoreAddress, storeHref } from "../application/storeAddress";
 import { categories, money, burgerPhoto } from "../lib/data";
 import { getStorefrontTemplate } from "../lib/storefrontTemplates";
@@ -265,7 +264,7 @@ export default function Dashboard() {
   const selected = orders.find((o) => o.id === selectedId);
   const headings = {
     overview: ["Bom movimento por aqui.", `Vamos acompanhar a ${company.name}.`],
-    orders: ["Cada pedido, no seu tempo.", "Aceite, prepare e conclua o pedido por aqui."],
+    orders: ["Cada pedido, no seu tempo.", "Aceite, prepare e acompanhe cada etapa."],
     menu: ["Um cardápio de dar fome.", "Produtos, ingredientes, adicionais e disponibilidade."],
     finance: [
       "Receber e entregar são coisas diferentes.",
@@ -541,13 +540,22 @@ export default function Dashboard() {
         <>
           <div className="table-toolbar" style={{ marginTop: 22 }}>
             <div className="filter-tabs">
-              {["Todos", "Pendente", "Aceito", "Preparando", "Entregue", "Cancelado"].map((s) => (
+              {[
+                "Todos",
+                "Pendente",
+                "Aceito",
+                "Preparando",
+                "A caminho",
+                "Pronto para retirada",
+                "Entregue",
+                "Cancelado",
+              ].map((s) => (
                 <button
                   key={s}
                   className={filter === s ? "active" : ""}
                   onClick={() => setFilter(s)}
                 >
-                  {s === "Todos" ? s : orderStatusLabel({ status: s })}
+                  {s}
                 </button>
               ))}
             </div>
@@ -567,7 +575,7 @@ export default function Dashboard() {
               busy={quickAction.busy}
               orders={orders.filter(
                 (o) =>
-                  (filter === "Todos" || orderStatusGroup(o.status) === filter) &&
+                  (filter === "Todos" || o.status === filter) &&
                   `${o.number} ${o.customer.name} ${o.customer.phone}`
                     .toLowerCase()
                     .includes(search.toLowerCase()),

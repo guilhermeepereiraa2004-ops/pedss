@@ -374,18 +374,17 @@ export function nextStatuses(order: Order): OrderStatus[] {
   const next: Partial<Record<OrderStatus, OrderStatus[]>> = {
     Pendente: ["Aceito", "Cancelado"],
     Aceito: ["Preparando", "Cancelado"],
-    Preparando: ["Entregue", "Cancelado"],
+    Preparando: [
+      order.fulfillment === "pickup" ? "Pronto para retirada" : "A caminho",
+      "Cancelado",
+    ],
     "A caminho": ["Entregue", "Cancelado"],
     "Pronto para retirada": ["Entregue", "Cancelado"],
   };
   return next[order.status] || [];
 }
 export function transition(order: Order, next: OrderStatus, actor: string, reason = ""): Order {
-  // Older clients may finish their existing delivery/pickup step; new UI uses one completion.
-  const legacyStep =
-    order.status === "Preparando" &&
-    next === (order.fulfillment === "pickup" ? "Pronto para retirada" : "A caminho");
-  if (!nextStatuses(order).includes(next) && !legacyStep)
+  if (!nextStatuses(order).includes(next))
     throw new DomainError("Essa mudança de status não é permitida.");
   if (next === "Cancelado" && reason.trim().length < 3)
     throw new DomainError("Informe o motivo do cancelamento.");
