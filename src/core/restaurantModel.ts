@@ -69,7 +69,65 @@ export const paymentEntrySchema = z.object({
   actor: z.string(),
   cashSessionId: id,
 });
+export const pizzaSaleSchema = z.object({
+  componentKey: z.string().min(1).max(400),
+  productId: id,
+  name: z.string().max(80),
+  quantity: z.number().int().min(1).max(100000),
+  sizeId: id,
+  sizeName: z.string().max(60),
+  diameterCm: z.number().optional(),
+  dough: z.string().max(60).default(""),
+  edge: z.string().max(60).default(""),
+  ovenMinutes: z.number().int().min(1).max(120),
+  ovenUnits: z.number().min(0.25).max(20),
+  flavors: z
+    .array(z.object({ id, name: z.string().max(80), share: z.number().positive().max(1) }))
+    .min(1)
+    .max(4),
+});
+export const supplierSchema = z.object({
+  id,
+  name: z.string().trim().min(2).max(80),
+  contact: z.string().trim().max(120).default(""),
+});
+const calendarDate = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/)
+  .refine(
+    (v) => Number.isFinite(Date.parse(v)) && new Date(v).toISOString().slice(0, 10) === v,
+    "Data inválida.",
+  );
+export const purchaseInputSchema = z.object({
+  requestId: id,
+  supplierId: id,
+  invoice: z.string().trim().max(80).default(""),
+  receivedOn: calendarDate,
+  lines: z
+    .array(
+      z.object({
+        ingredientId: id,
+        quantity: z
+          .number()
+          .min(0.0001)
+          .max(1e9)
+          .refine(
+            (n) => Math.abs(n * 10000 - Math.round(n * 10000)) < 0.00001,
+            "Use até quatro casas decimais na quantidade.",
+          ),
+        totalCents: money.refine((n) => n > 0),
+        batch: z.string().trim().max(60).default(""),
+        expiresOn: calendarDate.optional(),
+      }),
+    )
+    .min(1)
+    .max(100),
+});
 export const restaurantSchema = z.object({
+  suppliers: z.array(supplierSchema).max(500).default([]),
+  purchases: z
+    .array(purchaseInputSchema.extend({ id, at: z.string(), actor: z.string(), totalCents: money }))
+    .default([]),
   inventory: z
     .array(
       z.object({
@@ -142,6 +200,7 @@ export const restaurantSchema = z.object({
       capacity: z.number().int().min(1).max(500),
       days: z.number().int().min(1).max(30),
       pizzaCapacity: z.number().int().min(1).max(5000).optional(),
+      ovenSlots: z.number().int().min(1).max(100).optional(),
     })
     .default({ enabled: false, leadMinutes: 60, slotMinutes: 30, capacity: 10, days: 7 }),
 });

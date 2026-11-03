@@ -40,6 +40,8 @@ import { localDay } from "../core/calendar.ts";
 import { minimumPizzaPrice } from "../core/pizza.ts";
 import { createRestaurantServices, syncPizzaCatalog } from "./restaurantServices.ts";
 import { createOrderAmendmentServices } from "./orderAmendmentServices.ts";
+import { createPizzeriaOperationsServices } from "./pizzeriaOperationsServices.ts";
+import { pizzaWorkItems } from "../core/pizzeriaOperations.ts";
 import { markReplacedPizzaExtras } from "../core/catalogRules.ts";
 import { appendPayment, dueCents, paidCents } from "../core/payments.ts";
 import { reserveStock, restoreStock, comboLines } from "../core/restaurant.ts";
@@ -87,6 +89,7 @@ export function createServices(
   return {
     ...createRestaurantServices(repo, permit, company),
     ...createOrderAmendmentServices(repo, permit, tenant),
+    ...createPizzeriaOperationsServices(repo, permit, tenant),
     async quoteShipping(storeId: string, postalCode: string) {
       const t = tenant(repo.getSnapshot(), storeId);
       requireActiveTrial(company(repo.getSnapshot(), storeId));
@@ -531,6 +534,14 @@ export function createServices(
             "Este pedido foi atualizado por outra pessoa. Confira o status atual.",
           );
         const previous = t.orders[index];
+        if (
+          ["A caminho", "Pronto para retirada", "Entregue"].includes(next) &&
+          previous.production?.length &&
+          pizzaWorkItems(previous).some((p) => p.stage !== "ready")
+        )
+          throw new DomainError(
+            "Conclua a produção de todas as pizzas antes de despachar o pedido.",
+          );
         t.orders[index] = transition(previous, next, actor.name, reason);
         if (next === "Cancelado" && ["Pendente", "Aceito"].includes(previous.status))
           restoreStock(t, previous, iso());

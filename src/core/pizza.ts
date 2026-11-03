@@ -121,7 +121,25 @@ export function pricePizza(config: PizzaConfig, selection?: PizzaSelection) {
   const summary = `${size.name} · ${size.diameterCm} cm · ${size.slices} fatias · ${flavors.map((f, i) => `${flavors.length > 1 ? `${weights[i]}/${denominator} ` : ""}${f.name}`).join(" + ")} · Massa: ${dough.name} · Borda: ${edge.name}${details.length ? " · " + details.join("; ") : ""}`;
   if (summary.length > 1000)
     throw new DomainError("Reduza a quantidade de personalizações da pizza.");
-  return { priceCents, summary, size, flavors, dough, edge, customCents, pricing: config.pricing };
+  return {
+    priceCents,
+    summary,
+    size,
+    flavors,
+    dough,
+    edge,
+    customCents,
+    pricing: config.pricing,
+    breakdown: {
+      baseCents: base,
+      flavorBaseCents: flavorBase,
+      countExtraCents:
+        size.flavorCountPricing?.mode === "extra" && countPrice != null ? countPrice : 0,
+      doughCents: dough.priceCents,
+      edgeCents: edge.priceCents,
+      flavorExtrasCents: customCents,
+    },
+  };
 }
 
 export function minimumPizzaPrice(config: PizzaConfig) {

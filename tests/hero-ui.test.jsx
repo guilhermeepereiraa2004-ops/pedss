@@ -2,7 +2,7 @@
 import React from "react";
 import { pizzaIllustration } from "../src/lib/pizzaPhotography";
 import { afterEach, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
@@ -28,6 +28,13 @@ afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
 });
+
+// jsdom does not fetch/decode images: model the native flags before dispatching load.
+async function finishPhoto(photo) {
+  Object.defineProperty(photo, "complete", { configurable: true, value: true });
+  Object.defineProperty(photo, "naturalWidth", { configurable: true, value: 768 });
+  await act(async () => fireEvent.load(photo));
+}
 
 it("HERO-01 hero ilustrativa independe de fotos e usa o menor preço disponível", () => {
   const products = [
@@ -257,7 +264,7 @@ it.each([
         </ApplicationProvider>,
       );
       const photo = await screen.findByRole("img", { name: "Foto de Nome oficial" });
-      fireEvent.load(photo);
+      await finishPhoto(photo);
       expect(photo.closest(".product-artwork")).toHaveAttribute("data-motion", "on");
       const hero = screen.getByRole("img", { name: storefrontTemplates.burger.alt });
       const heroSrc = hero.getAttribute("src");
@@ -271,7 +278,7 @@ it.each([
       await userEvent.click(screen.getByRole("button", { name: "Ver Nome oficial" }));
       const modal = screen.getByRole("dialog");
       const detailPhoto = within(modal).getByRole("img", { name: "Foto de Nome oficial" });
-      fireEvent.load(detailPhoto);
+      await finishPhoto(detailPhoto);
       expect(detailPhoto.closest(".product-artwork")).toHaveAttribute("data-motion", "on");
       expect(
         within(modal).getByRole("button", { name: "Loja fechada para pedidos" }),
@@ -332,7 +339,7 @@ it("BURGER-05 catálogo legado sem cutout usa recortes da mesma foto, sem depend
   );
 });
 
-it("BURGER-06 arquivo opaco no campo sem fundo não aparece no cardápio", () => {
+it("BURGER-06 arquivo opaco no campo sem fundo não aparece no cardápio", async () => {
   vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({
     drawImage() {},
     getImageData() {
@@ -344,12 +351,12 @@ it("BURGER-06 arquivo opaco no campo sem fundo não aparece no cardápio", () =>
   );
   const photo = screen.getByRole("img");
   expect(photo).toHaveAttribute("data-verified", "false");
-  fireEvent.load(photo);
+  await finishPhoto(photo);
   expect(screen.queryByRole("img")).not.toBeInTheDocument();
   expect(screen.getByRole("status")).toHaveTextContent("Foto sem fundo");
 });
 
-it("BURGER-07 recorte com alpha só aparece e se movimenta depois da verificação", () => {
+it("BURGER-07 recorte com alpha só aparece e se movimenta depois da verificação", async () => {
   const data = new Uint8ClampedArray(64 * 64 * 4).fill(255);
   for (let i = 3; i < data.length / 2; i += 4) data[i] = 0;
   vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({
@@ -361,12 +368,12 @@ it("BURGER-07 recorte com alpha só aparece e se movimenta depois da verificaç�
   render(<ProductCutout product={{ ...product, cutoutImage: "/burger-alpha.webp" }} motion />);
   const photo = screen.getByRole("img");
   expect(photo.closest(".product-artwork")).toHaveAttribute("data-motion", "off");
-  fireEvent.load(photo);
+  await finishPhoto(photo);
   expect(photo).toHaveAttribute("data-verified", "true");
   expect(photo.closest(".product-artwork")).toHaveAttribute("data-motion", "on");
 });
 
-it("PHOTO-SYNC-01 fotos verificadas em momentos diferentes e retomadas usam a mesma fase", () => {
+it("PHOTO-SYNC-01 fotos verificadas em momentos diferentes e retomadas usam a mesma fase", async () => {
   const data = new Uint8ClampedArray(64 * 64 * 4).fill(255);
   for (let i = 3; i < data.length / 2; i += 4) data[i] = 0;
   vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({
@@ -389,10 +396,10 @@ it("PHOTO-SYNC-01 fotos verificadas em momentos diferentes e retomadas usam a me
     });
     return { running, getAnimations };
   });
-  fireEvent.load(images[0]);
+  await finishPhoto(images[0]);
   expect(animations[0].running.map((animation) => animation.startTime)).toEqual([0, 0]);
   expect(animations[1].getAnimations).not.toHaveBeenCalled();
-  fireEvent.load(images[1]);
+  await finishPhoto(images[1]);
   for (const { running, getAnimations } of animations) {
     expect(getAnimations).toHaveBeenCalledWith({ subtree: true });
     expect(running.map((animation) => animation.startTime)).toEqual([0, 0]);

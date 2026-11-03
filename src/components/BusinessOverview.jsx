@@ -11,6 +11,7 @@ import {
   Package,
 } from "lucide-react";
 import Metrics from "./Metrics";
+import PizzaSalesReport from "./PizzaSalesReport";
 import { businessOverview } from "../core/analytics.ts";
 import { money } from "../lib/data";
 import "./Business.css";
@@ -65,6 +66,10 @@ export default function BusinessOverview({ company, tenant, now, onExpenses, onC
         <small>Atualizado com os registros da loja</small>
       </div>
       <Metrics items={metrics} />
+      {(tenant.settings.heroSegment === "pizza" ||
+        tenant.products.some((p) => p.category === "Pizza")) && (
+        <PizzaSalesReport tenant={tenant} now={now} />
+      )}
       <div className="business-chart-grid">
         <section className="panel balance-panel">
           <div className="panel-head">

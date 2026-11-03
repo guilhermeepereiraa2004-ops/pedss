@@ -11,6 +11,13 @@ export function publicOrder(order) {
   } = order;
   return {
     ...safe,
+    ...(safe.production
+      ? {
+          production: safe.production.map(
+            ({ actor: _actor, requestId: _request, ...event }) => event,
+          ),
+        }
+      : {}),
     lines: safe.lines.map(({ unitCostCents: _cost, stockUsage: _usage, ...line }) => line),
     history: safe.history
       .filter((h) => h.kind === "order")

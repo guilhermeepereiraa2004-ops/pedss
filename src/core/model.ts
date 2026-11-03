@@ -6,6 +6,7 @@ import {
   restaurantSchema,
   pizzaChoiceSchema,
   paymentEntrySchema,
+  pizzaSaleSchema,
 } from "./restaurantModel.ts";
 
 const id = z.string().min(1).max(120);
@@ -162,6 +163,8 @@ export const pizzaConfigSchema = z
           id,
           name: text.min(1).max(60),
           diameterCm: z.number().int().min(1).max(200),
+          ovenMinutes: z.number().int().min(1).max(120).optional(),
+          ovenUnits: z.number().min(0.25).max(20).optional(),
           slices: z.number().int().min(1).max(64),
           maxFlavors: z.number().int().min(1).max(4),
           available: z.boolean(),
@@ -393,6 +396,7 @@ export const orderStatusSchema = z.enum([
 ]);
 export const paymentStatusSchema = z.enum(["Pendente", "Pago", "Estornado"]);
 export const orderLineSchema = z.object({
+  pizzaDetails: z.array(pizzaSaleSchema).max(100).optional(),
   productId: id,
   stockUsage: recipeSchema.optional(),
   pizzaUnits: z.number().int().min(0).max(100000).optional(),
@@ -431,12 +435,24 @@ export const historySchema = z.object({
   id,
   at: z.string(),
   actor: text,
-  kind: z.enum(["order", "payment", "amendment"]),
+  kind: z.enum(["order", "payment", "amendment", "production"]),
   from: text,
   to: text,
   reason: text,
 });
 export const orderSchema = z.object({
+  production: z
+    .array(
+      z.object({
+        key: z.string().min(1).max(600),
+        stage: z.enum(["preparing", "baking", "ready"]),
+        at: z.string(),
+        actor: z.string().optional(),
+        requestId: id,
+      }),
+    )
+    .max(900)
+    .optional(),
   amendments: z.array(orderItemChangeSchema).max(500).optional(),
   payments: z.array(paymentEntrySchema).optional(),
   pizzaUnits: z.number().int().min(0).max(100000).optional(),

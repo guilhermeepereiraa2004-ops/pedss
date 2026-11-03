@@ -14,6 +14,7 @@ import type {
 } from "./model.ts";
 
 import { DomainError } from "./errors.ts";
+import { pizzaSnapshot } from "./pizzeriaOperations.ts";
 import { applyCoupon } from "./coupons.ts";
 import { trialState } from "./trials.ts";
 import { pricePizza } from "./pizza.ts";
@@ -227,6 +228,18 @@ export function priceLine(
         : null;
   return {
     productId: p.id,
+    ...(p.category === "Pizza" || comboPriced.length
+      ? {
+          pizzaDetails: comboPriced.length
+            ? comboPriced.flatMap((c) =>
+                (c.pizzaDetails || []).map((d) => ({
+                  ...d,
+                  quantity: d.quantity * line.quantity,
+                })),
+              )
+            : pizzaSnapshot(p, line),
+        }
+      : {}),
     pizzaUnits: pizzaUnitsForLines([line], products),
     selection: structuredClone(line),
     ...(pizza
@@ -249,6 +262,8 @@ export function priceLine(
   };
 }
 export function quote(cart: Cart, products: Product[], inventory?: Restaurant["inventory"]) {
+  if (new Set(cart.lines.map((l) => l.key)).size !== cart.lines.length)
+    throw new DomainError("Os itens do pedido precisam ter identificadores diferentes.");
   const lines = cart.lines.map((line) => priceLine(line, products, inventory));
   return { lines, subtotalCents: lines.reduce((sum, l) => sum + l.totalCents, 0) };
 }

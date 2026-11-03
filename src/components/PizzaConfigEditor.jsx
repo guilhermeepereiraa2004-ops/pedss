@@ -185,6 +185,33 @@ export default function PizzaConfigEditor({ product, catalog = [], onChange, sec
                     />{" "}
                     Disponível
                   </label>
+                  <label className="field">
+                    Tempo de forno (minutos)
+                    <input
+                      type="number"
+                      min="1"
+                      max="120"
+                      value={size.ovenMinutes ?? 10}
+                      onChange={(e) =>
+                        update("sizes", size.id, { ovenMinutes: Number(e.target.value) })
+                      }
+                    />
+                    <small>Reserva antes do horário agendado.</small>
+                  </label>
+                  <label className="field">
+                    Espaços ocupados no forno
+                    <input
+                      type="number"
+                      min="0.25"
+                      max="20"
+                      step="0.25"
+                      value={size.ovenUnits ?? 1}
+                      onChange={(e) =>
+                        update("sizes", size.id, { ovenUnits: Number(e.target.value) })
+                      }
+                    />
+                    <small>Ex.: grande ocupa 2; brotinho ocupa 0,5.</small>
+                  </label>
                   <button
                     className="button button-outline button-small"
                     type="button"

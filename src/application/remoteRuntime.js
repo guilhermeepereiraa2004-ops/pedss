@@ -95,7 +95,15 @@ export function createRemoteRuntime({ storage = cartStorage(), fetcher = fetch }
         if (!previous) continue;
         if (payload.unchanged?.operations) {
           tenant.restaurant = { ...tenant.restaurant };
-          for (const field of ["inventory", "movements", "cashSessions", "tables", "tabs"])
+          for (const field of [
+            "inventory",
+            "movements",
+            "cashSessions",
+            "tables",
+            "tabs",
+            "suppliers",
+            "purchases",
+          ])
             if (previous[field] !== undefined) tenant.restaurant[field] = previous[field];
         }
         if (payload.unchanged?.catalog)

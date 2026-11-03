@@ -3,6 +3,7 @@ import type { CartLine, Product, Tenant, Order } from "./model.ts";
 import { DomainError } from "./errors.ts";
 import { pricePizza, pizzaFlavorAvailable } from "./pizza.ts";
 import { paymentLedger } from "./payments.ts";
+import { pizzaSnapshot, assertOvenCapacity } from "./pizzeriaOperations.ts";
 export function extraCostCents(
   extra: Product["extras"][number],
   inventory?: Restaurant["inventory"],
@@ -430,6 +431,21 @@ export function validateSchedule(
       }, 0);
     if (occupied + pizzaUnitsForLines(lines, t.products) > r.pizzaCapacity)
       throw new DomainError("A capacidade de pizzas deste horário foi atingida. Escolha outro.");
+  }
+  if (r.ovenSlots) {
+    const snapshots = lines.flatMap((line) => {
+      const p = t.products.find((p) => p.id === line.productId);
+      if (!p) throw new DomainError("Produto não encontrado.");
+      return p.combo
+        ? comboLines(line, t.products).flatMap((c) =>
+            pizzaSnapshot(
+              t.products.find((p) => p.id === c.productId)!,
+              c,
+            ).map((d) => ({ ...d, quantity: d.quantity * line.quantity })),
+          )
+        : pizzaSnapshot(p, line);
+    });
+    assertOvenCapacity(t, at.toISOString(), snapshots);
   }
 }
 export function cashSummary(t: Tenant, session: Restaurant["cashSessions"][number]) {

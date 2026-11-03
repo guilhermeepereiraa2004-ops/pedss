@@ -98,6 +98,14 @@ export function planOrderItemChange(tenant: Tenant, order: Order, draft: OrderIt
       ? {
           ...structuredClone(before),
           quantity: remaining,
+          ...(before.pizzaDetails
+            ? {
+                pizzaDetails: before.pizzaDetails.map((p) => ({
+                  ...p,
+                  quantity: (p.quantity * remaining) / before.quantity,
+                })),
+              }
+            : {}),
           totalCents: before.unitPriceCents * remaining,
           ...(before.selection
             ? { selection: { ...structuredClone(before.selection), quantity: remaining } }

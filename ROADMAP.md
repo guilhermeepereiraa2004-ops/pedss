@@ -1,5 +1,18 @@
 # Roadmap — Pedss
 
+## Versão integral publicada e novo Git conectado — 30/10/2026
+
+Produção Pedss/Diego Projects atualizada integralmente para o commit 15fe3a8ea95290857b2e210a213240da18ca227d de guilhermeepereiraa2004-ops/pedss/main. Fonte criada por git archive do commit, sem env reais nem registros locais. Deployment dpl_3fi667sKPZyRj9nfvjLHbNitf5BW, READY, funções gru1, promovido para https://pedss.vercel.app após validação. Bundle Dashboard publicado tem SHA256 idêntico ao build do gate. Projeto principal prj_wQ4WydtpnP5OS36ei515W9GpoVxV agora conectado ao novo repositório GitHub, productionBranch=main. Não é mais uma publicação parcial baseada na produção antiga.
+
+Gate aprovado:348 testes/48 arquivos,188/188 critérios, lint/tipos/camadas/build; CI GitHub Quality41125913799 success. Oito regressões novas cobrem HTTP/SQL de pizzaria, estoque/caixa, mesas e pagamento, isolamento, repetição, alteração auditada/idempotente de itens e caches parciais. PostgreSQL/WASM descartável foi usado nos testes; não houve pedido, pagamento, cliente, migração, seed nem alteração operacional no Supabase real.
+
+Leituras antes/staging/produção confirmaram seis lojas,48 produtos, identidade, preços, configurações e online preservados (novos defaults normalizados pelo mesmo schema). SSEv2 conectado, revisão67 e dois heartbeats; timeout4s intencional. Inspeção autenticada confirmou Pizzaria, Estoque e fichas, Caixa, Mesas e comandas, Agendamento, Combos, Cozinha e Balcão. Ativação do editor de tamanhos testada somente como rascunho e descartada, sem salvar. Console sem erros; logs de erro do deployment vazios na janela15m. Captura .quality/full-production-pizzeria-2026-10-30.png. Testes de gravação em produção, carga e rotas externas por CEP não realizados; OPENROUTESERVICE_API_KEY continua adiada pelo usuário. Cadastros locais de demonstração não foram copiados para o banco publicado.
+
+Incidente de vínculo: primeiro envio começou antes de terminar a criação da cópia isolada e criou full-release-15fe3a8 (prj_Idk2gd4zB0oKXonhcb02RBLCAF5g), sem afetar o Pedss original ou seu banco. Exclusão inicialmente bloqueada pela revisão automática; usuário autorizou expressamente excluir apenas esse projeto extra. CLI confirmou remoção permanente do projeto e deployment depois dessa autorização. Vínculo corrigido/inspecionado antes do envio ao Pedss correto. Nenhuma proteção, credencial, variável ou plano foi alterado. Raia única, sem subagentes.
+
+Registros posteriores à publicação não alteram o código funcional do commit enviado. Rollback disponível na produção anterior Supabase dpl_6Rq9cFo67yzEppZkoRGCFjSePBkH.
+
+
 ## Publicação integral em preparação — 30/10/2026
 
 Pedido explícito para atualizar toda a versão da Vercel. Fonte canônica: guilhermeepereiraa2004-ops/pedss, main. Contrato único de comandos agora conecta os módulos de pizzaria e operação à API: vínculo de sabores, estoque/fichas, agendamento, caixa, pagamentos parciais, mesas/comandas, balcão e alterações de itens. Repetição de pedido usa token opaco e mantém a sacola somente no navegador. A API reaplica permissões e preços do domínio; resultados de pedidos para atendentes são sanitizados.
@@ -718,3 +731,39 @@ Notebook experimental em notebooks/brasa-original-triposr.ipynb, gerador em scri
 | Pagamentos online, cobrança de assinatura e fiscal | Integrações futuras |
 | Normalização SQL, paginação e storage de mídia | Próxima etapa para escala; limites em docs/DEPLOYMENT.md |
 | Branches por ambiente, backups e restauração | Pendentes antes de operação comercial |
+
+## 03/11/2026 — Servidor local iniciado
+
+Pedido para executar localmente atendido com npm run dev -- --host 127.0.0.1 --port 5176 --strictPort. Vite iniciou e a landing http://127.0.0.1:5176/ foi aberta e conferida no navegador, sem erros de console. Runtime de demonstração local; conexão PostgreSQL remota desativada pelo guard existente. Sem alteração de código, env, cadastros, banco, publicação ou commit. Gate não repetido para simples inicialização do processo; último gate de código registrado permanece válido. Nenhuma nova lacuna identificada nesta verificação de abertura.
+
+## 03/11/2026 — Prévia fixa no montador de pizza mobile
+
+Pedido atendido localmente em src/components/PizzaBuilder.css: a prévia passa a usar sticky/top0/z-index4 no layout de uma coluna; a rolagem do modal reserva248px para manter opções focadas fora da área ocupada pela pizza. Layout desktop de duas colunas preservado. Sem alteração de preços, ingredientes, hero, banco ou lógica do pedido. Sem commit, envio GitHub ou deploy nesta tarefa.
+
+Gate npm run check aprovado:348 testes/48 arquivos e188/188 critérios, lint/tipos/camadas/build. Log .quality/pizza-mobile-sticky-gate-2026-11-03.log. Navegador local na Cia da Pizza validou390x844 e320x568, três e quatro sabores, nomes longos, seleção de massa/borda, botão adicionar e ausência de overflow horizontal. A posição da prévia permaneceu em y89 enquanto a rolagem mudou de1711 para1981 na verificação final. Desktop1440x900 manteve grid de duas colunas e scroll-padding auto. Console sem erros. Viewport temporário restaurado. Evidências .quality/pizza-mobile-sticky-browser-2026-11-03.json e capturas pizza-mobile-sticky-390/320-2026-11-03.png. Apenas rascunho de montagem no navegador, sem adicionar à sacola ou criar pedido. Limite: inspeção em navegador emulado, sem aparelho físico ou teclado virtual nativo; produção permanece na versão anterior até nova solicitação de publicação. Raia única, agente principal.
+
+
+## 03/11/2026 — Rollback da prévia fixa solicitado
+
+Revertido exclusivamente o ajuste anterior de src/components/PizzaBuilder.css: prévia mobile novamente relative/top:auto e reserva de248px da rolagem removida. Arquivo idêntico ao HEAD, sem diferenças funcionais remanescentes desta alteração. Registros anteriores preservados como histórico. Gate npm run check aprovado:348 testes/48 arquivos e188/188 critérios, lint/tipos/camadas/build. Navegador390x844 confirmou position:relative, scroll-padding:auto e topo da prévia de128 para-378 ao rolar506px. Viewport restaurado. Evidências .quality/pizza-mobile-rollback-browser-2026-11-03.json e .quality/pizza-mobile-rollback-2026-11-03.png; log .quality/pizza-mobile-rollback-gate-2026-11-03.log. Sem pedido, cadastro, banco, commit ou deploy; outras alterações da pasta preservadas.
+
+
+## 03/11/2026 — Revisão comercial da pizzaria
+
+Análise sem alterações funcionais: módulos principais já implementados/publicados. Recomendações priorizam montador mobile, busca interna de sabores, transparência do preço, configuração assistida/simulador, relatórios por sabor/tamanho, etapas individuais de produção e impressão térmica validada. Compras/lotes/validade e backup integral por loja ficam como evolução. Achados, evidências e limites em docs/GAPS.md, seção Revisão da pizzaria para apresentação comercial. Sem novos testes operacionais, commits ou deploy; último gate348/188 preservado.
+
+
+## 03/11/2026 — Refinamentos da pizzaria concluídos localmente
+
+Montador mobile em três etapas com prévia recolhível (sem reintroduzir sticky), busca/filtros internos, composição do preço, configuração guiada e simulador com o mesmo cálculo do pedido. Relatório por sabor/tamanho decompõe combos e usa snapshots históricos; cozinha controla cada pizza; impressão tem vias cozinha/cliente/entrega e 58/80mm. Compras com fornecedor, lote/validade e custo médio; agenda reserva espaços e minutos por tamanho, revalidando edições. Operações remotas preparadas nos contratos existentes, sem integrar ou acessar banco nesta tarefa. Hero e cards preservados.
+
+Gate final npm run check aprovado:363 testes/50 arquivos e203/203 critérios, lint/tipos/camadas/build/API. Log .quality/pizzeria-launch-gate-verified.log. Primeiro gate excedeu o timeout de um teste antigo XLSX; isolado e dois gates completos seguintes passaram sem aumentar timeout. UI desktop e390x844/320x568 conferida com runtime descartável em memória, incluindo sacola, cozinha, compras, impressão e relatório. Loja real em localhost:5176 conferida somente para abertura do montador; nenhum pedido/cadastro real alterado. Sem commits, push ou deploy.
+
+Limites: impressão e celular físicos ainda requerem ensaio; compras registram lotes recebidos e alertas, sem saldo por lote/FEFO/baixa automática por validade. Forno reserva capacidade conservadoramente, sem otimizar fornadas. Pedidos antigos sem snapshots ficam fora do detalhamento e são sinalizados. Backup/restauração integral por loja e recuperação remota por e-mail continuam evoluções. Detalhes em docs/PIZZERIA-REFINEMENTS.md e docs/QA.md.
+
+
+## 03/11/2026 — Carregamento das fotos das pizzas
+
+Corrigido ProductCutout: arquivos versionados confiáveis não são mais tratados como carregados antes de load/decode. A animação só inicia após a decodificação; fotos próximas da tela têm carregamento antecipado por IntersectionObserver, com rechecagem ao rolar, pageshow e retorno à aba. Falhas preservam o estado de foto indisponível e resultados de decodificação antigos não liberam outra imagem. Verificação de transparência das fotos próprias, movimento coordenado, hero, cards e cadastros preservados.
+
+Gate npm run check aprovado:366 testes/50 arquivos e206/206 critérios, lint/tipos/camadas/build/API. Log .quality/pizza-image-lifecycle-gate-final.log. Três novos testes de ciclo de carregamento; os testes de movimento existentes agora simulam complete/naturalWidth e aguardam decode, mantendo as mesmas garantias. Nenhuma biblioteca, alteração de banco, commit, push ou deploy.

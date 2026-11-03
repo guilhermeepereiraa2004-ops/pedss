@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Pizza, Plus, Check } from "lucide-react";
 import PizzaConfigEditor from "./PizzaConfigEditor";
 import { createPizzaConfig } from "../application/pizzaDraft.ts";
+import PizzaSimulator from "./PizzaSimulator";
+import Modal from "./Modal";
 import { useAction } from "../hooks/useApplication";
 import { uuid } from "../core/domain.ts";
 import { money } from "../lib/data";
@@ -13,6 +15,17 @@ function PricingForm({ product, catalog, onSave, onDirty, onSaved, isNew, onCanc
   const [editorVersion, setEditorVersion] = useState(0);
   const [section, setSection] = useState("general");
   const [dirty, setDirty] = useState(!!isNew);
+  const [guided, setGuided] = useState(!!isNew);
+  const [simulate, setSimulate] = useState(false);
+  const steps = [
+    ["general", "Como cobrar"],
+    ["sizes", "Tamanhos e fatias"],
+    ["rules", "Combinações e ingredientes"],
+    ["prices", "Preços por tamanho"],
+    ["options", "Massas e bordas"],
+    ["counts", "Preços por sabores"],
+  ];
+  const stepIndex = steps.findIndex(([id]) => id === section);
   const action = useAction();
   const change = (patch) => {
     setDraft((v) => ({ ...v, ...patch }));
@@ -22,119 +35,187 @@ function PricingForm({ product, catalog, onSave, onDirty, onSaved, isNew, onCanc
     action.setError("");
   };
   return (
-    <form
-      className="form-stack pizza-pricing-form"
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (!draft.pizza) {
-          action.setError("Ative a configuração de pizza para definir tamanhos e preços.");
-          return;
-        }
-        action.run(
-          () => onSave(draft),
-          () => {
-            setDirty(false);
-            onDirty(false);
-            setMessage("Tamanhos e preços salvos.");
-            onSaved();
-          },
-        );
-      }}
-    >
-      <div className="pizza-management-form-heading">
-        <div>
-          <span className="section-kicker">CONFIGURAÇÃO DO PRODUTO</span>
-          <h2>{draft.name}</h2>
+    <>
+      <form
+        className="form-stack pizza-pricing-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!draft.pizza) {
+            action.setError("Ative a configuração de pizza para definir tamanhos e preços.");
+            return;
+          }
+          action.run(
+            () => onSave(draft),
+            () => {
+              setDirty(false);
+              onDirty(false);
+              setMessage("Tamanhos e preços salvos.");
+              onSaved();
+            },
+          );
+        }}
+      >
+        <div className="pizza-management-form-heading">
+          <div>
+            <span className="section-kicker">CONFIGURAÇÃO DO PRODUTO</span>
+            <h2>{draft.name}</h2>
+          </div>
+          <span className="tag">
+            {draft.pizza ? `${draft.pizza.sizes.length} tamanhos` : "Preço único"}
+          </span>
         </div>
-        <span className="tag">
-          {draft.pizza ? `${draft.pizza.sizes.length} tamanhos` : "Preço único"}
-        </span>
-      </div>
-      <label className="field">
-        Nome da pizza ou montador
-        <input
-          required
-          maxLength={80}
-          value={draft.name}
-          onChange={(e) => change({ name: e.target.value })}
-        />
-      </label>
-      <div className="pizza-management-tabs" role="tablist" aria-label="Configurações da pizzaria">
-        {[
-          ["general", "Como cobrar"],
-          ["prices", "Preços por tamanho"],
-          ["sizes", "Tamanhos e fatias"],
-          ["counts", "Preços por sabores"],
-          ["options", "Massas e bordas"],
-          ["rules", "Combinações e ingredientes"],
-        ].map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            role="tab"
-            aria-selected={section === key}
-            onClick={() => setSection(key)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-      <PizzaConfigEditor
-        key={editorVersion}
-        section={section}
-        product={draft}
-        catalog={catalog}
-        onChange={(pizza) => change({ pizza })}
-      />
-      {!draft.pizza && (
-        <p className="notice">
-          Este produto usa preço único de {money(draft.priceCents / 100)}. Ative a configuração
-          acima para cadastrar preços por tamanho. As mudanças só entram em vigor ao salvar.
-        </p>
-      )}
-      {action.error && (
-        <p className="form-error" role="alert">
-          {action.error}
-        </p>
-      )}
-      {message && (
-        <p className="notice" role="status">
-          {message}
-        </p>
-      )}
-      <div className="pizza-management-save">
-        <span className="muted small-copy">
-          {dirty
-            ? "Você tem alterações ainda não salvas."
-            : "Os valores salvos são usados no cardápio e no pedido."}
-        </span>
-        <div>
+        <label className="field">
+          Nome da pizza ou montador
+          <input
+            required
+            maxLength={80}
+            value={draft.name}
+            onChange={(e) => change({ name: e.target.value })}
+          />
+        </label>
+        <div
+          className="pizza-management-tabs"
+          role="tablist"
+          aria-label="Configurações da pizzaria"
+        >
+          {[
+            ["general", "Como cobrar"],
+            ["prices", "Preços por tamanho"],
+            ["sizes", "Tamanhos e fatias"],
+            ["counts", "Preços por sabores"],
+            ["options", "Massas e bordas"],
+            ["rules", "Combinações e ingredientes"],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              aria-selected={section === key}
+              onClick={() => setSection(key)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="pizza-guided-actions">
           <button
             type="button"
             className="button button-outline"
-            disabled={action.busy || !dirty}
+            aria-pressed={guided}
             onClick={() => {
-              if (isNew) {
-                onCancelNew();
-                return;
-              }
-              setDraft(product);
-              setEditorVersion((v) => v + 1);
-              setDirty(false);
-              onDirty(false);
-              setMessage("");
-              action.setError("");
+              setGuided(!guided);
+              setSection("general");
             }}
           >
-            Descartar alterações
+            {guided ? "Usar edição livre" : "Configurar passo a passo"}
           </button>
-          <button className="button button-dark" disabled={action.busy || !dirty}>
-            <Check size={16} />
-            {action.busy ? "Salvando…" : "Salvar tamanhos e preços"}
+          <button
+            type="button"
+            className="button button-dark"
+            disabled={!draft.pizza}
+            onClick={() => setSimulate(true)}
+          >
+            Simular uma compra
           </button>
         </div>
-      </div>
-    </form>
+        {guided && (
+          <p className="notice" role="status">
+            Passo {stepIndex + 1} de {steps.length}: {steps[stepIndex]?.[1]}. As alterações só valem
+            depois de salvar. Você pode voltar a qualquer etapa.
+          </p>
+        )}
+        <PizzaConfigEditor
+          key={editorVersion}
+          section={section}
+          product={draft}
+          catalog={catalog}
+          onChange={(pizza) => change({ pizza })}
+        />
+        {!draft.pizza && (
+          <p className="notice">
+            Este produto usa preço único de {money(draft.priceCents / 100)}. Ative a configuração
+            acima para cadastrar preços por tamanho. As mudanças só entram em vigor ao salvar.
+          </p>
+        )}
+        {guided && (
+          <div className="pizza-guided-actions">
+            <button
+              type="button"
+              className="button button-outline"
+              disabled={stepIndex <= 0}
+              onClick={() => setSection(steps[stepIndex - 1][0])}
+            >
+              Etapa anterior
+            </button>
+            {stepIndex < steps.length - 1 ? (
+              <button
+                type="button"
+                className="button button-dark"
+                disabled={!draft.pizza}
+                onClick={() => setSection(steps[stepIndex + 1][0])}
+              >
+                Próxima etapa
+              </button>
+            ) : (
+              <p className="small-copy">
+                Simule uma compra para conferir as regras e clique em Salvar tamanhos e preços.
+              </p>
+            )}
+          </div>
+        )}
+        {action.error && (
+          <p className="form-error" role="alert">
+            {action.error}
+          </p>
+        )}
+        {message && (
+          <p className="notice" role="status">
+            {message}
+          </p>
+        )}
+        <div className="pizza-management-save">
+          <span className="muted small-copy">
+            {dirty
+              ? "Você tem alterações ainda não salvas."
+              : "Os valores salvos são usados no cardápio e no pedido."}
+          </span>
+          <div>
+            <button
+              type="button"
+              className="button button-outline"
+              disabled={action.busy || !dirty}
+              onClick={() => {
+                if (isNew) {
+                  onCancelNew();
+                  return;
+                }
+                setDraft(product);
+                setEditorVersion((v) => v + 1);
+                setDirty(false);
+                onDirty(false);
+                setMessage("");
+                action.setError("");
+              }}
+            >
+              Descartar alterações
+            </button>
+            <button className="button button-dark" disabled={action.busy || !dirty}>
+              <Check size={16} />
+              {action.busy ? "Salvando…" : "Salvar tamanhos e preços"}
+            </button>
+          </div>
+        </div>
+      </form>
+      {simulate && draft.pizza && (
+        <Modal
+          title="Simular uma compra"
+          className="pizza-simulator-modal"
+          onClose={() => setSimulate(false)}
+        >
+          <PizzaSimulator config={draft.pizza} />
+        </Modal>
+      )}
+    </>
   );
 }
 

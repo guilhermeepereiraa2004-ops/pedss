@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Check, ArrowUpRight, Printer } from "lucide-react";
+import { Check, ArrowUpRight } from "lucide-react";
+import OrderPrint from "./OrderPrint";
 import { nextStatuses } from "../core/domain.ts";
 import { money } from "../lib/data";
 import { orderActionLabel, orderStatusLabel } from "../lib/orderActions";
@@ -20,6 +21,7 @@ const addressText = (a) =>
     .join(", ");
 export default function OrderDetail({
   order,
+  storeName = "",
   canFinance,
   onTransition,
   onPayment,
@@ -246,10 +248,8 @@ export default function OrderDetail({
             Registrar estorno manual
           </button>
         )}
-        <button className="button button-outline" onClick={() => window.print()}>
-          <Printer size={14} /> Imprimir pedido
-        </button>
       </div>
+      <OrderPrint order={order} storeName={storeName} />
       {!!order.amendments?.length && (
         <section className="order-amendment-log" aria-label="Alterações dos itens">
           <h3>Alterações dos itens</h3>

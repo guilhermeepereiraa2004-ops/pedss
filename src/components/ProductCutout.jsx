@@ -14,34 +14,67 @@ function Photo({ product, className, motion, priority, sizes }) {
   const artwork = useRef(null);
   const image = useRef(null);
   const bundled = isBundledPizzaPhoto(src);
-  const ready = !!src && (bundled || verified === src);
+  const ready = !!src && verified === src;
   const rejectSource = useCallback(() => {
     setFailed((previous) => (previous.includes(src) ? previous : [...previous, src]));
   }, [src]);
-  const verifyImage = useCallback(
-    (element) => {
-      if (element !== image.current) return;
-      if (bundled || hasImageTransparency(element)) setVerified(src);
-      else rejectSource();
-    },
-    [bundled, src, rejectSource],
-  );
   useEffect(() => {
     let active = true;
+    let decoding = false;
     const element = image.current;
-    const checkCachedImage = () => {
+    if (!element) return;
+    const checkImage = () => {
       if (!active || !element?.complete) return;
-      if (element.naturalWidth > 0) verifyImage(element);
-      else rejectSource();
+      if (!element.naturalWidth) {
+        rejectSource();
+        return;
+      }
+      if (decoding) return;
+      decoding = true;
+      // A bundled alpha file is trusted, but it still has to load and decode before animation.
+      Promise.resolve()
+        .then(() => element.decode?.())
+        .then(() => {
+          if (!active || element !== image.current) return;
+          if (bundled || hasImageTransparency(element)) setVerified(src);
+          else rejectSource();
+        })
+        .catch(() => {
+          if (active) rejectSource();
+        });
     };
-    // A cached image can finish before React receives load. Also recheck a restored page.
-    queueMicrotask(checkCachedImage);
-    window.addEventListener("pageshow", checkCachedImage);
+    const visible = () => {
+      if (document.visibilityState === "visible") checkImage();
+    };
+    const observer =
+      typeof IntersectionObserver === "function"
+        ? new IntersectionObserver(
+            (entries) => {
+              if (!entries.some((entry) => entry.isIntersecting)) return;
+              // Force nearby photos to start even if native lazy loading was deferred on restoration.
+              element.loading = "eager";
+              checkImage();
+              observer.disconnect();
+            },
+            { rootMargin: "600px" },
+          )
+        : null;
+    observer?.observe(element);
+    element.addEventListener("load", checkImage);
+    element.addEventListener("error", rejectSource);
+    // Cached loads may precede the listener. Restoration/visibility can also skip a load event.
+    queueMicrotask(checkImage);
+    window.addEventListener("pageshow", checkImage);
+    document.addEventListener("visibilitychange", visible);
     return () => {
       active = false;
-      window.removeEventListener("pageshow", checkCachedImage);
+      observer?.disconnect();
+      element.removeEventListener("load", checkImage);
+      element.removeEventListener("error", rejectSource);
+      window.removeEventListener("pageshow", checkImage);
+      document.removeEventListener("visibilitychange", visible);
     };
-  }, [src, verifyImage, rejectSource]);
+  }, [src, bundled, rejectSource]);
   useLayoutEffect(() => {
     if (!motion || !ready) return;
     // Use the document timeline origin so late images and reopened details share the same phase.
@@ -56,7 +89,7 @@ function Photo({ product, className, motion, priority, sizes }) {
       data-cutout={!!src}
       data-ready={ready}
       data-motion={motion && ready ? "on" : "off"}
-      aria-busy={!!src && verified !== src}
+      aria-busy={!!src && !ready}
     >
       {src ? (
         <>
@@ -77,10 +110,8 @@ function Photo({ product, className, motion, priority, sizes }) {
             decoding="async"
             crossOrigin="anonymous"
             data-verified={ready}
-            onLoad={(event) => verifyImage(event.currentTarget)}
-            onError={rejectSource}
           />
-          {verified !== src && (
+          {!ready && (
             <span className="product-photo-loading" role="status">
               Carregando foto…
             </span>

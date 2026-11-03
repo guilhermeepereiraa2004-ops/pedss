@@ -1,7 +1,10 @@
 import { pizzaPricingLabels, pizzaFlavorAvailable } from "../core/pizza.ts";
 import { money } from "../lib/data";
 import "./PizzaBuilder.css";
+import "./PizzaRefinements.css";
 import PizzaPreview from "./PizzaPreview";
+import { useState } from "react";
+import PizzaPriceBreakdown from "./PizzaPriceBreakdown";
 
 export default function PizzaBuilder({
   config,
@@ -9,6 +12,19 @@ export default function PizzaBuilder({
   onChange: onSelectionChange,
   includedInCombo = false,
 }) {
+  const [step, setStep] = useState(0);
+  const [search, setSearch] = useState("");
+  const [kind, setKind] = useState("all");
+  const [showPreview, setShowPreview] = useState(true);
+  const normalize = (text) =>
+    text
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  const go = (next, element) => {
+    setStep(next);
+    element?.closest(".product-options-body")?.scrollTo?.({ top: 0, behavior: "smooth" });
+  };
   const onChange = (next) => {
     const kinds = next.flavorIds.map(
       (id) => config.flavors.find((f) => f.id === id)?.kind || "savory",
@@ -39,12 +55,32 @@ export default function PizzaBuilder({
       ? size?.fixedPriceCents
       : null;
   return (
-    <div className="pizza-builder">
+    <div className="pizza-builder" data-step={step} data-preview={showPreview ? "shown" : "hidden"}>
+      <nav className="pizza-mobile-steps" aria-label="Etapas da montagem">
+        {["Tamanho", "Sabores", "Massa e borda"].map((name, i) => (
+          <button
+            type="button"
+            key={name}
+            aria-current={step === i ? "step" : undefined}
+            onClick={(e) => go(i, e.currentTarget)}
+          >
+            {i + 1}. {name}
+          </button>
+        ))}
+      </nav>
+      <button
+        type="button"
+        className="pizza-preview-toggle text-link"
+        aria-expanded={showPreview}
+        onClick={() => setShowPreview(!showPreview)}
+      >
+        {showPreview ? "Recolher prévia" : "Ver minha pizza"}
+      </button>
       <div className="pizza-builder-visual">
         <PizzaPreview config={config} value={value} />
       </div>
       <div className="pizza-builder-controls">
-        <fieldset>
+        <fieldset data-pizza-step="0">
           <legend>
             <b>01</b> Escolha o tamanho
           </legend>
@@ -78,7 +114,7 @@ export default function PizzaBuilder({
               ))}
           </div>
         </fieldset>
-        <fieldset>
+        <fieldset data-pizza-step="1">
           <legend>
             <b>02</b> Quantos sabores?
           </legend>
@@ -120,7 +156,7 @@ export default function PizzaBuilder({
             ))}
           </div>
         </fieldset>
-        <fieldset>
+        <fieldset data-pizza-step="1">
           <legend>
             <b>03</b> Escolha seus sabores
           </legend>
@@ -139,45 +175,80 @@ export default function PizzaBuilder({
               (countPrice != null || baseFixedPrice != null) &&
               " Massa, borda e adicionais à parte."}
           </p>
-          <div className="pizza-choice-grid">
-            {flavors.map((f) => (
-              <label className="pizza-choice" key={f.id}>
-                <input
-                  type="checkbox"
-                  checked={value.flavorIds.includes(f.id)}
-                  disabled={!value.flavorIds.includes(f.id) && value.flavorIds.length >= count}
-                  onChange={(e) =>
-                    onChange({
-                      ...value,
-                      portions: undefined,
-                      customizations: undefined,
-                      flavorIds: e.target.checked
-                        ? [...value.flavorIds, f.id]
-                        : value.flavorIds.filter((id) => id !== f.id),
-                    })
-                  }
-                />
-                <span>
-                  <strong>{f.name}</strong>
-                  <small>
-                    {includedInCombo
-                      ? "Incluído no combo"
-                      : baseFixedPrice != null
-                        ? "Incluído no preço da combinação"
-                        : `${money(f.prices[value.sizeId] / 100)} · pizza inteira`}
-                  </small>
-                  {f.allergens?.length > 0 && <small>Contém: {f.allergens.join(", ")}</small>}
-                </span>
-              </label>
-            ))}
+          <div className="pizza-flavor-tools">
+            <label className="field">
+              Buscar sabor
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Ex.: calabresa"
+              />
+            </label>
+            <label className="field">
+              Tipo de sabor
+              <select value={kind} onChange={(e) => setKind(e.target.value)}>
+                <option value="all">Todos os sabores</option>
+                <option value="savory">Salgados</option>
+                <option value="sweet">Doces</option>
+              </select>
+            </label>
           </div>
+          <p className="small-copy" aria-live="polite">
+            {value.flavorIds.length
+              ? `Selecionados: ${value.flavorIds.map((id) => config.flavors.find((f) => f.id === id)?.name).join(", ")}`
+              : "Nenhum sabor selecionado"}
+          </p>
+          <div className="pizza-choice-grid">
+            {flavors
+              .filter(
+                (f) =>
+                  normalize(f.name).includes(normalize(search)) &&
+                  (kind === "all" || (f.kind || "savory") === kind),
+              )
+              .map((f) => (
+                <label className="pizza-choice" key={f.id}>
+                  <input
+                    type="checkbox"
+                    checked={value.flavorIds.includes(f.id)}
+                    disabled={!value.flavorIds.includes(f.id) && value.flavorIds.length >= count}
+                    onChange={(e) =>
+                      onChange({
+                        ...value,
+                        portions: undefined,
+                        customizations: undefined,
+                        flavorIds: e.target.checked
+                          ? [...value.flavorIds, f.id]
+                          : value.flavorIds.filter((id) => id !== f.id),
+                      })
+                    }
+                  />
+                  <span>
+                    <strong>{f.name}</strong>
+                    <small>
+                      {includedInCombo
+                        ? "Incluído no combo"
+                        : baseFixedPrice != null
+                          ? "Incluído no preço da combinação"
+                          : `${money(f.prices[value.sizeId] / 100)} · pizza inteira`}
+                    </small>
+                    {f.allergens?.length > 0 && <small>Contém: {f.allergens.join(", ")}</small>}
+                  </span>
+                </label>
+              ))}
+          </div>
+          {!flavors.some(
+            (f) =>
+              normalize(f.name).includes(normalize(search)) &&
+              (kind === "all" || (f.kind || "savory") === kind),
+          ) && <p role="status">Nenhum sabor encontrado. Tente outro nome ou tipo.</p>}
           <small aria-live="polite">
             {value.flavorIds.length} de {count}{" "}
             {count === 1 ? "sabor selecionado" : "sabores selecionados"}
           </small>
         </fieldset>
         {config.allowUnequalParts && value.flavorIds.length > 1 && (
-          <fieldset>
+          <fieldset data-pizza-step="1">
             <legend>Proporção dos sabores</legend>
             <label className="field">
               Divisão da pizza
@@ -241,7 +312,7 @@ export default function PizzaBuilder({
               ],
             });
           return (
-            <fieldset key={id}>
+            <fieldset key={id} data-pizza-step="2">
               <legend>Personalizar {f.name}</legend>
               <small>
                 Aplica somente à parte deste sabor. Cada adicional tem o valor indicado, cobrado uma
@@ -288,7 +359,7 @@ export default function PizzaBuilder({
           ["doughs", "doughId", "04", "Escolha a massa"],
           ["edges", "edgeId", "05", "Escolha a borda"],
         ].map(([key, field, step, title]) => (
-          <fieldset key={key}>
+          <fieldset key={key} data-pizza-step="2">
             <legend>
               <b>{step}</b> {title}
             </legend>
@@ -324,6 +395,32 @@ export default function PizzaBuilder({
             </div>
           </fieldset>
         ))}
+        {includedInCombo && (
+          <PizzaPriceBreakdown config={config} selection={value} includedInCombo />
+        )}
+        <div className="pizza-step-navigation">
+          {step > 0 && (
+            <button
+              type="button"
+              className="button button-outline"
+              onClick={(e) => go(step - 1, e.currentTarget)}
+            >
+              Voltar
+            </button>
+          )}
+          {step < 2 ? (
+            <button
+              type="button"
+              className="button button-dark"
+              disabled={step === 0 ? !size : value.flavorIds.length !== count}
+              onClick={(e) => go(step + 1, e.currentTarget)}
+            >
+              Continuar para {step === 0 ? "os sabores" : "massa e borda"}
+            </button>
+          ) : (
+            <p className="small-copy">Confira o preço e adicione quando estiver do seu jeito.</p>
+          )}
+        </div>
       </div>
     </div>
   );

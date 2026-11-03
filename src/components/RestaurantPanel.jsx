@@ -11,6 +11,7 @@ import Modal from "./Modal";
 import ProductOptions from "./ProductOptions";
 import Checkout from "./Checkout";
 import PaymentReceipt from "./PaymentReceipt";
+import PizzaProduction from "./PizzaProduction";
 import "./RestaurantPanel.css";
 
 function Feedback({ action, message }) {
@@ -82,6 +83,9 @@ function Kitchen({ tenant, company, services, now, onDetail }) {
               </div>
             ))}
             {o.notes && <p className="notice">Observação: {o.notes}</p>}
+            {services.changePizzaProduction && o.lines.some((l) => l.pizzaUnits) && (
+              <PizzaProduction order={o} company={company} services={services} />
+            )}
             <div className="restaurant-actions">
               {nextStatuses(o)
                 .filter((s) => s !== "Cancelado")
@@ -772,6 +776,27 @@ function Scheduling({ tenant, company, services }) {
           funcionamento está ativo nas Configurações, só são aceitos agendamentos dentro dele.
           Pedidos cancelados liberam a vaga.
         </p>
+        <label className="field">
+          Espaços simultâneos do forno (opcional)
+          <input
+            type="number"
+            min="1"
+            max="100"
+            value={config.ovenSlots ?? ""}
+            onChange={(e) => {
+              const next = { ...config };
+              if (e.target.value === "") delete next.ovenSlots;
+              else next.ovenSlots = Number(e.target.value);
+              setConfig(next);
+            }}
+          />
+          <small>
+            Vazio: sem limite de forno. Cada tamanho reserva espaços por um tempo, configurados em
+            Pizzaria → Tamanhos e fatias. Padrão: 1 espaço por 10 minutos. O sistema considera
+            sobreposição entre horários, inclusive combos. Não organiza fornadas automaticamente:
+            reserve capacidade suficiente para as pizzas assarem antes do horário combinado.
+          </small>
+        </label>
         <Feedback action={action} message={message} />
         <button className="button button-dark" disabled={action.busy}>
           Salvar agendamento

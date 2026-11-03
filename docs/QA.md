@@ -1,5 +1,18 @@
 # Verificação — 22/10/2026
 
+## Versão integral publicada e novo Git conectado — 30/10/2026
+
+Produção Pedss/Diego Projects atualizada integralmente para o commit 15fe3a8ea95290857b2e210a213240da18ca227d de guilhermeepereiraa2004-ops/pedss/main. Fonte criada por git archive do commit, sem env reais nem registros locais. Deployment dpl_3fi667sKPZyRj9nfvjLHbNitf5BW, READY, funções gru1, promovido para https://pedss.vercel.app após validação. Bundle Dashboard publicado tem SHA256 idêntico ao build do gate. Projeto principal prj_wQ4WydtpnP5OS36ei515W9GpoVxV agora conectado ao novo repositório GitHub, productionBranch=main. Não é mais uma publicação parcial baseada na produção antiga.
+
+Gate aprovado:348 testes/48 arquivos,188/188 critérios, lint/tipos/camadas/build; CI GitHub Quality41125913799 success. Oito regressões novas cobrem HTTP/SQL de pizzaria, estoque/caixa, mesas e pagamento, isolamento, repetição, alteração auditada/idempotente de itens e caches parciais. PostgreSQL/WASM descartável foi usado nos testes; não houve pedido, pagamento, cliente, migração, seed nem alteração operacional no Supabase real.
+
+Leituras antes/staging/produção confirmaram seis lojas,48 produtos, identidade, preços, configurações e online preservados (novos defaults normalizados pelo mesmo schema). SSEv2 conectado, revisão67 e dois heartbeats; timeout4s intencional. Inspeção autenticada confirmou Pizzaria, Estoque e fichas, Caixa, Mesas e comandas, Agendamento, Combos, Cozinha e Balcão. Ativação do editor de tamanhos testada somente como rascunho e descartada, sem salvar. Console sem erros; logs de erro do deployment vazios na janela15m. Captura .quality/full-production-pizzeria-2026-10-30.png. Testes de gravação em produção, carga e rotas externas por CEP não realizados; OPENROUTESERVICE_API_KEY continua adiada pelo usuário. Cadastros locais de demonstração não foram copiados para o banco publicado.
+
+Incidente de vínculo: primeiro envio começou antes de terminar a criação da cópia isolada e criou full-release-15fe3a8 (prj_Idk2gd4zB0oKXonhcb02RBLCAF5g), sem afetar o Pedss original ou seu banco. Exclusão inicialmente bloqueada pela revisão automática; usuário autorizou expressamente excluir apenas esse projeto extra. CLI confirmou remoção permanente do projeto e deployment depois dessa autorização. Vínculo corrigido/inspecionado antes do envio ao Pedss correto. Nenhuma proteção, credencial, variável ou plano foi alterado. Raia única, sem subagentes.
+
+Registros posteriores à publicação não alteram o código funcional do commit enviado. Rollback disponível na produção anterior Supabase dpl_6Rq9cFo67yzEppZkoRGCFjSePBkH.
+
+
 ## Publicação integral em preparação — 30/10/2026
 
 Pedido explícito para atualizar toda a versão da Vercel. Fonte canônica: guilhermeepereiraa2004-ops/pedss, main. Contrato único de comandos agora conecta os módulos de pizzaria e operação à API: vínculo de sabores, estoque/fichas, agendamento, caixa, pagamentos parciais, mesas/comandas, balcão e alterações de itens. Repetição de pedido usa token opaco e mantém a sacola somente no navegador. A API reaplica permissões e preços do domínio; resultados de pedidos para atendentes são sanitizados.
@@ -1003,3 +1016,42 @@ Pizza (demo) e hambúrguer (burger-station) conferidos, ambos usando mesmo compo
 ### Limites da verificação de abertura (30/10/2026)
 
 Inspeção visual desktop1280×720 da explicação e navegação. Dispositivo físico/mobile não verificado visualmente nesta tarefa. Testes automatizados incluem erro assíncrono do serviço, pausa pela central, múltiplos motivos, prazo trial no fluxo existente e programação de horários. Nenhuma chamada de gravação em produção/Supabase nem cálculo de rota real. O servidor Vite inicialmente isolado não era alcançável pelo navegador; reiniciado com autorização normal de execução fora do ambiente restrito, no mesmo127.0.0.1:5180, sem ampliar interface de rede. A consulta opcional de porta via CIM não estava disponível; não foi necessária depois. Revisões verification e react-best-practices aplicadas.
+
+## 03/11/2026 — Servidor local iniciado
+
+Pedido para executar localmente atendido com npm run dev -- --host 127.0.0.1 --port 5176 --strictPort. Vite iniciou e a landing http://127.0.0.1:5176/ foi aberta e conferida no navegador, sem erros de console. Runtime de demonstração local; conexão PostgreSQL remota desativada pelo guard existente. Sem alteração de código, env, cadastros, banco, publicação ou commit. Gate não repetido para simples inicialização do processo; último gate de código registrado permanece válido. Nenhuma nova lacuna identificada nesta verificação de abertura.
+
+## 03/11/2026 — Prévia fixa no montador de pizza mobile
+
+Pedido atendido localmente em src/components/PizzaBuilder.css: a prévia passa a usar sticky/top0/z-index4 no layout de uma coluna; a rolagem do modal reserva248px para manter opções focadas fora da área ocupada pela pizza. Layout desktop de duas colunas preservado. Sem alteração de preços, ingredientes, hero, banco ou lógica do pedido. Sem commit, envio GitHub ou deploy nesta tarefa.
+
+Gate npm run check aprovado:348 testes/48 arquivos e188/188 critérios, lint/tipos/camadas/build. Log .quality/pizza-mobile-sticky-gate-2026-11-03.log. Navegador local na Cia da Pizza validou390x844 e320x568, três e quatro sabores, nomes longos, seleção de massa/borda, botão adicionar e ausência de overflow horizontal. A posição da prévia permaneceu em y89 enquanto a rolagem mudou de1711 para1981 na verificação final. Desktop1440x900 manteve grid de duas colunas e scroll-padding auto. Console sem erros. Viewport temporário restaurado. Evidências .quality/pizza-mobile-sticky-browser-2026-11-03.json e capturas pizza-mobile-sticky-390/320-2026-11-03.png. Apenas rascunho de montagem no navegador, sem adicionar à sacola ou criar pedido. Limite: inspeção em navegador emulado, sem aparelho físico ou teclado virtual nativo; produção permanece na versão anterior até nova solicitação de publicação. Raia única, agente principal.
+
+
+## 03/11/2026 — Rollback da prévia fixa solicitado
+
+Revertido exclusivamente o ajuste anterior de src/components/PizzaBuilder.css: prévia mobile novamente relative/top:auto e reserva de248px da rolagem removida. Arquivo idêntico ao HEAD, sem diferenças funcionais remanescentes desta alteração. Registros anteriores preservados como histórico. Gate npm run check aprovado:348 testes/48 arquivos e188/188 critérios, lint/tipos/camadas/build. Navegador390x844 confirmou position:relative, scroll-padding:auto e topo da prévia de128 para-378 ao rolar506px. Viewport restaurado. Evidências .quality/pizza-mobile-rollback-browser-2026-11-03.json e .quality/pizza-mobile-rollback-2026-11-03.png; log .quality/pizza-mobile-rollback-gate-2026-11-03.log. Sem pedido, cadastro, banco, commit ou deploy; outras alterações da pasta preservadas.
+
+
+## 03/11/2026 — Refinamentos da pizzaria concluídos localmente
+
+Gate final npm run check aprovado:363 testes/50 arquivos e203/203 critérios, lint/tipos/camadas/build/API. Log .quality/pizzeria-launch-gate-verified.log. Primeiro gate excedeu o timeout de um teste antigo XLSX; isolado e dois gates completos seguintes passaram sem aumentar timeout. UI desktop e390x844/320x568 conferida com runtime descartável em memória, incluindo sacola, cozinha, compras, impressão e relatório. Loja real em localhost:5176 conferida somente para abertura do montador; nenhum pedido/cadastro real alterado. Sem commits, push ou deploy.
+
+Evidências ignoradas/local-only: .quality/pizzeria-launch-mobile.png, pizzeria-launch-simulator.png, pizzeria-launch-kitchen.png, pizzeria-launch-report.png. Harness .quality/pizzeria-launch-preview.html usa memória e autenticação demonstrativa própria: recarregar descarta as operações, sem localStorage do usuário. Ajustes de HMR do próprio harness produziram um aviso de createRoot duplicado/rota sem correspondência durante seu desenvolvimento; recarregamento final limpou sua execução. A loja normal foi recarregada e abriu o montador existente sem erro de console.
+
+Fluxos conferidos: busca “calá” encontra Calabresa; buscar Mussarela mantém a escolha anterior; duas metades Grande + borda de requeijão totalizamR$57,90; resumo monetário expansível e adicionar acessíveis em320px, sem overflow horizontal e prévia relative. Assistente avança para Tamanhos; simulador soma massa sem gravar. Cozinha bloqueia retirada com pizza pendente, evolui duas unidades separadamente e libera após ambas prontas. Via cozinha sem valores/telefone/endereço; via cliente mostraR$0,00 recebido e saldoR$99,80. Compra descartável de500g aumenta estoque de1500g para2000g; relatório mostra0,5 Calabresa +0,5 Mussarela e uma Grande. Campo opcional de forno foi salvo apenas no runtime descartável.
+
+Testes novos:9 domínio,4 React e2 HTTP/PGlite (autorização, isolamento, idempotência, concorrência, privacidade e leitura parcial), elevando348 para363. Critérios188→203. Revisão React aplicada à composição de componentes, formulários, labels, hooks, estados derivados e dependências; nenhuma biblioteca adicionada.
+
+Limites: impressão e celular físicos ainda requerem ensaio; compras registram lotes recebidos e alertas, sem saldo por lote/FEFO/baixa automática por validade. Forno reserva capacidade conservadoramente, sem otimizar fornadas. Pedidos antigos sem snapshots ficam fora do detalhamento e são sinalizados. Backup/restauração integral por loja e recuperação remota por e-mail continuam evoluções. Detalhes em docs/PIZZERIA-REFINEMENTS.md e docs/QA.md.
+
+Não houve ensaio com impressora física, driver/corte automático, dispositivo/teclado móvel nativo, várias sessões reais simultâneas nem escrita operacional em produção. Aviso antigo de bundle model-viewer acima de500kB continua no build; não foi introduzida dependência 3D ou rede adicional.
+
+
+## 03/11/2026 — Carregamento das fotos das pizzas
+
+Corrigido ProductCutout: arquivos versionados confiáveis não são mais tratados como carregados antes de load/decode. A animação só inicia após a decodificação; fotos próximas da tela têm carregamento antecipado por IntersectionObserver, com rechecagem ao rolar, pageshow e retorno à aba. Falhas preservam o estado de foto indisponível e resultados de decodificação antigos não liberam outra imagem. Verificação de transparência das fotos próprias, movimento coordenado, hero, cards e cadastros preservados.
+
+Gate npm run check aprovado:366 testes/50 arquivos e206/206 critérios, lint/tipos/camadas/build/API. Log .quality/pizza-image-lifecycle-gate-final.log. Três novos testes de ciclo de carregamento; os testes de movimento existentes agora simulam complete/naturalWidth e aguardam decode, mantendo as mesmas garantias. Nenhuma biblioteca, alteração de banco, commit, push ou deploy.
+
+Navegador local em /store/cia-da-pizza: desktop1440x900 e mobile390x844; 14/14 fotos com naturalWidth768, complete=true, data-verified=true e data-motion=on após rolagem. Recarregamento e filtro por “vege”, seguido de limpeza da busca, mantiveram Vegetariana e demais sabores visíveis. Console sem erros. Nenhum pedido/cadastro alterado; viewport restaurado. Evidências .quality/pizza-images-fixed-browser.json, pizza-images-fixed-desktop.png e pizza-images-fixed-mobile.png. Limite: o desaparecimento persistente original não foi reproduzido; testes determinísticos cobrem atraso de decode, cache/evento load ausente, erro e troca de foto. Primeira regressão acusou testes antigos com load sintético sem sinalizar complete/naturalWidth; mocks corrigidos para reproduzir navegador real, mantendo assertions de transparência/sincronização. Gate final integral aprovado.

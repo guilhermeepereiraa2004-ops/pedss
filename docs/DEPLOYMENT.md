@@ -1,5 +1,18 @@
 # Pedss — Neon e Vercel
 
+## Versão integral publicada e novo Git conectado — 30/10/2026
+
+Produção Pedss/Diego Projects atualizada integralmente para o commit 15fe3a8ea95290857b2e210a213240da18ca227d de guilhermeepereiraa2004-ops/pedss/main. Fonte criada por git archive do commit, sem env reais nem registros locais. Deployment dpl_3fi667sKPZyRj9nfvjLHbNitf5BW, READY, funções gru1, promovido para https://pedss.vercel.app após validação. Bundle Dashboard publicado tem SHA256 idêntico ao build do gate. Projeto principal prj_wQ4WydtpnP5OS36ei515W9GpoVxV agora conectado ao novo repositório GitHub, productionBranch=main. Não é mais uma publicação parcial baseada na produção antiga.
+
+Gate aprovado:348 testes/48 arquivos,188/188 critérios, lint/tipos/camadas/build; CI GitHub Quality41125913799 success. Oito regressões novas cobrem HTTP/SQL de pizzaria, estoque/caixa, mesas e pagamento, isolamento, repetição, alteração auditada/idempotente de itens e caches parciais. PostgreSQL/WASM descartável foi usado nos testes; não houve pedido, pagamento, cliente, migração, seed nem alteração operacional no Supabase real.
+
+Leituras antes/staging/produção confirmaram seis lojas,48 produtos, identidade, preços, configurações e online preservados (novos defaults normalizados pelo mesmo schema). SSEv2 conectado, revisão67 e dois heartbeats; timeout4s intencional. Inspeção autenticada confirmou Pizzaria, Estoque e fichas, Caixa, Mesas e comandas, Agendamento, Combos, Cozinha e Balcão. Ativação do editor de tamanhos testada somente como rascunho e descartada, sem salvar. Console sem erros; logs de erro do deployment vazios na janela15m. Captura .quality/full-production-pizzeria-2026-10-30.png. Testes de gravação em produção, carga e rotas externas por CEP não realizados; OPENROUTESERVICE_API_KEY continua adiada pelo usuário. Cadastros locais de demonstração não foram copiados para o banco publicado.
+
+Incidente de vínculo: primeiro envio começou antes de terminar a criação da cópia isolada e criou full-release-15fe3a8 (prj_Idk2gd4zB0oKXonhcb02RBLCAF5g), sem afetar o Pedss original ou seu banco. Exclusão inicialmente bloqueada pela revisão automática; usuário autorizou expressamente excluir apenas esse projeto extra. CLI confirmou remoção permanente do projeto e deployment depois dessa autorização. Vínculo corrigido/inspecionado antes do envio ao Pedss correto. Nenhuma proteção, credencial, variável ou plano foi alterado. Raia única, sem subagentes.
+
+Registros posteriores à publicação não alteram o código funcional do commit enviado. Rollback disponível na produção anterior Supabase dpl_6Rq9cFo67yzEppZkoRGCFjSePBkH.
+
+
 ## Publicação integral em preparação — 30/10/2026
 
 Pedido explícito para atualizar toda a versão da Vercel. Fonte canônica: guilhermeepereiraa2004-ops/pedss, main. Contrato único de comandos agora conecta os módulos de pizzaria e operação à API: vínculo de sabores, estoque/fichas, agendamento, caixa, pagamentos parciais, mesas/comandas, balcão e alterações de itens. Repetição de pedido usa token opaco e mantém a sacola somente no navegador. A API reaplica permissões e preços do domínio; resultados de pedidos para atendentes são sanitizados.

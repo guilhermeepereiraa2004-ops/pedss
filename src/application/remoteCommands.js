@@ -1,6 +1,9 @@
 // One explicit contract shared by the browser proxy and the HTTP dispatcher.
 // Authorization and input validation still run inside each server-side use case.
 export const remoteServiceCommands = [
+  "saveSupplier",
+  "receivePurchase",
+  "changePizzaProduction",
   "saveCompany",
   "activatePlan",
   "archiveCompany",
@@ -39,6 +42,9 @@ export const remoteServiceCommands = [
 
 // These operations change no catalog/media. Preserve the existing lightweight writes.
 export const operationCommands = [
+  "saveSupplier",
+  "receivePurchase",
+  "changePizzaProduction",
   "changeOrder",
   "changePayment",
   "saveExpense",

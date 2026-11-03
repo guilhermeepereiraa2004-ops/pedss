@@ -1,0 +1,88 @@
+.order-print-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+  margin: 20px 0;
+  padding: 16px;
+  border: 1px solid var(--line, #ddd);
+  border-radius: 14px;
+}
+.order-print-controls .field {
+  flex: 1 1 140px;
+}
+.order-print-controls > p,
+.order-print-controls > details {
+  flex-basis: 100%;
+}
+.thermal-ticket {
+  display: none;
+}
+.receipt-preview {
+  font:
+    13px/1.5 ui-monospace,
+    monospace;
+  color: #000;
+  background: #fff;
+  padding: 18px;
+  max-width: 320px;
+  border: 1px dashed #888;
+  overflow-wrap: anywhere;
+}
+.receipt-preview h2,
+.receipt-preview h3,
+.receipt-preview h4 {
+  margin: 8px 0;
+  font-family: inherit;
+}
+@media print {
+  @page {
+    margin: 4mm;
+  }
+  .modal:has(.thermal-ticket) {
+    width: auto !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    position: static !important;
+  }
+  .modal:has(.thermal-ticket) > .modal-head,
+  .order-detail:has(.thermal-ticket) > :not(.order-print-container),
+  .order-print-controls {
+    display: none !important;
+  }
+  .thermal-ticket {
+    display: block !important;
+    width: calc(var(--receipt-width) - 8mm);
+    max-width: 100%;
+    font:
+      11px/1.4 ui-monospace,
+      monospace;
+    color: #000 !important;
+    background: #fff !important;
+    overflow-wrap: anywhere;
+  }
+  .thermal-ticket h2,
+  .thermal-ticket h3,
+  .thermal-ticket h4 {
+    font-family: inherit;
+    color: #000;
+    font-size: 13px;
+    margin: 8px 0;
+  }
+  .thermal-ticket p {
+    font-size: 11px;
+    color: #000;
+    margin: 6px 0;
+  }
+  .thermal-ticket hr {
+    border: 0;
+    border-top: 1px dashed #000;
+    margin: 10px 0;
+  }
+  .thermal-ticket article {
+    break-inside: avoid;
+  }
+  .order-detail:has(.thermal-ticket) {
+    padding: 0 !important;
+  }
+}

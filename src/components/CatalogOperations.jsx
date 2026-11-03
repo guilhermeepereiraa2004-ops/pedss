@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAction } from "../hooks/useApplication";
 import { uuid } from "../core/domain.ts";
 import MoneyInput from "./MoneyInput";
+import PurchasePanel from "./PurchasePanel";
 import { ComboArtwork, ComboContents } from "./ComboPresentation";
 import { comboStartingPrice } from "../core/restaurant.ts";
 import { comboGroupMode, changeComboGroupMode } from "../application/comboDraft";
@@ -814,5 +815,12 @@ export default function CatalogOperations(props) {
         Recursos disponíveis localmente; integração remota em etapa posterior.
       </p>
     );
-  return props.view === "inventory" ? <Inventory {...props} /> : <Combos {...props} />;
+  return props.view === "inventory" ? (
+    <>
+      <Inventory {...props} />
+      <PurchasePanel {...props} />
+    </>
+  ) : (
+    <Combos {...props} />
+  );
 }

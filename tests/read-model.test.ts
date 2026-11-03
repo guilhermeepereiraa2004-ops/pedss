@@ -5,7 +5,7 @@ import { createHandler } from "../server/api.mjs";
 import { fixture, cartLine, checkout } from "./fixtures.ts";
 import { tokenDigest } from "../src/adapters/localAuth.ts";
 import { isDeepStrictEqual } from "node:util";
-import { pizzaProduct } from "./pizza-fixture.ts";
+import { pizzaProduct, pizzaLine } from "./pizza-fixture.ts";
 import { orderFixture, changeInput } from "./order-amendment-fixture.ts";
 
 // Execute the real SQL in PostgreSQL/WASM. Never load .env or contact Neon.
@@ -624,4 +624,97 @@ it("REMOTE-PIZZA-06 item amendments persist their audit and historical stock ret
   expect(tenant.restaurant.inventory[0].stock).toBe(750);
   const tracking = await request({ kind: "tracking", tracking: f.order.trackingToken });
   expect(tracking.body.state.tenants["store-one"].orders[0]).not.toHaveProperty("amendments");
+});
+
+it("PIZZA-LAUNCH-HTTP-01 purchases survive partial SQL reads and cannot cross the public boundary", async () => {
+  const scope = { kind: "dashboard", store: "demo" };
+  const call = async (command: string, args: any[], extras = {}) => {
+    const r = await request(scope, token, "", store, { kind: "service", command, args }, extras);
+    expect(r.statusCode, r.body.error?.message).toBe(200);
+    return r;
+  };
+  await call("saveInventoryItem", [
+    "store-one",
+    { id: "flour", name: "Farinha", unit: "g", stock: 0, costPerUnitCents: 0, minimum: 0 },
+  ]);
+  await call("saveSupplier", ["store-one", { id: "supplier", name: "Fornecedor reservado" }]);
+  const first = await request(scope, token);
+  const known = {
+    "x-pedss-catalog": first.body.versions.catalog,
+    "x-pedss-operations": first.body.versions.operations,
+  };
+  const { localDay } = await import("../src/core/calendar.ts");
+  const purchase = {
+    requestId: "sql-purchase",
+    supplierId: "supplier",
+    invoice: "NF77",
+    receivedOn: localDay(new Date()),
+    lines: [
+      {
+        ingredientId: "flour",
+        quantity: 100,
+        totalCents: 2000,
+        batch: "LOTE77",
+        expiresOn: "2099-01-01",
+      },
+    ],
+  };
+  await call("receivePurchase", ["store-one", purchase], known);
+  await call("receivePurchase", ["store-one", purchase], known);
+  const refreshed = await request(scope, token, first.headers.ETag, store, undefined, known);
+  expect(refreshed.body.unchanged).toEqual({ catalog: true, operations: false });
+  expect(refreshed.body.state.tenants["store-one"].restaurant.purchases).toHaveLength(1);
+  expect(refreshed.body.state.tenants["store-one"].restaurant.inventory[0].stock).toBe(100);
+  const publicRead = await request({ kind: "store", store: "demo" });
+  expect(JSON.stringify(publicRead.body)).not.toMatch(/Fornecedor reservado|NF77|LOTE77/);
+  const saved: any = (await db.query("SELECT data FROM pedss.workspace WHERE id=1")).rows[0].data;
+  expect(saved.tenants["store-two"]).toEqual(seed.tenants["store-two"]);
+});
+
+it("PIZZA-LAUNCH-HTTP-02 individual pizza production persists through the API with optimistic concurrency", async () => {
+  const scope = { kind: "dashboard", store: "demo" };
+  const call = async (command: string, args: any[]) => {
+    const r = await request(scope, token, "", store, { kind: "service", command, args });
+    expect(r.statusCode, r.body.error?.message).toBe(200);
+    return r.body.result;
+  };
+  await call("saveProduct", ["store-one", pizzaProduct]);
+  let o = await call("createStaffOrder", [
+    "store-one",
+    {
+      requestId: "individual-http",
+      channel: "counter",
+      lines: [pizzaLine],
+      checkout: { ...checkout, fulfillment: "pickup", expectedTotalCents: 5001 },
+    },
+  ]);
+  expect(o.lines[0].pizzaDetails[0].flavors.map((f: any) => f.name)).toEqual([
+    "Mussarela",
+    "Calabresa",
+  ]);
+  o = await call("changeOrder", ["store-one", o.id, "Aceito"]);
+  const { pizzaWorkItems } = await import("../src/core/pizzeriaOperations.ts");
+  const item = pizzaWorkItems(o)[0];
+  const start = {
+    key: item.key,
+    requestId: "pizza-start",
+    expectedUpdatedAt: o.updatedAt,
+    stage: "preparing",
+  };
+  o = await call("changePizzaProduction", ["store-one", o.id, start]);
+  await call("changePizzaProduction", ["store-one", o.id, start]);
+  const conflict = await request(scope, token, "", store, {
+    kind: "service",
+    command: "changePizzaProduction",
+    args: ["store-one", o.id, { ...start, requestId: "stale", stage: "baking" }],
+  });
+  expect(conflict.statusCode).not.toBe(200);
+  const fresh = await request(scope, token);
+  expect(
+    fresh.body.state.tenants["store-one"].orders.find((v: any) => v.id === o.id).production,
+  ).toHaveLength(1);
+  const publicRead = await request({ kind: "tracking", tracking: o.trackingToken });
+  const tracked = publicRead.body.state.tenants["store-one"].orders[0];
+  expect(tracked.production[0].stage).toBe("preparing");
+  expect(tracked.production[0]).not.toHaveProperty("actor");
 });

@@ -5,6 +5,7 @@ import { money } from "../lib/data";
 import { isIllustrativeProductPhoto } from "../lib/productPhotography";
 import "./ProductOptions.css";
 import PizzaBuilder from "./PizzaBuilder";
+import PizzaPriceBreakdown from "./PizzaPriceBreakdown";
 import { pricePizza, initialPizzaSelection } from "../core/pizza.ts";
 import ComboOptions from "./ComboOptions";
 import { replacesPizzaOption } from "../core/catalogRules.ts";
@@ -182,6 +183,16 @@ function SingleProductOptions({
         </label>
       </div>
       <div className="product-option-actions">
+        {product.pizza && (
+          <PizzaPriceBreakdown
+            config={product.pizza}
+            selection={pizza}
+            quantity={quantity}
+            extrasCents={product.extras
+              .filter((e) => extras.includes(e.id))
+              .reduce((sum, e) => sum + e.priceCents, 0)}
+          />
+        )}
         <div className="product-option-footer">
           <div className="quantity-control">
             <button

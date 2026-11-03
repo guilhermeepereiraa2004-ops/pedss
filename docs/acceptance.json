@@ -1,5 +1,5 @@
 {
-  "floor": 188,
+  "floor": 206,
   "items": [
     {
       "id": "AUTH-06",
@@ -940,6 +940,96 @@
       "id": "OPEN-UI-03",
       "title": "atendimento programado não desliga silenciosamente ao clicar",
       "source": "tests/store-opening-ui.test.jsx"
+    },
+    {
+      "id": "PIZZA-LAUNCH-01",
+      "title": "composition reconciles the flavor rule, count surcharge, dough, edge and extras",
+      "source": "tests/pizzeria-launch.test.ts"
+    },
+    {
+      "id": "PIZZA-LAUNCH-02",
+      "title": "snapshots decompose Pizza-category combos, quantities and historical names",
+      "source": "tests/pizzeria-launch.test.ts"
+    },
+    {
+      "id": "PIZZA-LAUNCH-03",
+      "title": "fractions sum to whole pizzas, exclude canceled/demo and disclose legacy data",
+      "source": "tests/pizzeria-launch.test.ts"
+    },
+    {
+      "id": "PIZZA-LAUNCH-04",
+      "title": "individual kitchen enforces sequence, conflicts, idempotency and all-ready dispatch",
+      "source": "tests/pizzeria-launch.test.ts"
+    },
+    {
+      "id": "PIZZA-LAUNCH-05",
+      "title": "receiving purchases is atomic, idempotent, private and updates weighted cost without a cash expense",
+      "source": "tests/pizzeria-launch.test.ts"
+    },
+    {
+      "id": "PIZZA-LAUNCH-06",
+      "title": "purchase and supplier writes require management, refuse expired lots and preserve inventory",
+      "source": "tests/pizzeria-launch.test.ts"
+    },
+    {
+      "id": "PIZZA-LAUNCH-07",
+      "title": "oven capacity respects overlapping bake intervals, size weight, cancellation and historical settings",
+      "source": "tests/pizzeria-launch.test.ts"
+    },
+    {
+      "id": "PIZZA-LAUNCH-08",
+      "title": "unknown legacy oven reservations are never treated as zero",
+      "source": "tests/pizzeria-launch.test.ts"
+    },
+    {
+      "id": "PIZZA-LAUNCH-09",
+      "title": "scheduled edits recheck oven and pizza capacity atomically, cancellations shrink historical quantities",
+      "source": "tests/pizzeria-launch.test.ts"
+    },
+    {
+      "id": "PIZZA-LAUNCH-UI-01",
+      "title": "flavor search/filter retain chosen flavors and show an empty-state without resetting the pizza",
+      "source": "tests/pizzeria-launch-ui.test.jsx"
+    },
+    {
+      "id": "PIZZA-LAUNCH-UI-02",
+      "title": "price breakdown accounts for quantity, dough and edge without changing the submitted selection",
+      "source": "tests/pizzeria-launch-ui.test.jsx"
+    },
+    {
+      "id": "PIZZA-LAUNCH-UI-03",
+      "title": "guided editing and the simulator do not save on Enter or create orders",
+      "source": "tests/pizzeria-launch-ui.test.jsx"
+    },
+    {
+      "id": "PIZZA-LAUNCH-UI-04",
+      "title": "thermal copies separate kitchen from customer money and use the selected width",
+      "source": "tests/pizzeria-launch-ui.test.jsx"
+    },
+    {
+      "id": "PIZZA-LAUNCH-HTTP-01",
+      "title": "purchases survive partial SQL reads and cannot cross the public boundary",
+      "source": "tests/read-model.test.ts"
+    },
+    {
+      "id": "PIZZA-LAUNCH-HTTP-02",
+      "title": "individual pizza production persists through the API with optimistic concurrency",
+      "source": "tests/read-model.test.ts"
+    },
+    {
+      "id": "PHOTO-LOAD-06",
+      "title": "fotografia só anima após carregar e decodificar",
+      "source": "tests/product-photo-loading.test.jsx"
+    },
+    {
+      "id": "PHOTO-LOAD-07",
+      "title": "rolagem recupera foto lazy sem evento load",
+      "source": "tests/product-photo-loading.test.jsx"
+    },
+    {
+      "id": "PHOTO-LOAD-08",
+      "title": "troca de foto ignora decodificação antiga e trata falhas",
+      "source": "tests/product-photo-loading.test.jsx"
     }
   ]
 }

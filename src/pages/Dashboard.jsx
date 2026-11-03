@@ -926,6 +926,7 @@ export default function Dashboard() {
             />
           ) : (
             <OrderDetail
+              storeName={company.name}
               key={selected.id}
               order={selected}
               canFinance={canManage}

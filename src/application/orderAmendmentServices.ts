@@ -1,6 +1,7 @@
 import { orderItemInputSchema, planOrderItemChange } from "../core/orderAmendments.ts";
 import { DomainError, uuid } from "../core/domain.ts";
 import { paymentLedger, paidCents } from "../core/payments.ts";
+import { assertOvenCapacity } from "../core/pizzeriaOperations.ts";
 import type { Identity, Permission, Tenant, Workspace } from "../core/model.ts";
 import type { WorkspaceRepository } from "../core/ports.ts";
 
@@ -25,6 +26,36 @@ export function createOrderAmendmentServices(
         if (order.updatedAt !== data.expectedUpdatedAt)
           throw new DomainError("Este pedido mudou. Feche a revisão e abra o item novamente.");
         const plan = planOrderItemChange(t, order, data);
+        if (order.scheduledAt && data.kind === "edit") {
+          const config = t.restaurant?.scheduling;
+          if (config?.pizzaCapacity) {
+            const others = t.orders.filter(
+              (o) =>
+                o.id !== order.id &&
+                o.status !== "Cancelado" &&
+                o.scheduledAt === order.scheduledAt,
+            );
+            if (plan.pizzaUnits === undefined || others.some((o) => o.pizzaUnits === undefined))
+              throw new DomainError(
+                "Revise a contagem dos pedidos antigos antes de alterar este agendamento.",
+              );
+            if (
+              plan.pizzaUnits + others.reduce((sum, o) => sum + o.pizzaUnits!, 0) >
+              config.pizzaCapacity
+            )
+              throw new DomainError("A capacidade de pizzas deste horário foi atingida.");
+          }
+          if (config?.ovenSlots && plan.lines.some((l) => !l.pizzaDetails && l.pizzaUnits !== 0))
+            throw new DomainError(
+              "Revise a reserva de forno dos itens antigos antes de alterar este agendamento.",
+            );
+          assertOvenCapacity(
+            t,
+            order.scheduledAt,
+            plan.lines.flatMap((l) => l.pizzaDetails || []),
+            order.id,
+          );
+        }
         if (plan.totalCents !== data.expectedTotalCents)
           throw new DomainError("Os valores mudaram. Revise o novo total antes de confirmar.");
         if (paidCents(order) > 0 && plan.totalCents !== order.totalCents)
