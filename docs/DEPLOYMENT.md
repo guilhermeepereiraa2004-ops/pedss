@@ -1,5 +1,14 @@
 # Pedss — Neon e Vercel
 
+
+## 03/11/2026 — Refinamentos publicados no GitHub e na Vercel
+
+Alterações funcionais enviadas para guilhermeepereiraa2004-ops/pedss/main no commit c23c8f69c66b125ab5e2c42f675574a057ab547b. A integração Git criou o deployment de produção dpl_FvjK4UFgFyLiGvTwvXXZTVE2E8ZB (READY), projeto pedss/prj_wQ4WydtpnP5OS36ei515W9GpoVxV na equipe Diego Projects, funções gru1. Publicados montador em etapas/busca/preço detalhado, assistente/simulador, relatórios, produção por pizza, vias térmicas, compras/lotes e capacidade de forno, além da correção de load/decode das fotos. Este registro documental não altera funcionalidades.
+
+Gate local366 testes/50 arquivos e206 critérios aprovado; GitHub Quality41679447419 success. API pública antes/depois preservou hashes dos catálogos/configurações,6 lojas e48 produtos, sem escrita operacional, seed ou migração no banco. Leitura anônima sem contas/sessões. Bundles publicados nos domínios pedss.com.br/www.pedss.com.br/pedss.vercel.app contêm simulador, relatório, compras e correção de decode; assets Dashboard-BGF4NZLv.js e StoreLogo-D4YbqyBy.js. Navegador conferiu as8 fotos do cardápio remoto, todas carregadas e verificadas; console sem erros. Logs do deployment:0 registros error na janela15m.
+
+O alias manual pedss.vercel.app ainda apontava para o deployment anterior, apesar do domínio próprio já estar novo; foi explicitamente realinhado ao novo deployment do mesmo projeto. Conferir esse alias em futuros envios Git. Configurações e14 sabores do ambiente local não são importados automaticamente: a Cia publicada preserva seus8 produtos e precisa configurar o montador no próprio painel para oferecê-lo ao cliente. Sem novas credenciais, serviços, plano ou alteração de proteções. Limites de impressão/dispositivo físicos e lote por recebimento continuam em docs/PIZZERIA-REFINEMENTS.md.
+
 ## Versão integral publicada e novo Git conectado — 30/10/2026
 
 Produção Pedss/Diego Projects atualizada integralmente para o commit 15fe3a8ea95290857b2e210a213240da18ca227d de guilhermeepereiraa2004-ops/pedss/main. Fonte criada por git archive do commit, sem env reais nem registros locais. Deployment dpl_3fi667sKPZyRj9nfvjLHbNitf5BW, READY, funções gru1, promovido para https://pedss.vercel.app após validação. Bundle Dashboard publicado tem SHA256 idêntico ao build do gate. Projeto principal prj_wQ4WydtpnP5OS36ei515W9GpoVxV agora conectado ao novo repositório GitHub, productionBranch=main. Não é mais uma publicação parcial baseada na produção antiga.
