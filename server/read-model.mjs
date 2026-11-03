@@ -1,4 +1,5 @@
 import { workspaceSchema } from "../src/core/model.ts";
+import { resolveStoreCompany } from "../src/core/storeAddress.ts";
 import { defaultsSettings, emptyTenant } from "../src/core/domain.ts";
 import { isDeepStrictEqual } from "node:util";
 
@@ -123,7 +124,13 @@ async function selectView(
         ($2 = 'admin' OR c.value->>'id' = $4) AS own
       FROM w, jsonb_array_elements(data->'companies') c
       WHERE $1 = 'legacy' OR ($1 = 'central' AND $2 = 'admin')
-        OR ($1 IN ('store', 'dashboard') AND (c.value->>'id' = $3 OR c.value->>'slug' = $3))
+        OR ($1 IN ('store', 'dashboard') AND (c.value->>'id' = $3 OR c.value->>'slug' = $3 OR (
+          replace(c.value->>'slug', '-', '') = $3
+          AND NOT EXISTS (SELECT 1 FROM jsonb_array_elements(data->'companies') exact
+            WHERE exact->>'id' = $3 OR exact->>'slug' = $3)
+          AND (SELECT count(*) FROM jsonb_array_elements(data->'companies') alias
+            WHERE replace(alias->>'slug', '-', '') = $3) = 1
+        )))
         OR ($1 IN ('auth', 'dashboard') AND $3 = '' AND c.value->>'id' = $4)
         OR ($1 = 'tracking' AND $5 <> '' AND EXISTS (
           SELECT 1 FROM jsonb_array_elements(data->'tenants'->(c.value->>'id')->'orders') o
@@ -204,11 +211,11 @@ export async function readScoped(db, view) {
 // POST already holds the authoritative workspace for validation; trim only its response.
 export function scopeState(state, identity, scope, tracking) {
   if (scope.kind === "legacy") return state;
+  const addressedCompany = resolveStoreCompany(state.companies, scope.store || "");
   const companies = state.companies.filter(
     (c) =>
       (scope.kind === "central" && identity?.role === "admin") ||
-      (["store", "dashboard"].includes(scope.kind) &&
-        (c.id === scope.store || c.slug === scope.store)) ||
+      (["store", "dashboard"].includes(scope.kind) && c.id === addressedCompany?.id) ||
       (["auth", "dashboard"].includes(scope.kind) && !scope.store && c.id === identity?.storeId) ||
       (scope.kind === "tracking" &&
         tracking &&

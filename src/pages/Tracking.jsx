@@ -4,6 +4,7 @@ import { Check, Flame, ArrowUpRight, Copy, Clock3, Send } from "lucide-react";
 import LandingBrand from "../components/LandingBrand";
 import useApplication, { useAction } from "../hooks/useApplication";
 import { money } from "../lib/data";
+import { orderStatusLabel } from "../lib/orderActions";
 import "./Tracking.css";
 export default function Tracking() {
   const { token } = useParams(),
@@ -119,7 +120,7 @@ export default function Tracking() {
             <p>{order.customer.name.split(" ")[0]}, acompanhe cada etapa por este link.</p>
             <div className="tracking-badges">
               <span className={`tag ${order.status === "Cancelado" ? "danger" : ""}`}>
-                {order.status}
+                {orderStatusLabel(order)}
               </span>
             </div>
             <div className="notice">
@@ -132,7 +133,7 @@ export default function Tracking() {
                 <div key={event.id} className={i === history.length - 1 ? "current" : ""}>
                   <span />
                   <div>
-                    <strong>{event.to}</strong>
+                    <strong>{orderStatusLabel({ status: event.to })}</strong>
                     <small>
                       {new Date(event.at).toLocaleString("pt-BR", { timeZone: "America/Bahia" })}
                     </small>

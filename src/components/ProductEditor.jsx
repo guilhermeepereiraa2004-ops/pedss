@@ -121,7 +121,7 @@ export default function ProductEditor({
         />
         <small>
           Preencha o custo para calcular a margem dos próximos pedidos. Se desconhecido, deixe
-          vazio. Não altera pedidos anteriores.
+          vazio. Veja os resultados em Financeiro → Custos e margem. Não altera pedidos anteriores.
         </small>
       </label>
       <label className="field">

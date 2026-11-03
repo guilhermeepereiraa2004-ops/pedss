@@ -18,14 +18,15 @@ import { storeColors } from "../lib/storeColors";
 import Modal from "../components/Modal";
 import { useStore } from "../hooks/useApplication";
 import { categories, money } from "../lib/data";
-import { matchesMenuSearch, menuPath } from "../lib/menu";
+import { matchesMenuSearch } from "../lib/menu";
+import { storeHref } from "../application/storeAddress";
 import { isIllustrativeProductPhoto } from "../lib/productPhotography";
 import { pizzaPricingLabels, pizzaFlavorAvailable } from "../core/pizza.ts";
 import "./DigitalMenu.css";
 const days = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-export default function DigitalMenu() {
+export default function DigitalMenu({ manualStoreId }) {
   const { storeId } = useParams(),
-    { company, tenant } = useStore(storeId);
+    { company, tenant } = useStore(manualStoreId || storeId);
   const [search, setSearch] = useState(""),
     [category, setCategory] = useState("Todos"),
     [selectedId, setSelectedId] = useState(null);
@@ -65,7 +66,7 @@ export default function DigitalMenu() {
         <LandingBrand />
       </div>
       <header className="digital-header">
-        <Link to={menuPath(company.slug)} className="digital-brand">
+        <Link to={storeHref(company.slug, "menu")} className="digital-brand">
           <StoreLogo company={company} />
           <div>
             <strong>{company.name}</strong>

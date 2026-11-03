@@ -37,6 +37,7 @@ import { shippingMode } from "../core/shipping.ts";
 import useToast from "../hooks/useToast";
 import { categories, money } from "../lib/data";
 import { storeColors } from "../lib/storeColors";
+import { storeHref } from "../application/storeAddress";
 import { getStorefrontTemplate } from "../lib/storefrontTemplates";
 import "./Storefront.css";
 import "./Operations.css";
@@ -126,7 +127,7 @@ function StoreExperience({ slug }) {
       }}
     >
       <header className="store-header store-container">
-        <Link className="store-logo" to={`/store/${slug}`}>
+        <Link className="store-logo" to={storeHref(company.slug)}>
           <StoreLogo company={company} />
           <div>
             {company.name}
@@ -436,7 +437,7 @@ function StoreExperience({ slug }) {
         <Link className="text-link" to="/acompanhar">
           Acompanhar pedido <ArrowUpRight size={12} />
         </Link>
-        <Link className="text-link" to={`/dashboard?store=${slug}`}>
+        <Link className="text-link" to={storeHref(company.slug, "dashboard")}>
           Painel da loja <ArrowUpRight size={12} />
         </Link>
         <p>

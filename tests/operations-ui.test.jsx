@@ -96,7 +96,7 @@ it("OPS-01 adicionar mostra confirmação e ícone da sacola com contador", asyn
   expect(await screen.findByRole("dialog")).toHaveTextContent("Coisa boa na sua sacola.");
   expect(f.repo.getSnapshot().tenants[company.id].cart.lines).toHaveLength(1);
 });
-it("OPS-02 pedidos podem avançar direto na lista sem alterar pagamento", async () => {
+it("OPS-02 SIMPLE-ORDER-02 pedidos são aceitos, preparados e concluídos na lista sem alterar pagamento", async () => {
   const f = await fixture();
   await f.services.addToCart(company.id, cartLine);
   const order = await f.services.checkout(
@@ -120,8 +120,34 @@ it("OPS-02 pedidos podem avançar direto na lista sem alterar pagamento", async 
   expect(f.repo.getSnapshot().tenants[company.id].orders[0].paymentStatus).toBe("Pendente");
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   expect(
-    screen.getByRole("button", { name: `Iniciar preparo ${order.number}` }),
+    screen.getByRole("button", { name: `Preparar pedido ${order.number}` }),
   ).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Cozinha", exact: true })).not.toBeInTheDocument();
+  await userEvent.click(screen.getByRole("button", { name: `Preparar pedido ${order.number}` }));
+  await userEvent.click(
+    await screen.findByRole("button", { name: `Concluir pedido ${order.number}` }),
+  );
+  await waitFor(() =>
+    expect(f.repo.getSnapshot().tenants[company.id].orders[0].status).toBe("Entregue"),
+  );
+  expect(f.repo.getSnapshot().tenants[company.id].orders[0].paymentStatus).toBe("Pendente");
+  expect(screen.getByText("Concluído", { selector: ".tag" })).toBeInTheDocument();
+});
+
+it("SIMPLE-ORDER-03 endereço antigo da cozinha abre Pedidos sem controles de produção", async () => {
+  const f = await fixture();
+  render(
+    <ApplicationProvider runtime={{ ...f, repository: f.repo }}>
+      <MemoryRouter initialEntries={["/dashboard?store=demo&tab=kitchen"]}>
+        <Dashboard />
+      </MemoryRouter>
+    </ApplicationProvider>,
+  );
+  expect(
+    await screen.findByRole("heading", { name: "Cada pedido, no seu tempo." }),
+  ).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Cozinha", exact: true })).not.toBeInTheDocument();
+  expect(screen.queryByText("Cozinha em movimento.")).not.toBeInTheDocument();
 });
 it("OPS-03 acompanhamento não mostra status de pagamento, preservando o financeiro interno", async () => {
   const f = await fixture();

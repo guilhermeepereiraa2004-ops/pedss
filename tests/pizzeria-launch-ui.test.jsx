@@ -96,13 +96,14 @@ it("PIZZA-LAUNCH-UI-03 guided editing and the simulator do not save on Enter or 
   expect(screen.queryByRole("dialog")).toBeNull();
 });
 
-it("PIZZA-LAUNCH-UI-04 thermal copies separate kitchen from customer money and use the selected width", async () => {
+it("PIZZA-LAUNCH-UI-04 thermal copies show customer/delivery totals and use the selected width", async () => {
   const f = await orderFixture(),
     print = vi.spyOn(window, "print").mockImplementation(() => {});
   const { container } = render(<OrderPrint order={f.order} storeName="Cia de teste" />);
   const receipt = container.querySelector(".thermal-ticket");
-  expect(receipt).toHaveTextContent("COZINHA");
-  expect(receipt).not.toHaveTextContent("R$");
+  expect(receipt).toHaveTextContent("CLIENTE");
+  expect(receipt).toHaveTextContent("R$");
+  expect(screen.queryByRole("option", { name: "Cozinha" })).not.toBeInTheDocument();
   await userEvent.selectOptions(
     screen.getByRole("combobox", { name: "Via da impressão" }),
     "delivery",

@@ -5,6 +5,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Landing from "./pages/Landing";
 import { viewScope } from "./application/viewScope";
+import { currentStoreAddress } from "./application/storeAddress";
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Storefront = lazy(() => import("./pages/Storefront"));
 const SuperAdmin = lazy(() => import("./pages/SuperAdmin"));
@@ -43,6 +44,7 @@ function ApplicationRoutes({ subdomain }) {
           <Route path="/" element={<Storefront manualStoreId={subdomain} />} />
           <Route path="/store/:storeId" element={<Storefront />} />
           <Route path="/menu/:storeId" element={<DigitalMenu />} />
+          <Route path="/menu" element={<DigitalMenu manualStoreId={subdomain} />} />
           <Route
             path="/dashboard/*"
             element={
@@ -93,14 +95,7 @@ function ApplicationRoutes({ subdomain }) {
   );
 }
 export default function App() {
-  const hostname = window.location.hostname;
-  const base = import.meta.env.VITE_PUBLIC_DOMAIN || "";
-  const candidate = hostname.endsWith(".localhost")
-    ? hostname.slice(0, -10)
-    : base && hostname.endsWith(`.${base}`)
-      ? hostname.slice(0, -base.length - 1)
-      : null;
-  const subdomain = candidate && !["www", "admin"].includes(candidate) ? candidate : null;
+  const subdomain = currentStoreAddress() || null;
   return (
     <ErrorBoundary>
       <BrowserRouter>

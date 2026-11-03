@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { useAction } from "../hooks/useApplication";
-import { uuid, priceLine, nextStatuses } from "../core/domain.ts";
+import { uuid, priceLine } from "../core/domain.ts";
 import { cashSummary, comboStartingPrice } from "../core/restaurant.ts";
 import { paidCents, dueCents } from "../core/payments.ts";
 import { restaurantSchema } from "../core/restaurantModel.ts";
 import { money } from "../lib/data";
-import { orderActionLabel, orderStatusLabel } from "../lib/orderActions";
 import MoneyInput from "./MoneyInput";
 import Modal from "./Modal";
 import ProductOptions from "./ProductOptions";
 import Checkout from "./Checkout";
 import PaymentReceipt from "./PaymentReceipt";
-import PizzaProduction from "./PizzaProduction";
 import "./RestaurantPanel.css";
 
 function Feedback({ action, message }) {
@@ -28,87 +26,6 @@ function Feedback({ action, message }) {
         </p>
       )}
     </>
-  );
-}
-function Kitchen({ tenant, company, services, now, onDetail }) {
-  const action = useAction();
-  const orders = tenant.orders
-    .filter((o) => !["Entregue", "Cancelado"].includes(o.status))
-    .sort((a, b) => (a.scheduledAt || a.createdAt).localeCompare(b.scheduledAt || b.createdAt));
-  return (
-    <section className="restaurant-stack">
-      <div className="restaurant-intro">
-        <span>DA ENTRADA AO FORNO</span>
-        <h2>Cozinha em movimento.</h2>
-        <p>
-          Pedidos, montagem e observações no mesmo lugar. Agendados mostram o horário combinado.
-        </p>
-      </div>
-      <Feedback action={action} />
-      <div className="kitchen-grid">
-        {orders.length === 0 && <p className="notice">Nenhum pedido em produção.</p>}
-        {orders.map((o) => (
-          <article className="kitchen-ticket" key={o.id}>
-            <header>
-              <strong>{o.number}</strong>
-              <span className="tag">{orderStatusLabel(o)}</span>
-            </header>
-            <p>
-              {o.customer.name}
-              {o.tableName ? ` · ${o.tableName}` : ""} ·{" "}
-              {o.channel === "phone"
-                ? "Telefone"
-                : o.channel === "counter"
-                  ? "Balcão"
-                  : o.channel === "table"
-                    ? "Mesa"
-                    : o.fulfillment === "pickup"
-                      ? "Retirada"
-                      : "Entrega"}
-            </p>
-            <small>
-              {o.scheduledAt
-                ? `Agendado: ${new Date(o.scheduledAt).toLocaleString("pt-BR", { timeZone: "America/Bahia" })}`
-                : `Há ${Math.max(0, Math.floor((new Date(now) - new Date(o.createdAt)) / 60000))} min`}
-            </small>
-            {o.lines.map((l, i) => (
-              <div className="kitchen-line" key={i}>
-                <strong>
-                  {l.quantity} × {l.name}
-                </strong>
-                {l.pizzaSummary && <p>{l.pizzaSummary}</p>}
-                {l.extras.length > 0 && <p>Adicionais: {l.extras.map((e) => e.name).join(", ")}</p>}
-                {l.removedIngredients.length > 0 && <p>Sem: {l.removedIngredients.join(", ")}</p>}
-                {l.notes && <p className="notice">{l.notes}</p>}
-              </div>
-            ))}
-            {o.notes && <p className="notice">Observação: {o.notes}</p>}
-            {services.changePizzaProduction && o.lines.some((l) => l.pizzaUnits) && (
-              <PizzaProduction order={o} company={company} services={services} />
-            )}
-            <div className="restaurant-actions">
-              {nextStatuses(o)
-                .filter((s) => s !== "Cancelado")
-                .map((s) => (
-                  <button
-                    key={s}
-                    className="button button-dark"
-                    disabled={action.busy}
-                    onClick={() =>
-                      action.run(() => services.changeOrder(company.id, o.id, s, "", o.updatedAt))
-                    }
-                  >
-                    {orderActionLabel(o, s)}
-                  </button>
-                ))}
-              <button className="button button-outline" onClick={() => onDetail(o.id)}>
-                Detalhes e impressão
-              </button>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
   );
 }
 function Counter({ tenant, company, services, onDetail }) {
@@ -419,7 +336,7 @@ function Cash({ tenant, company, services }) {
           .slice()
           .reverse()
           .map((s) => (
-            <article className="kitchen-line" key={s.id}>
+            <article className="restaurant-line" key={s.id}>
               <strong>
                 {new Date(s.openedAt).toLocaleString("pt-BR")} →{" "}
                 {new Date(s.closedAt).toLocaleString("pt-BR")}
@@ -814,7 +731,6 @@ export default function RestaurantPanel(props) {
       </p>
     );
   const Component = {
-    kitchen: Kitchen,
     counter: Counter,
     cash: Cash,
     tables: Tables,

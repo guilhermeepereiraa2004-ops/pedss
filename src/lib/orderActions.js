@@ -1,23 +1,19 @@
 export const orderActionLabels = {
   Aceito: "Aceitar pedido",
-  Preparando: "Iniciar preparo",
+  Preparando: "Preparar pedido",
   "A caminho": "Saiu para entrega",
   "Pronto para retirada": "Pronto para retirada",
-  Entregue: "Concluir entrega",
+  Entregue: "Concluir pedido",
 };
 export function orderActionLabel(order, status) {
-  if (order.channel === "table")
-    return status === "Pronto para retirada"
-      ? "Pronto para servir"
-      : status === "Entregue"
-        ? "Marcar como servido"
-        : orderActionLabels[status];
+  if (order.channel === "table" && status === "Pronto para retirada") return "Pronto para servir";
   return orderActionLabels[status];
 }
 export function orderStatusLabel(order) {
-  return order.channel === "table" && order.status === "Pronto para retirada"
-    ? "Pronto para servir"
-    : order.channel === "table" && order.status === "Entregue"
-      ? "Servido"
-      : order.status;
+  return (
+    { Pendente: "Recebido", Preparando: "Em preparo", Entregue: "Concluído" }[order.status] ||
+    order.status
+  );
 }
+export const orderStatusGroup = (status) =>
+  ["A caminho", "Pronto para retirada"].includes(status) ? "Preparando" : status;

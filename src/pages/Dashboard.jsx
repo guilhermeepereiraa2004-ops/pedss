@@ -38,6 +38,7 @@ import FoodImage from "../components/FoodImage";
 import BusinessOverview from "../components/BusinessOverview";
 import CouponPanel from "../components/CouponPanel";
 import ExpensePanel from "../components/ExpensePanel";
+import ProfitabilityPanel from "../components/ProfitabilityPanel";
 import ShippingPanel from "../components/ShippingPanel";
 import PizzaManagement from "../components/PizzaManagement";
 import RestaurantPanel from "../components/RestaurantPanel";
@@ -51,6 +52,8 @@ import useApplication, { useAction, useStore } from "../hooks/useApplication";
 import { trialState } from "../core/trials.ts";
 import useToast from "../hooks/useToast";
 import { finance } from "../core/domain.ts";
+import { orderStatusLabel, orderStatusGroup } from "../lib/orderActions";
+import { currentStoreAddress, storeHref } from "../application/storeAddress";
 import { categories, money, burgerPhoto } from "../lib/data";
 import { getStorefrontTemplate } from "../lib/storefrontTemplates";
 import "./Dashboard.css";
@@ -61,6 +64,7 @@ export default function Dashboard() {
   const [params, setParams] = useSearchParams();
   const account = useApplication();
   const slug =
+    currentStoreAddress() ||
     params.get("store") ||
     account.state.companies.find((c) => c.id === account.identity?.storeId)?.slug ||
     "demo";
@@ -77,7 +81,6 @@ export default function Dashboard() {
   const baseNav = [
     { id: "overview", label: "Visão geral", icon: LayoutGrid },
     { id: "orders", label: "Pedidos", icon: ShoppingBag },
-    { id: "kitchen", label: "Cozinha", icon: Flame },
     { id: "counter", label: "Balcão e telefone", icon: Receipt },
     { id: "tables", label: "Mesas e comandas", icon: UtensilsCrossed },
   ];
@@ -103,11 +106,13 @@ export default function Dashboard() {
     : baseNav;
   const requested = params.get("tab") || "overview",
     active =
-      requested === "expenses" && canManage
-        ? "finance"
-        : nav.some((n) => n.id === requested)
-          ? requested
-          : "overview";
+      requested === "kitchen"
+        ? "orders"
+        : requested === "expenses" && canManage
+          ? "finance"
+          : nav.some((n) => n.id === requested)
+            ? requested
+            : "overview";
   const [financeView, setFinanceView] = useState(
     requested === "expenses" ? "expenses" : "receipts",
   );
@@ -195,7 +200,7 @@ export default function Dashboard() {
       setFinanceView("expenses");
       tab = "finance";
     }
-    setParams({ store: slug, tab });
+    setParams(currentStoreAddress() ? { tab } : { store: slug, tab });
   };
   const day = (d) => new Date(d).toLocaleDateString("en-CA", { timeZone: "America/Bahia" });
   const selectedOrders = orders.filter(
@@ -260,7 +265,7 @@ export default function Dashboard() {
   const selected = orders.find((o) => o.id === selectedId);
   const headings = {
     overview: ["Bom movimento por aqui.", `Vamos acompanhar a ${company.name}.`],
-    orders: ["Cada pedido, no seu tempo.", "Aceite, prepare e acompanhe cada etapa."],
+    orders: ["Cada pedido, no seu tempo.", "Aceite, prepare e conclua o pedido por aqui."],
     menu: ["Um cardápio de dar fome.", "Produtos, ingredientes, adicionais e disponibilidade."],
     finance: [
       "Receber e entregar são coisas diferentes.",
@@ -268,13 +273,12 @@ export default function Dashboard() {
     ],
     settings: ["Tudo do seu jeito.", "Identidade, horários e formas de pagamento."],
     pizza: ["Sua pizzaria, do seu jeito.", "Tamanhos, fatias e valores de cada combinação."],
-    kitchen: ["Pedidos na cozinha.", "Montagem, tempo de espera e próxima etapa."],
     counter: ["Atendimento da loja.", "Vendas de balcão, telefone e consumo nas mesas."],
     tables: ["Cada mesa, uma comanda.", "Consumo e fechamento pelo painel da equipe."],
     combos: ["Combinações que vendem.", "Conjuntos com opções e preço próprio."],
     inventory: ["Ingredientes sob controle.", "Fichas técnicas, custos e movimentos de estoque."],
     cash: ["O caixa do turno.", "Abertura, movimentos e conferência do dinheiro."],
-    scheduling: ["Um horário para cada pedido.", "Antecedência e capacidade da cozinha."],
+    scheduling: ["Um horário para cada pedido.", "Antecedência e capacidade de atendimento."],
     shipping: ["O frete, do seu jeito.", "Taxa única ou por quilômetro, entrega e retirada."],
     team: ["Gente que faz acontecer.", "Acessos locais e permissões da operação."],
     "digital-menu": [
@@ -482,7 +486,7 @@ export default function Dashboard() {
                   <br />É esse o objetivo.
                 </h2>
                 <p>Veja como os clientes encontram os seus sabores.</p>
-                <Link to={`/store/${slug}`} className="button button-dark button-small">
+                <Link to={storeHref(company.slug)} className="button button-dark button-small">
                   Explorar minha loja <ArrowUpRight size={13} />
                 </Link>
               </div>
@@ -537,22 +541,13 @@ export default function Dashboard() {
         <>
           <div className="table-toolbar" style={{ marginTop: 22 }}>
             <div className="filter-tabs">
-              {[
-                "Todos",
-                "Pendente",
-                "Aceito",
-                "Preparando",
-                "A caminho",
-                "Pronto para retirada",
-                "Entregue",
-                "Cancelado",
-              ].map((s) => (
+              {["Todos", "Pendente", "Aceito", "Preparando", "Entregue", "Cancelado"].map((s) => (
                 <button
                   key={s}
                   className={filter === s ? "active" : ""}
                   onClick={() => setFilter(s)}
                 >
-                  {s}
+                  {s === "Todos" ? s : orderStatusLabel({ status: s })}
                 </button>
               ))}
             </div>
@@ -572,7 +567,7 @@ export default function Dashboard() {
               busy={quickAction.busy}
               orders={orders.filter(
                 (o) =>
-                  (filter === "Todos" || o.status === filter) &&
+                  (filter === "Todos" || orderStatusGroup(o.status) === filter) &&
                   `${o.number} ${o.customer.name} ${o.customer.phone}`
                     .toLowerCase()
                     .includes(search.toLowerCase()),
@@ -667,7 +662,7 @@ export default function Dashboard() {
           )}
         </>
       )}
-      {["kitchen", "counter", "cash", "tables", "scheduling"].includes(active) && (
+      {["counter", "cash", "tables", "scheduling"].includes(active) && (
         <RestaurantPanel
           key={`${company.id}-${active}`}
           view={active}
@@ -715,6 +710,13 @@ export default function Dashboard() {
             >
               Despesas
             </button>
+            <button
+              role="tab"
+              aria-selected={financeView === "margin"}
+              onClick={() => setFinanceView("margin")}
+            >
+              Custos e margem
+            </button>
           </div>
           {financeView === "expenses" ? (
             <ExpensePanel
@@ -723,6 +725,19 @@ export default function Dashboard() {
               tenant={tenant}
               services={services}
               now={now}
+            />
+          ) : financeView === "margin" ? (
+            <ProfitabilityPanel
+              orders={orders}
+              from={from}
+              to={to}
+              onFrom={setFrom}
+              onTo={setTo}
+              onCatalog={() => navigate("menu")}
+              onOrder={(id) => {
+                detailAction.setError("");
+                setSelectedId(id);
+              }}
             />
           ) : (
             <>

@@ -67,6 +67,44 @@ afterAll(async () => {
   await db?.close();
 });
 
+it("SUBDOMAIN-07 PostgreSQL resolve alias sem hífen com o mesmo isolamento de sessão", async () => {
+  const state = structuredClone(seed);
+  state.companies[0].slug = "cia-da-pizza";
+  state.revision++;
+  await db.query("UPDATE pedss.workspace SET data=$1 WHERE id=1", [JSON.stringify(state)]);
+  const publicView = await request({ kind: "store", store: "ciadapizza" });
+  expect(publicView.statusCode).toBe(200);
+  expect(publicView.body.state.companies.map((c: any) => c.slug)).toEqual(["cia-da-pizza"]);
+  expect(publicView.body.state.tenants["store-one"].orders).toEqual([]);
+  expect(publicView.body.state.users).toEqual([]);
+  const ownView = await request({ kind: "dashboard", store: "ciadapizza" }, token);
+  expect(ownView.body.state.tenants["store-one"].orders).toHaveLength(1);
+  expect(JSON.stringify(ownView.body)).not.toContain("Cliente privado da outra loja");
+  const foreign = await request({ kind: "dashboard", store: "outra" }, token);
+  expect(foreign.body.state.tenants["store-two"].orders).toEqual([]);
+});
+
+it("SUBDOMAIN-08 PostgreSQL e projeção rejeitam alias ambíguo e priorizam slug exato", async () => {
+  const state = structuredClone(seed);
+  state.companies[0].slug = "cia-da-pizza";
+  state.companies[1].slug = "ciadapizz-a";
+  state.revision++;
+  await db.query("UPDATE pedss.workspace SET data=$1 WHERE id=1", [JSON.stringify(state)]);
+  const ambiguous = await store.readScoped({
+    identity: null,
+    scope: { kind: "store", store: "ciadapizza" },
+  });
+  expect(ambiguous.companies).toEqual([]);
+  state.companies[1].slug = "ciadapizza";
+  state.revision++;
+  await db.query("UPDATE pedss.workspace SET data=$1 WHERE id=1", [JSON.stringify(state)]);
+  const exact = await store.readScoped({
+    identity: null,
+    scope: { kind: "store", store: "ciadapizza" },
+  });
+  expect(exact.companies.map((c: any) => c.id)).toEqual(["store-two"]);
+});
+
 async function request(
   scope: object,
   cookie = "",

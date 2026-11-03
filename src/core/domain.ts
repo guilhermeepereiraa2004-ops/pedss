@@ -14,6 +14,7 @@ import type {
 } from "./model.ts";
 
 import { DomainError } from "./errors.ts";
+import { compactStoreSlug, RESERVED_STORE_ADDRESSES } from "./storeAddress.ts";
 import { pizzaSnapshot } from "./pizzeriaOperations.ts";
 import { applyCoupon } from "./coupons.ts";
 import { trialState } from "./trials.ts";
@@ -35,25 +36,11 @@ export const digits = (value: string) => value.replace(/\D/g, "");
 export const uuid = () => crypto.randomUUID();
 export const iso = () => new Date().toISOString();
 export function requireAvailableStoreSlug(companies: Company[], slug: string, exceptId?: string) {
-  if (
-    [
-      "admin",
-      "www",
-      "dashboard",
-      "super-admin",
-      "login",
-      "pedido",
-      "menu",
-      "store",
-      "cadastro",
-      "teste-gratis",
-      "recuperar",
-      "configurar-acesso",
-      "api",
-    ].includes(slug)
-  )
+  if (RESERVED_STORE_ADDRESSES.some((name) => compactStoreSlug(name) === compactStoreSlug(slug)))
     throw new DomainError("Esse endereço é reservado.");
-  if (companies.some((c) => c.slug === slug && c.id !== exceptId))
+  if (
+    companies.some((c) => compactStoreSlug(c.slug) === compactStoreSlug(slug) && c.id !== exceptId)
+  )
     throw new DomainError(
       "Esse endereço já foi utilizado. Escolha outro para preservar o histórico.",
     );
@@ -387,17 +374,18 @@ export function nextStatuses(order: Order): OrderStatus[] {
   const next: Partial<Record<OrderStatus, OrderStatus[]>> = {
     Pendente: ["Aceito", "Cancelado"],
     Aceito: ["Preparando", "Cancelado"],
-    Preparando: [
-      order.fulfillment === "pickup" ? "Pronto para retirada" : "A caminho",
-      "Cancelado",
-    ],
+    Preparando: ["Entregue", "Cancelado"],
     "A caminho": ["Entregue", "Cancelado"],
     "Pronto para retirada": ["Entregue", "Cancelado"],
   };
   return next[order.status] || [];
 }
 export function transition(order: Order, next: OrderStatus, actor: string, reason = ""): Order {
-  if (!nextStatuses(order).includes(next))
+  // Older clients may finish their existing delivery/pickup step; new UI uses one completion.
+  const legacyStep =
+    order.status === "Preparando" &&
+    next === (order.fulfillment === "pickup" ? "Pronto para retirada" : "A caminho");
+  if (!nextStatuses(order).includes(next) && !legacyStep)
     throw new DomainError("Essa mudança de status não é permitida.");
   if (next === "Cancelado" && reason.trim().length < 3)
     throw new DomainError("Informe o motivo do cancelamento.");

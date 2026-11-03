@@ -102,7 +102,7 @@ export function createPizzeriaOperationsServices(
           return order;
         }
         if (order.updatedAt !== data.expectedUpdatedAt)
-          throw new DomainError("Este pedido mudou. Confira a cozinha novamente.");
+          throw new DomainError("Este pedido mudou. Confira o pedido novamente.");
         if (!["Aceito", "Preparando"].includes(order.status))
           throw new DomainError(
             "Aceite o pedido antes de iniciar a produção. Pedidos concluídos não podem ser alterados.",

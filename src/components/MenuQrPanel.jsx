@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import { Copy, Download, Printer, ArrowUpRight, ScanLine } from "lucide-react";
 import { useAction } from "../hooks/useApplication";
-import { menuPath, menuUrl, localMenuUrl } from "../lib/menu";
+import { localMenuUrl } from "../lib/menu";
+import { publishedMenuUrl, storeHref } from "../application/storeAddress";
 import StoreLogo from "./StoreLogo";
 import "./MenuQrPanel.css";
 function saveFile(blob, name) {
@@ -24,7 +25,10 @@ export default function MenuQrPanel({ company, mode = "local" }) {
   let url = "",
     problem = "";
   try {
-    url = menuUrl(import.meta.env.VITE_PUBLIC_MENU_ORIGIN || window.location.origin, company.slug);
+    url = publishedMenuUrl(
+      import.meta.env.VITE_PUBLIC_MENU_ORIGIN || window.location.origin,
+      company.slug,
+    );
   } catch {
     problem = "Revise VITE_PUBLIC_MENU_ORIGIN: use um endereço HTTP ou HTTPS válido.";
   }
@@ -98,7 +102,7 @@ export default function MenuQrPanel({ company, mode = "local" }) {
           </p>
         )}
         <div className="qr-actions">
-          <Link className="button button-dark" to={menuPath(company.slug)}>
+          <Link className="button button-dark" to={storeHref(company.slug, "menu")}>
             Visualizar cardápio <ArrowUpRight size={14} />
           </Link>
           <button

@@ -1,5 +1,5 @@
 {
-  "floor": 206,
+  "floor": 224,
   "items": [
     {
       "id": "AUTH-06",
@@ -958,7 +958,7 @@
     },
     {
       "id": "PIZZA-LAUNCH-04",
-      "title": "individual kitchen enforces sequence, conflicts, idempotency and all-ready dispatch",
+      "title": "legacy production events preserve sequence, conflicts and idempotency without blocking order completion",
       "source": "tests/pizzeria-launch.test.ts"
     },
     {
@@ -1003,7 +1003,7 @@
     },
     {
       "id": "PIZZA-LAUNCH-UI-04",
-      "title": "thermal copies separate kitchen from customer money and use the selected width",
+      "title": "thermal copies show customer/delivery totals and selected width, without kitchen copy",
       "source": "tests/pizzeria-launch-ui.test.jsx"
     },
     {
@@ -1030,6 +1030,96 @@
       "id": "PHOTO-LOAD-08",
       "title": "troca de foto ignora decodificação antiga e trata falhas",
       "source": "tests/product-photo-loading.test.jsx"
+    },
+    {
+      "id": "MARGIN-01",
+      "title": "custos históricos por quantidade, cupom e exclusão de frete",
+      "source": "tests/profitability.test.ts"
+    },
+    {
+      "id": "MARGIN-02",
+      "title": "custos ausentes ou composição incompleta sinalizam apuração parcial",
+      "source": "tests/profitability.test.ts"
+    },
+    {
+      "id": "MARGIN-03",
+      "title": "período Bahia e exclusão de cancelados, estornos, pendentes e exemplos",
+      "source": "tests/profitability.test.ts"
+    },
+    {
+      "id": "MARGIN-04",
+      "title": "custo zero, prejuízo, desconto integral e histórico vazio",
+      "source": "tests/profitability.test.ts"
+    },
+    {
+      "id": "MARGIN-05",
+      "title": "aba financeira filtra e abre pedidos sem alterar registros",
+      "source": "tests/profitability-ui.test.jsx"
+    },
+    {
+      "id": "MARGIN-06",
+      "title": "interface indica cobertura e orienta cadastro de custos",
+      "source": "tests/profitability-ui.test.jsx"
+    },
+    {
+      "id": "MARGIN-07",
+      "title": "atendente não acessa indicadores privados de custos",
+      "source": "tests/profitability-ui.test.jsx"
+    },
+    {
+      "id": "SUBDOMAIN-01",
+      "title": "hostname válido e separação de nomes reservados",
+      "source": "tests/store-subdomains.test.ts"
+    },
+    {
+      "id": "SUBDOMAIN-02",
+      "title": "alias sem hífen preserva IDs e rejeita ambiguidade",
+      "source": "tests/store-subdomains.test.ts"
+    },
+    {
+      "id": "SUBDOMAIN-03",
+      "title": "colisões e reserva de endereços arquivados",
+      "source": "tests/store-subdomains.test.ts"
+    },
+    {
+      "id": "SUBDOMAIN-04",
+      "title": "rotas de subdomínio e links publicados e legados",
+      "source": "tests/store-subdomains-ui.test.jsx"
+    },
+    {
+      "id": "SUBDOMAIN-05",
+      "title": "painel resolve hostname e navega sem query de loja",
+      "source": "tests/store-subdomains-ui.test.jsx"
+    },
+    {
+      "id": "SUBDOMAIN-06",
+      "title": "cardápio presencial abre por alias sem pedido",
+      "source": "tests/store-subdomains-ui.test.jsx"
+    },
+    {
+      "id": "SUBDOMAIN-07",
+      "title": "SQL resolve alias preservando autorização e isolamento",
+      "source": "tests/read-model.test.ts"
+    },
+    {
+      "id": "SUBDOMAIN-08",
+      "title": "SQL rejeita alias ambíguo e prioriza slug exato",
+      "source": "tests/read-model.test.ts"
+    },
+    {
+      "id": "SIMPLE-ORDER-01",
+      "title": "fluxo direto por entrega/retirada/mesa e conclusão de pedidos antigos sem dependência da cozinha",
+      "source": "tests/simple-order-flow.test.ts"
+    },
+    {
+      "id": "SIMPLE-ORDER-02",
+      "title": "aceitar, preparar e concluir na lista sem confirmar pagamento nem expor Cozinha",
+      "source": "tests/operations-ui.test.jsx"
+    },
+    {
+      "id": "SIMPLE-ORDER-03",
+      "title": "atalho legado de Cozinha abre somente Pedidos",
+      "source": "tests/operations-ui.test.jsx"
     }
   ]
 }

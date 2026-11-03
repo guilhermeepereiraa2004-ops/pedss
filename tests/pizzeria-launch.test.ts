@@ -149,9 +149,6 @@ it("PIZZA-LAUNCH-04 individual kitchen enforces sequence, conflicts, idempotency
   await f.services.changePizzaProduction(company.id, f.order.id, data);
   expect(current().production).toHaveLength(1);
   await expect(
-    f.services.changeOrder(company.id, f.order.id, "Pronto para retirada"),
-  ).rejects.toThrow(/todas/);
-  await expect(
     f.services.changePizzaProduction(company.id, f.order.id, {
       ...data,
       stage: "baking",

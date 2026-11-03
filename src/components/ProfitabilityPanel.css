@@ -1,0 +1,77 @@
+.profitability-panel {
+  display: grid;
+  gap: 22px;
+}
+.profitability-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.profitability-heading h2 {
+  font-size: 28px;
+  margin: 9px 0;
+}
+.profitability-heading p,
+.profitability-method p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.profitability-heading .button {
+  flex-shrink: 0;
+}
+.profitability-period {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.profitability-period .field {
+  width: 180px;
+  margin: 0;
+}
+.profitability-period small {
+  padding-bottom: 12px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.profitability-panel .metrics-grid {
+  margin: 0;
+}
+.profitability-panel .notice p {
+  margin-top: 8px;
+}
+.profitability-method {
+  padding: 18px 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.profitability-method summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.profitability-method p {
+  margin: 14px 0 0;
+}
+@media (max-width: 600px) {
+  .profitability-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+  .profitability-period .field {
+    width: calc(50% - 8px);
+    min-width: 0;
+  }
+  .profitability-period small {
+    padding: 0;
+  }
+  .finance-sections {
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+  .finance-sections button {
+    padding: 12px;
+  }
+}

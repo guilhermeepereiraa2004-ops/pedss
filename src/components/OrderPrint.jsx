@@ -6,7 +6,7 @@ import { orderStatusLabel } from "../lib/orderActions";
 
 export default function OrderPrint({ order, storeName = "" }) {
   const [paper, setPaper] = useState("80"),
-    [copy, setCopy] = useState("kitchen");
+    [copy, setCopy] = useState("customer");
   const address = [
     order.address.street,
     order.address.number,
@@ -23,7 +23,6 @@ export default function OrderPrint({ order, storeName = "" }) {
         <label className="field">
           Via da impressão
           <select value={copy} onChange={(e) => setCopy(e.target.value)}>
-            <option value="kitchen">Cozinha</option>
             <option value="customer">Cliente</option>
             <option value="delivery">Entrega</option>
           </select>
@@ -64,8 +63,7 @@ function Ticket({ order, storeName, copy, address }) {
     <>
       {storeName && <h2>{storeName}</h2>}
       <h3>
-        {copy === "kitchen" ? "COZINHA" : copy === "delivery" ? "ENTREGA" : "CLIENTE"} ·{" "}
-        {order.number}
+        {copy === "delivery" ? "ENTREGA" : "CLIENTE"} · {order.number}
       </h3>
       <p>Situação: {orderStatusLabel(order)}</p>
       <p>
@@ -83,13 +81,11 @@ function Ticket({ order, storeName, copy, address }) {
         {order.tableName ? ` · ${order.tableName}` : ""} ·{" "}
         {order.fulfillment === "pickup" ? "Retirada / consumo local" : "Entrega"}
       </p>
-      {copy !== "kitchen" && (
-        <p>
-          {order.customer.phone}
-          <br />
-          {address}
-        </p>
-      )}
+      <p>
+        {order.customer.phone}
+        <br />
+        {address}
+      </p>
       <hr />
       {order.lines.map((l, i) => (
         <article key={i}>
@@ -104,7 +100,7 @@ function Ticket({ order, storeName, copy, address }) {
               <b>OBS: {l.notes}</b>
             </p>
           )}
-          {copy !== "kitchen" && <p>{money(l.totalCents / 100)}</p>}
+          <p>{money(l.totalCents / 100)}</p>
         </article>
       ))}
       {order.notes && (
@@ -112,32 +108,30 @@ function Ticket({ order, storeName, copy, address }) {
           <b>Observações: {order.notes}</b>
         </p>
       )}
-      {copy !== "kitchen" && (
-        <>
-          <hr />
-          <p>
-            Itens: {money(order.subtotalCents / 100)}
-            <br />
-            Desconto: {money((order.coupon?.discountCents || 0) / 100)}
-            <br />
-            Frete: {money(order.deliveryFeeCents / 100)}
-          </p>
-          <h3>Total: {money(order.totalCents / 100)}</h3>
-          <p>
-            Forma prevista: {order.paymentMethod}
-            <br />
-            Recebido registrado: {money(paidCents(order) / 100)}
-            <br />
-            Saldo: {money(dueCents(order) / 100)}
-            {order.changeForCents !== null && (
-              <>
-                <br />
-                Troco para: {money(order.changeForCents / 100)}
-              </>
-            )}
-          </p>
-        </>
-      )}
+      <>
+        <hr />
+        <p>
+          Itens: {money(order.subtotalCents / 100)}
+          <br />
+          Desconto: {money((order.coupon?.discountCents || 0) / 100)}
+          <br />
+          Frete: {money(order.deliveryFeeCents / 100)}
+        </p>
+        <h3>Total: {money(order.totalCents / 100)}</h3>
+        <p>
+          Forma prevista: {order.paymentMethod}
+          <br />
+          Recebido registrado: {money(paidCents(order) / 100)}
+          <br />
+          Saldo: {money(dueCents(order) / 100)}
+          {order.changeForCents !== null && (
+            <>
+              <br />
+              Troco para: {money(order.changeForCents / 100)}
+            </>
+          )}
+        </p>
+      </>
       <hr />
       <p>Pedido sem valor fiscal.</p>
     </>

@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { ApplicationContext } from "./ApplicationContext";
 import { openState } from "../core/domain.ts";
+import { resolveStoreCompany } from "../core/storeAddress.ts";
 export default function useApplication() {
   const value = useContext(ApplicationContext);
   if (!value) throw new Error("ApplicationProvider ausente.");
@@ -8,7 +9,8 @@ export default function useApplication() {
 }
 export function useStore(slug) {
   const app = useApplication();
-  const company = app.state.companies.find((c) => c.slug === slug && !c.archived);
+  const resolved = resolveStoreCompany(app.state.companies, slug);
+  const company = resolved && !resolved.archived ? resolved : undefined;
   const tenant = company && app.state.tenants[company.id];
   return {
     ...app,

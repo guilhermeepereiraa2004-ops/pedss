@@ -349,7 +349,7 @@ function Inventory({ tenant, company, services }) {
           <p>Cadastre os ingredientes para começar.</p>
         ) : (
           inventory.map((i) => (
-            <div className="kitchen-line" key={i.id}>
+            <div className="restaurant-line" key={i.id}>
               <strong>{i.name}</strong>
               <p className={i.stock <= i.minimum ? "stock-low" : ""}>
                 {Number(i.stock.toFixed(4))} {i.unit}
@@ -596,7 +596,7 @@ function ComboForm({ product, tenant, onSave, onCancel, busy, error }) {
           {options.map((p) => {
             const o = g.options.find((o) => o.productId === p.id);
             return (
-              <div className="kitchen-line" key={p.id}>
+              <div className="restaurant-line" key={p.id}>
                 <label className="checkbox-field">
                   <input
                     type={comboGroupMode(g) === "included" ? "radio" : "checkbox"}

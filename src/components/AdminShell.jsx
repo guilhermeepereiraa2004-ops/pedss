@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import useApplication, { useAction } from "../hooks/useApplication";
 import { ArrowUpRight, ChevronRight, Menu, X, Sparkles, CircleHelp, Check } from "lucide-react";
 import Brand from "./Brand";
+import { storeHref } from "../application/storeAddress";
 import "./AdminShell.css";
 export default function AdminShell({
   central = false,
@@ -75,7 +76,7 @@ export default function AdminShell({
                 ? "Cada loja tem seu jeito. A gestão tem um só lugar."
                 : "O sabor é seu. A organização fica por nossa conta."}
             </p>
-            <Link to={central ? "/dashboard" : `/store/${storeId}`}>
+            <Link to={central ? "/dashboard" : storeHref(storeId)}>
               {central ? "Explorar painel da loja" : "Abrir minha loja"} <ArrowUpRight size={13} />
             </Link>
           </div>
@@ -138,7 +139,7 @@ export default function AdminShell({
             <span className="demo-indicator">
               <i /> {mode === "remote" ? "Conectado" : "Demonstração"}
             </span>
-            <Link to={central ? "/dashboard" : `/store/${storeId}`} className="topbar-store">
+            <Link to={central ? "/dashboard" : storeHref(storeId)} className="topbar-store">
               {central ? "Painel da loja" : "Ver minha loja"} <ArrowUpRight size={14} />
             </Link>
             <span className="avatar">{central ? "AD" : "BB"}</span>
