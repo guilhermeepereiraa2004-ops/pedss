@@ -7,7 +7,7 @@
     "api/app.mjs": { "maxDuration": 30, "includeFiles": ".server/**" },
     "api/updates.mjs": { "maxDuration": 30, "includeFiles": ".server/**" }
   },
-  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }],
+  "rewrites": [{ "source": "/((?!api/|assets/).*)", "destination": "/index.html" }],
   "headers": [
     {
       "source": "/images/optimized/(.*)",

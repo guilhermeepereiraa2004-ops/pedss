@@ -13,8 +13,8 @@ export default function OrdersTable({ orders, onSelect, onAdvance, busy = false 
       </div>
     );
   return (
-    <div className="table-scroll">
-      <table className="data-table">
+    <div className="table-scroll orders-table-scroll">
+      <table className="data-table" aria-label="Pedidos da loja">
         <thead>
           <tr>
             <th>Pedido</th>
@@ -29,7 +29,7 @@ export default function OrdersTable({ orders, onSelect, onAdvance, busy = false 
         <tbody>
           {orders.map((order) => (
             <tr key={order.id}>
-              <td>
+              <td data-label="Pedido">
                 <strong>{order.number}</strong>
                 <small>
                   {new Date(order.createdAt).toLocaleTimeString("pt-BR", {
@@ -39,11 +39,11 @@ export default function OrdersTable({ orders, onSelect, onAdvance, busy = false 
                   })}
                 </small>
               </td>
-              <td>
+              <td data-label="Cliente">
                 <strong>{order.customer.name}</strong>
                 <small>{order.tableName || order.customer.phone || "Sem telefone"}</small>
               </td>
-              <td>
+              <td data-label="Itens" className="order-items-cell">
                 <span
                   className="order-items-text"
                   title={
@@ -55,17 +55,17 @@ export default function OrdersTable({ orders, onSelect, onAdvance, busy = false 
                     order.legacyItems}
                 </span>
               </td>
-              <td>
+              <td data-label="Total">
                 <strong>{money(order.totalCents / 100)}</strong>
               </td>
-              <td>
+              <td data-label="Operação">
                 <span
                   className={`tag ${order.status === "Cancelado" ? "danger" : order.status === "Pendente" ? "warning" : ""}`}
                 >
                   {orderStatusLabel(order)}
                 </span>
               </td>
-              <td>
+              <td data-label="Pagamento">
                 <span
                   className={`tag ${order.paymentStatus === "Pago" ? "" : order.paymentStatus === "Estornado" ? "danger" : "neutral"}`}
                 >

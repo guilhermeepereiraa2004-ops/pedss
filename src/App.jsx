@@ -6,13 +6,14 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Landing from "./pages/Landing";
 import { viewScope } from "./application/viewScope";
 import { currentStoreAddress } from "./application/storeAddress";
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Storefront = lazy(() => import("./pages/Storefront"));
-const SuperAdmin = lazy(() => import("./pages/SuperAdmin"));
-const Auth = lazy(() => import("./pages/Auth"));
-const Tracking = lazy(() => import("./pages/Tracking"));
-const DigitalMenu = lazy(() => import("./pages/DigitalMenu"));
-const TrialSignup = lazy(() => import("./pages/TrialSignup"));
+import { loadPage } from "./application/pageLoading";
+const Dashboard = lazy(() => loadPage(() => import("./pages/Dashboard")));
+const Storefront = lazy(() => loadPage(() => import("./pages/Storefront")));
+const SuperAdmin = lazy(() => loadPage(() => import("./pages/SuperAdmin")));
+const Auth = lazy(() => loadPage(() => import("./pages/Auth")));
+const Tracking = lazy(() => loadPage(() => import("./pages/Tracking")));
+const DigitalMenu = lazy(() => loadPage(() => import("./pages/DigitalMenu")));
+const TrialSignup = lazy(() => loadPage(() => import("./pages/TrialSignup")));
 function ScrollReset() {
   const { pathname, search } = useLocation();
   useEffect(() => {

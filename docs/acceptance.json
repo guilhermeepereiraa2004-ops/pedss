@@ -1130,6 +1130,86 @@
       "id": "SIMPLE-ORDER-03",
       "title": "atalho legado de Cozinha abre somente Pedidos",
       "source": "tests/operations-ui.test.jsx"
+    },
+    {
+      "id": "RECOVERY-01",
+      "title": "leituras recuperam uma falha transitória sem repetir erros de autorização",
+      "source": "tests/connection-recovery.test.jsx"
+    },
+    {
+      "id": "RECOVERY-02",
+      "title": "leitura travada é abortada e termina após tentativas limitadas",
+      "source": "tests/connection-recovery.test.jsx"
+    },
+    {
+      "id": "RECOVERY-03",
+      "title": "falha de envio não repete gravações nem confirma resultado inexistente",
+      "source": "tests/connection-recovery.test.jsx"
+    },
+    {
+      "id": "RECOVERY-04",
+      "title": "tela recupera uma falha de importação sem ocultar erros de código",
+      "source": "tests/connection-recovery.test.jsx"
+    },
+    {
+      "id": "RECOVERY-05",
+      "title": "inicialização pode ser retomada pelo botão ou retorno da conexão sem recarregar a página",
+      "source": "tests/connection-recovery-ui.test.jsx"
+    },
+    {
+      "id": "RECOVERY-06",
+      "title": "erro de carregamento de versão apresenta recuperação sem expor detalhes técnicos",
+      "source": "tests/connection-recovery-ui.test.jsx"
+    },
+    {
+      "id": "RETURN-MENU-01",
+      "title": "acompanhamento preserva a loja de origem ao voltar ao cardápio em produção",
+      "source": "tests/connection-recovery-ui.test.jsx"
+    },
+    {
+      "id": "RETURN-MENU-02",
+      "title": "acompanhamento sem origem retorna ao início em vez de loja inexistente",
+      "source": "tests/connection-recovery-ui.test.jsx"
+    },
+    {
+      "id": "RETURN-MENU-03",
+      "title": "pedido identificado retorna à própria loja independentemente da origem indicada na URL",
+      "source": "tests/connection-recovery-ui.test.jsx"
+    },
+    {
+      "id": "VERSION-01",
+      "title": "nova versão é confirmada antes de atualizar uma única vez, preservando a sacola",
+      "source": "tests/page-version.test.jsx"
+    },
+    {
+      "id": "VERSION-02",
+      "title": "rede indisponível, mesma versão e resposta inválida não causam loop de atualização",
+      "source": "tests/page-version.test.jsx"
+    },
+    {
+      "id": "VERSION-03",
+      "title": "arquivos estáticos ausentes não recebem HTML da aplicação por engano",
+      "source": "tests/page-version.test.jsx"
+    },
+    {
+      "id": "AUDIT-FIX-01",
+      "title": "edição e reabertura da sacola preservam os dados da finalização e a retirada",
+      "source": "tests/pizzeria-audit-fixes.test.jsx"
+    },
+    {
+      "id": "AUDIT-FIX-02",
+      "title": "pizza individual não duplica retiradas e preserva personalizações antigas",
+      "source": "tests/pizzeria-audit-fixes.test.jsx"
+    },
+    {
+      "id": "AUDIT-FIX-03",
+      "title": "repetir pedido abre a sacola da loja correta sem enviar novo pedido",
+      "source": "tests/pizzeria-audit-fixes.test.jsx"
+    },
+    {
+      "id": "AUDIT-FIX-04",
+      "title": "rascunho não reaproveita cupom de outra sacola nem cotação de frete vencida",
+      "source": "tests/pizzeria-audit-fixes.test.jsx"
     }
   ]
 }

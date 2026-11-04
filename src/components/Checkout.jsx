@@ -1,5 +1,5 @@
 import { useForm, useWatch } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Minus, Plus, Trash2, ArrowUpRight, ShieldCheck } from "lucide-react";
 import FoodImage from "./FoodImage";
 import { digits, priceLine } from "../core/domain.ts";
@@ -21,13 +21,15 @@ export default function Checkout({
   now = new Date(),
   onEditLine,
   customerOptional = false,
+  initialDraft,
+  onDraftChange,
 }) {
   const settings = tenant.settings;
-  const [couponText, setCouponText] = useState(""),
-    [couponCode, setCouponCode] = useState("");
-  const [remoteCoupon, setRemoteCoupon] = useState(null);
+  const [couponText, setCouponText] = useState(initialDraft?.couponText || ""),
+    [couponCode, setCouponCode] = useState(initialDraft?.couponCode || "");
+  const [remoteCoupon, setRemoteCoupon] = useState(initialDraft?.remoteCoupon || null);
   const [validating, setValidating] = useState(false);
-  const [shippingQuote, setShippingQuote] = useState(null);
+  const [shippingQuote, setShippingQuote] = useState(initialDraft?.shippingQuote || null);
   const shippingAction = useAction();
   const freightMode = shippingMode(settings);
   const scheduling = tenant.restaurant?.scheduling;
@@ -37,6 +39,7 @@ export default function Checkout({
     control,
     setValue,
     getValues,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -53,8 +56,19 @@ export default function Checkout({
       paymentMethod: settings.paymentMethods[0] || "",
       change: "",
       notes: "",
+      ...initialDraft?.values,
     },
   });
+  // Keep the draft in the store page's memory while its dialogs are closed or switched.
+  // Coupon keys and quote expiry/rules below still revalidate restored values.
+  useEffect(() => {
+    if (!onDraftChange) return;
+    const save = () =>
+      onDraftChange({ values: getValues(), couponText, couponCode, remoteCoupon, shippingQuote });
+    save();
+    const subscription = watch(save);
+    return () => subscription.unsubscribe();
+  }, [watch, getValues, onDraftChange, couponText, couponCode, remoteCoupon, shippingQuote]);
   const [fulfillment, areaId, method, phone, postalCode] = useWatch({
     control,
     name: ["fulfillment", "areaId", "paymentMethod", "phone", "postalCode"],

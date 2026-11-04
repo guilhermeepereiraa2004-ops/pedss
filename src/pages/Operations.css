@@ -386,6 +386,72 @@
   min-height: 49px;
   justify-content: center;
 }
+.orders-table-scroll {
+  container-type: inline-size;
+}
+@container (max-width: 760px) {
+  .orders-table-scroll .data-table {
+    display: block;
+    min-width: 0;
+    width: 100%;
+    border: 0;
+  }
+  .orders-table-scroll thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .orders-table-scroll tbody {
+    display: grid;
+    gap: 14px;
+  }
+  .orders-table-scroll tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--paper, #fafbf6);
+  }
+  .orders-table-scroll .data-table td {
+    display: block;
+    min-width: 0;
+    padding: 9px;
+    border: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .orders-table-scroll td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 6px;
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .orders-table-scroll .order-items-cell,
+  .orders-table-scroll .data-table td.order-actions-cell {
+    grid-column: 1 / -1;
+  }
+  .orders-table-scroll .order-items-text {
+    display: block;
+    max-width: none;
+    white-space: normal;
+  }
+  .orders-table-scroll .data-table td.order-actions-cell {
+    position: static;
+    display: flex;
+    gap: 8px;
+    box-shadow: none;
+  }
+  .orders-table-scroll .order-actions-cell > button {
+    min-height: 46px;
+    flex: 1;
+    min-width: 0;
+    white-space: normal;
+  }
+}
 .finance-sections {
   display: flex;
   gap: 8px;

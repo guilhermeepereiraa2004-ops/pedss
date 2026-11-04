@@ -12,7 +12,9 @@ export function orderActionLabel(order, status) {
       : status === "Entregue"
         ? "Marcar como servido"
         : orderActionLabels[status];
-  return orderActionLabels[status];
+  return status === "Entregue" && order.fulfillment === "pickup"
+    ? "Confirmar retirada"
+    : orderActionLabels[status];
 }
 export function orderStatusLabel(order) {
   return order.channel === "table" && order.status === "Pronto para retirada"

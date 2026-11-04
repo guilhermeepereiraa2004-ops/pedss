@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Check, Flame, ArrowUpRight, Copy, Clock3, Send } from "lucide-react";
 import LandingBrand from "../components/LandingBrand";
 import useApplication, { useAction } from "../hooks/useApplication";
 import { money } from "../lib/data";
+import { currentStoreAddress, storeHref } from "../application/storeAddress";
 import "./Tracking.css";
 export default function Tracking() {
   const { token } = useParams(),
@@ -12,6 +13,7 @@ export default function Tracking() {
     action = useAction();
   const [link, setLink] = useState(""),
     [message, setMessage] = useState("");
+  const [searchParams] = useSearchParams();
   useEffect(() => {
     if (token) refresh?.().catch(() => {});
   }, [token, refresh]);
@@ -39,12 +41,16 @@ export default function Tracking() {
         action.setError("Cole o link de acompanhamento recebido na confirmação.");
         return;
       }
-      navigate(`/pedido/${value}`);
+      const originStore = searchParams.get("store") || currentStoreAddress();
+      navigate(`/pedido/${value}${originStore ? `?store=${encodeURIComponent(originStore)}` : ""}`);
     } catch {
       action.setError("Link inválido. Confira o endereço.");
     }
   };
   const history = order?.history.filter((e) => e.kind === "order") || [];
+  const returnStore = company?.archived
+    ? null
+    : company?.slug || searchParams.get("store") || currentStoreAddress();
   const whatsapp =
     order && settings?.whatsapp
       ? `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(`Olá, ${company.name}! Pedido ${order.number}\n${order.lines.map((l) => `${l.quantity} × ${l.name}${l.pizzaSummary ? " — " + l.pizzaSummary : ""}${l.extras.length ? " + " + l.extras.map((e) => e.name).join(", ") : ""}${l.removedIngredients.length ? " (sem " + l.removedIngredients.join(", ") + ")" : ""}${l.notes ? " — " + l.notes : ""}`).join("\n") || order.legacyItems}\nCliente: ${order.customer.name}\nTelefone: ${order.customer.phone}\n${[order.address.street, order.address.number, order.address.neighborhood, order.address.complement, order.address.reference].filter(Boolean).join(", ")}\nObservações: ${order.notes || "Nenhuma"}\nPagamento: ${order.paymentMethod}\nTotal: ${money(order.totalCents / 100)}\nAcompanhamento: ${window.location.origin}/pedido/${order.trackingToken}`)}`
@@ -53,11 +59,8 @@ export default function Tracking() {
     <div className="tracking-page">
       <header className="tracking-header">
         <LandingBrand />
-        <Link
-          className="text-link"
-          to={company && !company.archived ? `/store/${company.slug}` : "/store/demo"}
-        >
-          Voltar ao cardápio <ArrowUpRight size={13} />
+        <Link className="text-link" to={returnStore ? storeHref(returnStore) : "/"}>
+          {returnStore ? "Voltar ao cardápio" : "Voltar ao início"} <ArrowUpRight size={13} />
         </Link>
       </header>
       <main className="tracking-card">
@@ -95,7 +98,12 @@ export default function Tracking() {
                 ? "Confira o link de acompanhamento recebido ao concluir o pedido."
                 : "Confira o link e use o mesmo navegador e endereço em que realizou o pedido. O acompanhamento ainda é local."}
             </p>
-            <Link className="button button-dark" to="/acompanhar">
+            <Link
+              className="button button-dark"
+              to={
+                returnStore ? `/acompanhar?store=${encodeURIComponent(returnStore)}` : "/acompanhar"
+              }
+            >
               Conferir outro link
             </Link>
           </>
@@ -161,7 +169,7 @@ export default function Tracking() {
               ))}
               {!order.lines.length && <p>{order.legacyItems}</p>}
               <div>
-                <span>Entrega</span>
+                <span>{order.fulfillment === "pickup" ? "Retirada" : "Entrega"}</span>
                 <span>{money(order.deliveryFeeCents / 100)}</span>
               </div>
               {order.coupon && (
@@ -207,10 +215,7 @@ export default function Tracking() {
                   onClick={() =>
                     action.run(
                       () => services.repeatOrder(company.id, order.trackingToken),
-                      () =>
-                        setMessage(
-                          "Itens adicionados à sacola com os preços atuais. Confira antes de confirmar.",
-                        ),
+                      () => navigate(`${storeHref(company.slug)}?sacola=1`),
                     )
                   }
                 >

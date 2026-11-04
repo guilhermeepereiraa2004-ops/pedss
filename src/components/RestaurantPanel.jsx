@@ -690,7 +690,7 @@ function Scheduling({ tenant, company, services }) {
   return (
     <section className="restaurant-stack">
       <div className="restaurant-intro">
-        <span>CAPACIDADE DA COZINHA</span>
+        <span>CAPACIDADE DE ATENDIMENTO</span>
         <h2>Pedidos agendados.</h2>
         <p>
           O cliente escolhe um horário de entrega ou retirada. A capacidade limita a quantidade de

@@ -6,7 +6,8 @@ import { isIllustrativeProductPhoto } from "../lib/productPhotography";
 import "./ProductOptions.css";
 import PizzaBuilder from "./PizzaBuilder";
 import PizzaPriceBreakdown from "./PizzaPriceBreakdown";
-import { pricePizza, initialPizzaSelection } from "../core/pizza.ts";
+import { pricePizza } from "../core/pizza.ts";
+import { globalProductIngredients, productPizzaSelection } from "../application/productSelections";
 import ComboOptions from "./ComboOptions";
 import { replacesPizzaOption } from "../core/catalogRules.ts";
 export default function ProductOptions(props) {
@@ -22,26 +23,19 @@ function SingleProductOptions({
   initialLine,
   submitLabel,
 }) {
+  const globalIngredients = globalProductIngredients(product);
   const [quantity, setQuantity] = useState(initialLine?.quantity || 1),
     [extras, setExtras] = useState(
       (initialLine?.extraIds || []).filter((id) =>
         product.extras.some((e) => e.id === id && e.available && !replacesPizzaOption(product, e)),
       ),
     ),
-    [removed, setRemoved] = useState(initialLine?.removedIngredients || []),
+    [removed, setRemoved] = useState(
+      (initialLine?.removedIngredients || []).filter((name) => globalIngredients.includes(name)),
+    ),
     [notes, setNotes] = useState(initialLine?.notes || "");
   const [pizza, setPizza] = useState(() =>
-    product.pizza
-      ? structuredClone(
-          initialLine?.pizza
-            ? {
-                ...initialLine.pizza,
-                flavorCount:
-                  initialLine.pizza.flavorCount || initialLine.pizza.flavorIds.length || 1,
-              }
-            : initialPizzaSelection(product.pizza),
-        )
-      : undefined,
+    productPizzaSelection(product, initialLine?.pizza, initialLine?.removedIngredients),
   );
   let pizzaPrice = null,
     pizzaError = "";
@@ -116,7 +110,20 @@ function SingleProductOptions({
         )}
         {product.pizza && (
           <>
-            <PizzaBuilder config={product.pizza} value={pizza} onChange={setPizza} />
+            <PizzaBuilder
+              config={product.pizza}
+              value={pizza}
+              onChange={(next) =>
+                setPizza(
+                  productPizzaSelection(product, {
+                    ...next,
+                    ...(product.pizza.flavors.length === 1 && next.sizeId !== pizza.sizeId
+                      ? { customizations: pizza.customizations }
+                      : {}),
+                  }),
+                )
+              }
+            />
             <div className="pizza-order-summary" aria-live="polite">
               {pizzaPrice?.summary || pizzaError}
             </div>
@@ -148,10 +155,10 @@ function SingleProductOptions({
               ))}
           </fieldset>
         )}
-        {product.ingredients.length > 0 && (
+        {globalIngredients.length > 0 && (
           <fieldset>
             <legend>Prefere sem algum ingrediente?</legend>
-            {product.ingredients.map((ingredient) => (
+            {globalIngredients.map((ingredient) => (
               <label className="option-row" key={ingredient}>
                 <span>
                   <input

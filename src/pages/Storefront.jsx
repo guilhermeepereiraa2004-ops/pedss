@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowUpRight,
   ShoppingBag,
@@ -63,14 +63,18 @@ export default function Storefront({ manualStoreId }) {
   );
 }
 function StoreExperience({ slug }) {
+  const location = useLocation();
   const { company, tenant, availability, services, now, mode } = useStore(slug),
     action = useAction(),
     navigate = useNavigate();
   const [search, setSearch] = useState(""),
     [category, setCategory] = useState("Todos"),
-    [cartOpen, setCartOpen] = useState(false),
+    [cartOpen, setCartOpen] = useState(
+      () => new URLSearchParams(location.search).get("sacola") === "1",
+    ),
     [productId, setProductId] = useState(null);
   const [editingCartKey, setEditingCartKey] = useState(null);
+  const [checkoutDraft, setCheckoutDraft] = useState(null);
   const [toast, notify] = useToast();
   if (!company || !tenant)
     return (
@@ -79,8 +83,9 @@ function StoreExperience({ slug }) {
         <Flame size={60} />
         <h1>Essa brasa ainda não acendeu.</h1>
         <p>Estabelecimento não encontrado.</p>
-        <Link className="button button-dark" to="/store/demo">
-          Conhecer a loja demo <ArrowUpRight size={15} />
+        <Link className="button button-dark" to={mode === "remote" ? "/" : "/store/demo"}>
+          {mode === "remote" ? "Conhecer a Peds's" : "Conhecer a loja demo"}{" "}
+          <ArrowUpRight size={15} />
         </Link>
       </div>
     );
@@ -420,7 +425,7 @@ function StoreExperience({ slug }) {
       <footer className="store-footer store-container">
         <LandingBrand />
         <span>Uma loja com o sabor de {company.name}.</span>
-        <Link className="text-link" to="/acompanhar">
+        <Link className="text-link" to={`/acompanhar?store=${encodeURIComponent(company.slug)}`}>
           Acompanhar pedido <ArrowUpRight size={12} />
         </Link>
         <Link className="text-link" to={storeHref(company.slug, "dashboard")}>
@@ -467,6 +472,8 @@ function StoreExperience({ slug }) {
       {cartOpen && (
         <Modal title="Coisa boa na sua sacola." onClose={() => setCartOpen(false)}>
           <Checkout
+            initialDraft={checkoutDraft}
+            onDraftChange={setCheckoutDraft}
             onEditLine={
               services.updateCartLine
                 ? (key) => {

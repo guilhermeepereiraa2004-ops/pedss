@@ -279,7 +279,7 @@ export default function Dashboard() {
     cash: ["O caixa do turno.", "Abertura, movimentos e conferência do dinheiro."],
     scheduling: ["Um horário para cada pedido.", "Antecedência e capacidade de atendimento."],
     shipping: ["O frete, do seu jeito.", "Taxa única ou por quilômetro, entrega e retirada."],
-    team: ["Gente que faz acontecer.", "Acessos locais e permissões da operação."],
+    team: ["Gente que faz acontecer.", "Acessos e permissões da operação."],
     "digital-menu": [
       "Seu cardápio, em cada mesa.",
       "Consulta presencial, link próprio e QR code para compartilhar.",

@@ -1,3 +1,23 @@
+## Correções da auditoria de pizzaria publicadas — 04/11/2026
+
+Pedido atual autoriza executar as recomendações da auditoria, incluindo a publicação. Finalização mantém nome, telefone, modalidade, endereço, pagamento, observações e rascunho de cupom durante edição/cancelamento/reabertura da sacola. Estado somente em memória da página; cupom e cotação continuam sujeitos à validade, telefone, sacola e regras atuais. Nenhum preço enviado pelo navegador passa a ser confiado.
+
+Pizzas individuais vinculadas iniciam com seu único sabor selecionado, não duplicam as retiradas globais e preservam personalizações antigas e ao trocar tamanho. Ingredientes gerais sem equivalente no sabor permanecem disponíveis. Pedir novamente abre a sacola da loja correspondente, sem confirmar compra. Retirada mostra Retirada no total e Confirmar retirada na ação final; status históricos e pagamento permanecem separados. Tabela de pedidos adapta-se à largura do próprio contêiner, com informações rotuladas e ações visíveis no mobile. Textos de Equipe/Agendamento revisados. Descrição pública da Cia da Pizza corrigida pela UI para “Escolha sua pizza favorita e monte cada detalhe do seu jeito.”; somente esse campo foi editado.
+
+Incluídas as correções locais anteriores de retorno ao cardápio, recuperação de leitura com repetição limitada, recuperação de versão antiga e 404 de assets. Nenhum POST é repetido automaticamente. Nenhuma alteração em preços, regras comerciais, credenciais, permissões, DNS, esquema ou registros financeiros.
+
+Publicação via CLI autenticada em Pedss/prj_wQ4WydtpnP5OS36ei515W9GpoVxV, equipe Diego Projects/team_31LF1BKscdWn5gGQQgAxp4c1. Deployment dpl_HQxuEcaRXoY2QC26A3RaS1o1Kjni, URL pedss-psvfhsivw-diegos-projects-2f58d897.vercel.app, READY; funções gru1. Pacote sanitizado com 292 arquivos efetivamente enviados, sem env, registros locais, backups ou clientes; manifesto .quality/audit-fixes-release-manifest.json. Fonte é o working tree validado sobre b483efe, sem novo commit/push. Não afirmar que o GitHub recebeu esta correção.
+
+Versão criada sem trocar domínios, validada e então promovida. O alias pedss.vercel.app ainda estava em uma versão antiga e foi alinhado explicitamente. www.pedss.com.br, pedss.com.br (redireciona para www) e pedss.vercel.app retornam HTTP 200 e /assets/index-DZ0bufkK.js. GET público da Cia retorna 15 produtos com hash idêntico nos três hosts, zero pedidos/usuários privados; arquivo inexistente em /assets/ retorna 404 text/plain. Nenhum pedido de produção foi criado ou alterado nesta rodada.
+
+Validação: npm run check passou com 412 testes/60 arquivos, lint, tipos, camadas e build. Após registrar quatro critérios novos, scripts/acceptance.mjs confirmou 242/242 critérios. Primeiro gate apontou helper no diretório lib importando core; corrigido para application antes da execução aprovada. Fluxos operacionais em memória/PostgreSQL descartável cobrem cupons, combos, estoque (baixa, cancelamento, duplicidade), recebimentos/sangrias/estornos, fechamento de caixa, mesas/comandas, agenda/capacidade, preços e permissões. Não representam lançamentos ou fechamento financeiro na loja real.
+
+QA pelo navegador integrado: finalização local preservada ao editar quantidade e ao cancelar; pizza individual sem controles duplicados; pedido fictício pronto para retirada concluído mantendo pagamento pendente; Pedir novamente abriu sacola sem criar pedido. Viewport real 390×844 confirmou card de pedido sem rolagem horizontal e botões acessíveis; viewport restaurado. Em produção, painel autenticado recarregou; Calabresa mostrou Sem Cebola e Sem Orégano apenas uma vez; rascunho de finalização manteve nome/telefone/retirada/Pix/observações ao voltar da edição sem envio de pedido. Console da loja sem erros/avisos na verificação.
+
+Evidências locais: .quality/pizzeria-audit-fixes-gate.log, .quality/audit-fixes-public-verification.json, .quality/audit-fixes-deploy.log, .quality/pizzeria-orders-mobile-fixed.png e .quality/pizzeria-checkout-production-fixed.png. Página isolada .quality/audit-fixes-preview.html usa somente memória e não é publicada.
+
+Limites remanescentes: ficha técnica, custos e alergênicos precisam de dados reais da loja; não foram inventados. Impressora térmica física, câmera de QR, rede/aparelho independente e recuperação após interrupções prolongadas não foram homologados fisicamente. Não foi reproduzido o erro intermitente original em produção; as causas de recuperação cobertas por testes foram corrigidas, sem prometer ausência de qualquer indisponibilidade futura. Frete por rotas/CEP e ativação DNS de subdomínios permanecem conforme decisões anteriores, fora deste escopo.
+
 # Pendências — Pedss
 
 ## Publicação autorizada da restauração de status — 03/11/2026
@@ -824,3 +844,23 @@ Gate do rollback aprovado: npm run check,366 testes/50 arquivos e206 critérios,
 ## 04/11/2026 — Cardápio completo no balcão e telefone
 
 Resolvido localmente: acesso explícito ao montador no atendimento e compartilhamento do catálogo do cardápio. Não são criados montadores automaticamente: a loja deve ter um montador disponível e configurado, como no cardápio público. UI validada em memória; sem teste operacional real na produção, frete externo ou dispositivo físico. Publicação desta mudança ainda não realizada.
+
+
+## 04/11/2026 — Recuperação de conexão, versões e retorno ao cardápio
+
+Resolvidos localmente: retorno indevido para /store/demo, inicialização presa após falha transitória e recuperação de importações diante de uma versão nova confirmada. Roteamento de assets preparado para não servir HTML no lugar de JS. Publicação, conferência dos dois aliases e ensaio de navegação entre deployments continuam pendentes. Erro genérico da captura ainda sem stack da sessão real; não atribuído exclusivamente ao banco ou à rede.
+
+## 04/11/2026 — Auditoria da pizzaria em produção (parcial)
+
+Auditoria realizada na aba do ChatGPT, respeitando a proibição de excluir dados, mudar regras/configurações e executar alterações diretas no banco. Fluxo público validado até criação, persistência, consulta e repetição do único pedido fictício #62892B6B (R$ 62,90, retirada, Pendente, sem pagamento, identificado NÃO PREPARAR/NÃO ENTREGAR/NÃO CONTATAR). Pedido preservado; repetição deixou apenas rascunho na sacola. Nenhuma comunicação externa, pagamento, alteração de acesso, commit ou deploy.
+
+Falhas reproduzidas: editar item reinicia nome/observações/modalidade/pagamento do checkout e recoloca frete; acompanhamento sem pedido volta para /store/demo inexistente; www e alias Vercel continuam com bundles diferentes. Fotos carregaram durante a navegação; montador/preço e cardápio presencial funcionaram nos casos exercitados. Detalhes e matriz dos 16 módulos em docs/PIZZERIA-PRODUCTION-AUDIT-2026-11-04.md.
+
+Painel de produção exige login na sessão disponível: não foi validado nem houve tentativa de contornar autenticação. Receber/aceitar/preparar/pronto para retirada/concluir e atualização simultânea real continuam pendentes de sessão autenticada.114 testes complementares em18 arquivos passaram, log .quality/pizzeria-production-audit-supplement.log; são testes locais descartáveis e não equivalem a validação administrativa remota. Nenhuma implementação alterada, gate anterior408/238 preservado. Viewport efetivo631x572; tentativa390x844 não aplicada pelo navegador e override restaurado, sem afirmar teste em celular físico. Raia única, agente principal.
+
+## 04/11/2026 — Complemento da auditoria autenticada
+
+Resolvida a limitação de sessão: pedidos de retirada e telefone/entrega foram exercitados até Entregue, com pagamento Pendente e atualização entre abas sem refresh. Os 16 módulos foram inspecionados. Permanecem: perda do rascunho do checkout ao editar item, retorno sem origem para demo inexistente na versão publicada, aliases divergentes; cadastro dos doces como salgados; 0/14 sabores vinculados; custos/fichas ausentes; tabela de pedidos pouco prática em largura estreita; textos legados. Não classificados como falha: módulos vazios/desativados preservados por autorização, ausência de recebimentos/custos e uma dificuldade inicial de automação dos campos de data (calendário nativo e CSV confirmados corretos). Matriz/limites e pedidos QA preservados no relatório de auditoria. Sem correções ou publicação nesta rodada.
+## 04/11/2026 — Sabores unificados na Cia da Pizza
+
+Resolvidos em produção via painel: 0/14 vínculos passou a 14/14, listas de ingredientes removíveis compartilhadas e classificação correta das duas pizzas doces. Preços, fotos e descrições preservados e verificados no cliente. Custos/alergênicos continuam dependentes de informação real da loja. Refinamento observado: no produto individual vinculado, opções de retirada aparecem tanto na personalização do sabor quanto no grupo global; não altera o preço, mas a interface deve evitar repetição. Demais pendências da auditoria permanecem registradas, sem atribuir a esta alteração de cadastro uma correção de código ou publicação.

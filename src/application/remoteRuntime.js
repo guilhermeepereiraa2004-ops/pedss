@@ -5,6 +5,7 @@ import { cartSchema } from "../core/model.ts";
 import { startLiveUpdates } from "./liveUpdates";
 import { viewScope } from "./viewScope";
 import { remoteServiceCommands } from "./remoteCommands.js";
+import { remoteRead } from "../adapters/remoteRead.js";
 
 const CART_KEY = "pedss.carts.v1";
 /** Only carts persist in this browser. All authoritative state comes from sanitized API projections. */
@@ -128,7 +129,7 @@ export function createRemoteRuntime({ storage = cartStorage(), fetcher = fetch }
     const scopeKey = JSON.stringify(scope);
     const tracking = window.location.pathname.match(/^\/pedido\/([a-f\d-]{36,100})$/i)?.[1];
     try {
-      const response = await fetcher("/api/app", {
+      const options = {
         method: body ? "POST" : "GET",
         credentials: "same-origin",
         cache: "no-store",
@@ -146,7 +147,10 @@ export function createRemoteRuntime({ storage = cartStorage(), fetcher = fetch }
           ...(tracking ? { "X-Pedss-Tracking": tracking } : {}),
         },
         ...(body ? { body: JSON.stringify(body) } : {}),
-      });
+      };
+      const response = body
+        ? await fetcher("/api/app", options)
+        : await remoteRead(fetcher, "/api/app", options);
       if (!body && response.status === 304) {
         if (scopeKey === JSON.stringify(viewScope())) {
           warning = "";

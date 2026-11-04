@@ -140,7 +140,9 @@ it.each(["delivery", "pickup"])(
     ).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Todos", exact: true }));
     await userEvent.click(
-      await screen.findByRole("button", { name: `Concluir entrega ${order.number}` }),
+      await screen.findByRole("button", {
+        name: `${fulfillment === "pickup" ? "Confirmar retirada" : "Concluir entrega"} ${order.number}`,
+      }),
     );
     await waitFor(() =>
       expect(f.repo.getSnapshot().tenants[company.id].orders[0].status).toBe("Entregue"),
