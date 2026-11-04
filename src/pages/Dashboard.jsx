@@ -674,6 +674,7 @@ export default function Dashboard() {
         <RestaurantPanel
           key={`${company.id}-${active}`}
           view={active}
+          mode={app.mode}
           company={company}
           tenant={tenant}
           services={services}

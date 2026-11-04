@@ -848,3 +848,8 @@ O alias manual pedss.vercel.app ainda apontava para o deployment anterior, apesa
 Revertida somente a composição visual da pizza com fatia separada, conforme pedido do usuário. ProductCutout.jsx e ProductCutout.css restaurados byte a byte ao HEAD3fa24c4; imagens inteiras, animação coordenada e correção de load/decode preservadas. Navegador confirmou14 fotos carregadas/animadas e nenhum elemento de fatia destacada. Viewport restaurado. Sem alteração de dados, hero, montador, commit ou publicação. Evidência .quality/pizza-slice-rollback.png.
 
 Gate do rollback aprovado: npm run check,366 testes/50 arquivos e206 critérios, lint/tipos/camadas/build/API. Log .quality/pizza-slice-rollback-gate.log.
+
+
+## 04/11/2026 — Cardápio completo no balcão e telefone
+
+Concluído localmente: paridade de opções entre cardápio e atendimento de balcão/telefone; montagem visual, combos, categorias/busca e edição. Gate391/226 aprovado. Publicação desta mudança aguarda pedido do usuário.

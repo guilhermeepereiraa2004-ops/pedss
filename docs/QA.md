@@ -1138,3 +1138,12 @@ Evidências locais ignoradas: .quality/release-public-before.json, release-publi
 Revertida somente a composição visual da pizza com fatia separada, conforme pedido do usuário. ProductCutout.jsx e ProductCutout.css restaurados byte a byte ao HEAD3fa24c4; imagens inteiras, animação coordenada e correção de load/decode preservadas. Navegador confirmou14 fotos carregadas/animadas e nenhum elemento de fatia destacada. Viewport restaurado. Sem alteração de dados, hero, montador, commit ou publicação. Evidência .quality/pizza-slice-rollback.png.
 
 Gate do rollback aprovado: npm run check,366 testes/50 arquivos e206 critérios, lint/tipos/camadas/build/API. Log .quality/pizza-slice-rollback-gate.log.
+
+
+## 04/11/2026 — Cardápio completo no balcão e telefone
+
+Atendimento usa o mesmo seletor de catálogo do cardápio público, com acesso destacado a Monte sua pizza, catálogo por categoria, fotos e busca por nome/descrição. Mesmo ProductOptions/PizzaBuilder para tamanhos, quantidade de sabores, massa, borda, adicionais, combos e edição antes de confirmar; sem duplicar configurações ou regras de preço. Resumo usa estilos próprios do Checkout também ao abrir o painel diretamente. Modo remoto, validação de cupom e cotação de frete encaminhados aos serviços existentes. Sacola pública e pagamento separados do atendimento.
+
+Gate npm run check aprovado:391 testes/56 arquivos,226/226 critérios, lint/tipos/camadas/build. Log .quality/counter-menu-gate-complete.log. Regressões COUNTER-MENU-01/02 testam balcão e telefone com pizza de três sabores, alteração de massa, borda/adicional, bebida, preço final em centavos, pagamento pendente, catálogo/combos e preservação da sacola pública. Primeiro gate teve timeout isolado no teste legado de exportação XLSX; reexecução isolada e dois gates completos seguintes passaram sem alterar timeout.
+
+Navegador validou o painel em prévia descartável em memória e o montador no desktop e390x844, incluindo escolha de sabores/massa/borda e adição ao resumo. Mobile: viewport, largura da página e largura do modal390px, sem overflow horizontal; viewport restaurado. Console sem erros. Capturas .quality/counter-menu-desktop.png, .quality/counter-pizza-desktop.png e .quality/counter-pizza-mobile.png. Nenhum pedido/cadastro real, banco ou API de produção alterados. Integrações externas de frete e pagamento real não foram exercitadas; dispositivo físico não testado.

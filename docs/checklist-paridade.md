@@ -2,10 +2,12 @@
 
 Gerado por `npm run check`. Fonte: `docs/acceptance.json`.
 
-Total: 224 | Verificados: 224 | Progresso: 100%
+Total: 226 | Verificados: 226 | Progresso: 100%
 
 | ID | Critério | Estado | Evidência |
 | --- | --- | --- | --- |
+| COUNTER-MENU-01 | balcão e telefone montam e editam pizza completa com bebida sem alterar a sacola pública | Verificado | COUNTER-MENU-01 counter monta, edita e registra pizza completa com bebida, sem alterar a sacola pública; COUNTER-MENU-01 phone monta, edita e registra pizza completa com bebida, sem alterar a sacola pública |
+| COUNTER-MENU-02 | catálogo do atendimento oferece busca, categorias, combos e acesso separado ao montador | Verificado | COUNTER-MENU-02 busca e categorias preservam o acesso ao montador e oferecem combos completos |
 | AUTH-06 | sair limpa identidade mesmo quando falha a gravação compartilhada | Verificado | acesso local AUTH-06 sair limpa identidade mesmo quando falha a gravação compartilhada |
 | UI-07 | aplicação completa abre em StrictMode mesmo se scrollTo retornar Promise | Verificado | interfaces da operação UI-07 aplicação completa abre em StrictMode mesmo se scrollTo retornar Promise |
 | UI-08 | moeda aceita vírgula e preserva centavos durante edição | Verificado | interfaces da operação UI-08 moeda aceita vírgula e preserva centavos durante edição |
@@ -49,8 +51,8 @@ Total: 224 | Verificados: 224 | Progresso: 100%
 | BUSINESS-03 | receita respeita recebimento, estorno e timezone; meses vazios aparecem | Verificado | cupons, despesas e indicadores BUSINESS-03 receita respeita recebimento, estorno e timezone; meses vazios aparecem |
 | BUSINESS-04 | rankings somam opções por produto, incluem zero e ignoram exemplos | Verificado | cupons, despesas e indicadores BUSINESS-04 rankings somam opções por produto, incluem zero e ignoram exemplos |
 | DATA-05 | dados v2 anteriores ganham campos sem apagar pedidos nem inventar custos | Verificado | cupons, despesas e indicadores DATA-05 dados v2 anteriores ganham campos sem apagar pedidos nem inventar custos; DATA-05 tracking reads just the matching order and session expiry defeats a previous ETag |
-| MENU-01 | cardápio presencial funciona com delivery fechado e exibe detalhes sem sacola | Verificado | MENU-01 Hamburguer: presencial funciona com delivery fechado e exibe recorte sem sacola; MENU-01 Porção: presencial funciona com delivery fechado e exibe recorte sem sacola; MENU-01 Bebida: presencial funciona com delivery fechado e exibe recorte sem sacola; MENU-01 Sobremesa: presencial funciona com delivery fechado e exibe recorte sem sacola; PIZZA-MENU-01 catálogo mantém pizzas individuais e montador é uma chamada separada |
-| MENU-02 | loja inexistente não mostra o catálogo de outro estabelecimento | Verificado | MENU-02 loja inexistente não mostra o catálogo de outro estabelecimento |
+| MENU-01 | cardápio presencial funciona com delivery fechado e exibe detalhes sem sacola | Verificado | COUNTER-MENU-01 counter monta, edita e registra pizza completa com bebida, sem alterar a sacola pública; COUNTER-MENU-01 phone monta, edita e registra pizza completa com bebida, sem alterar a sacola pública; MENU-01 Hamburguer: presencial funciona com delivery fechado e exibe recorte sem sacola; MENU-01 Porção: presencial funciona com delivery fechado e exibe recorte sem sacola; MENU-01 Bebida: presencial funciona com delivery fechado e exibe recorte sem sacola; MENU-01 Sobremesa: presencial funciona com delivery fechado e exibe recorte sem sacola; PIZZA-MENU-01 catálogo mantém pizzas individuais e montador é uma chamada separada |
+| MENU-02 | loja inexistente não mostra o catálogo de outro estabelecimento | Verificado | COUNTER-MENU-02 busca e categorias preservam o acesso ao montador e oferecem combos completos; MENU-02 loja inexistente não mostra o catálogo de outro estabelecimento |
 | QR-01 | link e QR pertencem à loja e exportação SVG cria arquivo vetorial | Verificado | QR-01 link e QR pertencem à loja e exportação SVG cria arquivo vetorial |
 | QR-02 | prévia local informa limite de acesso e permite pedir impressão da placa | Verificado | QR-02 prévia local informa limite de acesso e permite pedir impressão da placa |
 | COUPON-UI-01 | gestor cadastra oferta, cliente a aplica e checkout envia total com desconto | Verificado | COUPON-UI-01 gestor cadastra oferta, cliente a aplica e checkout envia total com desconto |

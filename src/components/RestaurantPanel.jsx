@@ -1,13 +1,16 @@
 import { useState } from "react";
+import { ArrowUpRight, Pizza } from "lucide-react";
 import { useAction } from "../hooks/useApplication";
 import { uuid, priceLine } from "../core/domain.ts";
 import { cashSummary, comboStartingPrice } from "../core/restaurant.ts";
 import { paidCents, dueCents } from "../core/payments.ts";
 import { restaurantSchema } from "../core/restaurantModel.ts";
-import { money } from "../lib/data";
+import { categories, money } from "../lib/data";
+import { menuCatalog } from "../core/menuCatalog.ts";
 import MoneyInput from "./MoneyInput";
 import Modal from "./Modal";
 import ProductOptions from "./ProductOptions";
+import FoodImage from "./FoodImage";
 import Checkout from "./Checkout";
 import PaymentReceipt from "./PaymentReceipt";
 import "./RestaurantPanel.css";
@@ -28,7 +31,7 @@ function Feedback({ action, message }) {
     </>
   );
 }
-function Counter({ tenant, company, services, onDetail }) {
+function Counter({ tenant, company, services, onDetail, mode = "local", now }) {
   const [lines, setLines] = useState([]),
     [selected, setSelected] = useState(null),
     [channel, setChannel] = useState("counter"),
@@ -36,8 +39,27 @@ function Counter({ tenant, company, services, onDetail }) {
     [requestId, setRequestId] = useState(uuid),
     [message, setMessage] = useState("");
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("Todos");
   const [editingLineKey, setEditingLineKey] = useState(null);
   const action = useAction();
+  const { products, pizzaBuilders } = menuCatalog(tenant.products);
+  const filtered = products.filter(
+    (p) =>
+      (category === "Todos" || p.category === category) &&
+      `${p.name} ${p.description}`
+        .toLocaleLowerCase("pt-BR")
+        .includes(search.toLocaleLowerCase("pt-BR")),
+  );
+  const openProduct = (p) => {
+    action.setError("");
+    setEditingLineKey(null);
+    setSelected(p);
+  };
+  const closeProduct = () => {
+    setSelected(null);
+    setEditingLineKey(null);
+    action.setError("");
+  };
   const copy = {
     ...tenant,
     cart: { requestId, lines },
@@ -88,41 +110,87 @@ function Counter({ tenant, company, services, onDetail }) {
       <div className="counter-columns">
         <section className="panel restaurant-stack">
           <h3>Escolha os produtos</h3>
+          {pizzaBuilders.length > 0 && (
+            <aside
+              className="counter-pizza-invitation"
+              aria-label="Monte uma pizza com vários sabores"
+            >
+              <Pizza size={28} aria-hidden="true" />
+              <div>
+                <strong>Quer mais de um sabor?</strong>
+                <p>Escolha tamanho, sabores, massa e borda, como no cardápio.</p>
+              </div>
+              <div className="counter-builder-actions">
+                {pizzaBuilders.map((builder) => (
+                  <button
+                    type="button"
+                    className="button button-dark"
+                    key={builder.id}
+                    onClick={() => openProduct(builder)}
+                  >
+                    {pizzaBuilders.length === 1 ? "Monte sua pizza" : `Montar ${builder.name}`}
+                    <ArrowUpRight size={16} aria-hidden="true" />
+                  </button>
+                ))}
+              </div>
+            </aside>
+          )}
           <label className="field">
             Buscar produto
-            <input value={search} onChange={(e) => setSearch(e.target.value)} />
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Nome ou descrição"
+            />
           </label>
-          <div className="counter-products">
-            {tenant.products
-              .filter(
-                (p) =>
-                  p.status === "Disponível" &&
-                  (!p.combo || comboStartingPrice(p, tenant.products) !== null) &&
-                  p.name.toLowerCase().includes(search.toLowerCase()),
-              )
-              .map((p) => (
+          <nav className="counter-categories" aria-label="Categorias do atendimento">
+            {categories
+              .filter(([value]) => value === "Todos" || products.some((p) => p.category === value))
+              .map(([value, label]) => (
                 <button
-                  className="counter-product"
-                  key={p.id}
-                  onClick={() => {
-                    action.setError("");
-                    setEditingLineKey(null);
-                    setSelected(p);
-                  }}
+                  type="button"
+                  key={value}
+                  aria-pressed={category === value}
+                  onClick={() => setCategory(value)}
                 >
-                  <strong>{p.name}</strong>
-                  <span>
-                    {p.pizza || p.combo ? "A partir de " : ""}
-                    {money((p.combo ? comboStartingPrice(p, tenant.products) : p.priceCents) / 100)}
-                  </span>
+                  {label}
                 </button>
               ))}
+          </nav>
+          <div className="counter-products">
+            {filtered.map((p) => (
+              <button
+                type="button"
+                className="counter-product"
+                key={p.id}
+                aria-label={`Escolher ${p.name}`}
+                onClick={() => openProduct(p)}
+              >
+                <FoodImage product={p} />
+                <strong>{p.name}</strong>
+                <span className="counter-product-description">{p.description}</span>
+                <span>
+                  {p.pizza || p.combo ? "A partir de " : ""}
+                  {money((p.combo ? comboStartingPrice(p, tenant.products) : p.priceCents) / 100)}
+                </span>
+              </button>
+            ))}
           </div>
+          {!filtered.length && (
+            <p role="status">Nenhum produto encontrado nesta busca ou categoria.</p>
+          )}
         </section>
         <section className="panel">
           <h3>Resumo do atendimento</h3>
           <Checkout
             key={channel}
+            mode={mode}
+            now={now}
+            onQuoteShipping={(cep) => services.quoteShipping(company.id, cep)}
+            onValidateCoupon={(code, phone) =>
+              services.validateCoupon(company.id, copy.cart, code, phone)
+            }
             tenant={copy}
             availability={{ open: true, reason: "" }}
             customerOptional={channel !== "phone"}
@@ -168,16 +236,15 @@ function Counter({ tenant, company, services, onDetail }) {
       {selected && (
         <Modal
           title={selected.name}
-          onClose={() => {
-            setSelected(null);
-            setEditingLineKey(null);
-          }}
+          onClose={closeProduct}
           className={selected.pizza || selected.combo ? "pizza-builder-modal" : ""}
         >
           <ProductOptions
             product={selected}
             products={tenant.products}
             initialLine={lines.find((l) => l.key === editingLineKey)}
+            onBack={closeProduct}
+            submitLabel={editingLineKey ? "Salvar alterações" : "Adicionar ao atendimento"}
             onAdd={(line) => {
               const checked = { ...line, key: editingLineKey || uuid() };
               try {

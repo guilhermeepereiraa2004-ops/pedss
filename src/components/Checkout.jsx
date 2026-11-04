@@ -7,6 +7,7 @@ import { money } from "../lib/data";
 import { applyCoupon } from "../core/coupons.ts";
 import { shippingMode, shippingRuleKey, deliveryConfigured } from "../core/shipping.ts";
 import { useAction } from "../hooks/useApplication";
+import "./Checkout.css";
 export default function Checkout({
   tenant,
   availability,

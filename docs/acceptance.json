@@ -2,6 +2,16 @@
   "floor": 224,
   "items": [
     {
+      "id": "COUNTER-MENU-01",
+      "title": "balcão e telefone montam e editam pizza completa com bebida sem alterar a sacola pública",
+      "source": "tests/counter-menu.test.jsx"
+    },
+    {
+      "id": "COUNTER-MENU-02",
+      "title": "catálogo do atendimento oferece busca, categorias, combos e acesso separado ao montador",
+      "source": "tests/counter-menu.test.jsx"
+    },
+    {
       "id": "AUTH-06",
       "title": "sair limpa identidade mesmo quando falha a gravação compartilhada",
       "source": "tests/auth.test.ts"

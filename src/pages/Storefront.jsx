@@ -31,7 +31,7 @@ import CouponOffers from "../components/CouponOffers";
 import StoreHero from "../components/StoreHero";
 import { useStore, useAction } from "../hooks/useApplication";
 import { DEFAULT_STORE_DESCRIPTION } from "../core/domain.ts";
-import { pizzaFlavorAvailable } from "../core/pizza.ts";
+import { menuCatalog } from "../core/menuCatalog.ts";
 import { comboStartingPrice } from "../core/restaurant.ts";
 import { shippingMode } from "../core/shipping.ts";
 import useToast from "../hooks/useToast";
@@ -85,21 +85,7 @@ function StoreExperience({ slug }) {
       </div>
     );
   const settings = tenant.settings,
-    availableProducts = tenant.products.filter(
-      (p) =>
-        p.status === "Disponível" && (!p.combo || comboStartingPrice(p, tenant.products) !== null),
-    ),
-    products = availableProducts.filter((p) => p.pizza?.menuPlacement !== "builder"),
-    pizzaBuilders = availableProducts.filter(
-      (p) =>
-        p.category === "Pizza" &&
-        p.pizza?.sizes.some(
-          (size) =>
-            size.available &&
-            size.maxFlavors > 1 &&
-            p.pizza.flavors.filter((f) => pizzaFlavorAvailable(p.pizza, f, size.id)).length > 1,
-        ),
-    ),
+    { availableProducts, products, pizzaBuilders } = menuCatalog(tenant.products),
     filtered = products.filter(
       (p) =>
         (category === "Todos" || p.category === category) &&

@@ -819,3 +819,8 @@ O alias manual pedss.vercel.app ainda apontava para o deployment anterior, apesa
 Revertida somente a composição visual da pizza com fatia separada, conforme pedido do usuário. ProductCutout.jsx e ProductCutout.css restaurados byte a byte ao HEAD3fa24c4; imagens inteiras, animação coordenada e correção de load/decode preservadas. Navegador confirmou14 fotos carregadas/animadas e nenhum elemento de fatia destacada. Viewport restaurado. Sem alteração de dados, hero, montador, commit ou publicação. Evidência .quality/pizza-slice-rollback.png.
 
 Gate do rollback aprovado: npm run check,366 testes/50 arquivos e206 critérios, lint/tipos/camadas/build/API. Log .quality/pizza-slice-rollback-gate.log.
+
+
+## 04/11/2026 — Cardápio completo no balcão e telefone
+
+Resolvido localmente: acesso explícito ao montador no atendimento e compartilhamento do catálogo do cardápio. Não são criados montadores automaticamente: a loja deve ter um montador disponível e configurado, como no cardápio público. UI validada em memória; sem teste operacional real na produção, frete externo ou dispositivo físico. Publicação desta mudança ainda não realizada.

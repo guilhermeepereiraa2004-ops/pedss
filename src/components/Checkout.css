@@ -1,0 +1,114 @@
+.cart-product-list {
+  display: grid;
+  gap: 18px;
+}
+.cart-product {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 18px;
+}
+.cart-product > img,
+.cart-product > .food-placeholder {
+  height: 78px;
+  width: 75px;
+  object-fit: cover;
+  border-radius: 8px;
+  object-position: center 65%;
+}
+.cart-product > div {
+  flex: 1;
+}
+.cart-product h3 {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  margin: 2px 0 7px;
+}
+.cart-product div > span {
+  font-size: 11px;
+  color: #7f9069;
+}
+.quantity-control {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 12px;
+}
+.quantity-control button {
+  height: 22px;
+  width: 22px;
+  display: grid;
+  place-items: center;
+  background: #f2f4eb;
+  border-radius: 4px;
+  border: 1px solid #e2e8d6;
+}
+.quantity-control > span {
+  font-size: 11px !important;
+  color: var(--ink) !important;
+}
+.cart-remove {
+  color: #a3ab96;
+  padding: 2px;
+}
+.cart-remove:hover {
+  color: #c26f57;
+}
+.checkout-form {
+  margin-top: 24px;
+}
+.delivery-options {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+.delivery-options button {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  padding: 12px;
+  font-size: 12px;
+  color: #9da98b;
+}
+.delivery-options button.selected {
+  background: #eef4df;
+  color: #728a50;
+  border-color: #d5e4ba;
+}
+.cart-totals {
+  display: grid;
+  gap: 13px;
+  margin: 24px 0;
+  font-size: 12px;
+}
+.cart-totals > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #929d80;
+}
+.cart-totals .total-line {
+  border-top: 1px solid var(--line);
+  padding-top: 17px;
+  font-size: 17px;
+  color: var(--ink);
+}
+.checkout-note {
+  font-size: 9px;
+  color: #a0aa90;
+  margin-top: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  line-height: 1.7;
+}
+.checkout-form > .form-error {
+  margin-bottom: 15px;
+}

@@ -64,6 +64,52 @@
   max-height: 600px;
   overflow: auto;
 }
+.counter-pizza-invitation {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid #dbe6c2;
+  border-radius: 18px;
+  background: linear-gradient(120deg, #eff5dd, #fafcf5);
+}
+.counter-pizza-invitation > svg {
+  color: #586c34;
+}
+.counter-pizza-invitation strong {
+  font-size: 18px;
+}
+.counter-pizza-invitation p {
+  margin: 6px 0 0;
+  color: #657058;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.counter-builder-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.counter-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.counter-categories button {
+  padding: 10px 14px;
+  border: 1px solid #dfe4d7;
+  border-radius: 24px;
+  color: #465037;
+  background: #fff;
+  cursor: pointer;
+}
+.counter-categories button[aria-pressed="true"] {
+  background: #252d20;
+  border-color: #252d20;
+  color: #fff;
+}
 .counter-product {
   display: grid;
   gap: 12px;
@@ -74,6 +120,25 @@
   background: #fafcf5;
   color: #252d20;
   cursor: pointer;
+  align-content: start;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.counter-product img,
+.counter-product .food-placeholder {
+  width: 100%;
+  height: 100px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+.counter-product-description {
+  color: #657058;
+  line-height: 1.6;
+}
+.counter-product:focus-visible,
+.counter-categories button:focus-visible {
+  outline: 3px solid #718b41;
+  outline-offset: 2px;
 }
 .counter-product:hover {
   background: #eef5da;
