@@ -10,6 +10,11 @@ export const pizzaPricingLabels = {
   fixed: "Preço fixo por tamanho",
   sum: "Soma dos sabores",
 };
+export function pizzaFlavorCounts(size: PizzaConfig["sizes"][number]) {
+  return size.allowedFlavorCounts
+    ? [...size.allowedFlavorCounts].sort((a, b) => a - b)
+    : Array.from({ length: size.maxFlavors }, (_, index) => index + 1);
+}
 export function pizzaFlavorAvailable(
   config: PizzaConfig,
   flavor: PizzaConfig["flavors"][number],
@@ -21,10 +26,11 @@ export function pizzaFlavorAvailable(
   );
 }
 export function initialPizzaSelection(config: PizzaConfig): PizzaSelection {
+  const size = config.sizes.find((s) => s.available);
   return {
-    sizeId: config.sizes.find((s) => s.available)?.id || "",
+    sizeId: size?.id || "",
     flavorIds: [],
-    flavorCount: 1,
+    flavorCount: size ? pizzaFlavorCounts(size)[0] : 1,
     doughId: config.doughs.find((v) => v.available)?.id || "",
     edgeId: config.edges.find((v) => v.available)?.id || "",
   };
@@ -45,6 +51,10 @@ export function pricePizza(config: PizzaConfig, selection?: PizzaSelection) {
     );
   if (!ids.length || ids.length > size.maxFlavors || new Set(ids).size !== ids.length)
     throw new DomainError(`Escolha de 1 a ${size.maxFlavors} sabores diferentes.`);
+  if (size.allowedFlavorCounts && !size.allowedFlavorCounts.includes(ids.length))
+    throw new DomainError(
+      `Este tamanho não é oferecido com ${ids.length} ${ids.length === 1 ? "sabor" : "sabores"}.`,
+    );
   const flavors = ids.map((id) => {
     const flavor = config.flavors.find((f) => f.id === id && f.available);
     if (!flavor || !pizzaFlavorAvailable(config, flavor, size.id))
@@ -118,7 +128,7 @@ export function pricePizza(config: PizzaConfig, selection?: PizzaSelection) {
   const priceCents = base + dough.priceCents + edge.priceCents + customCents;
   if (!Number.isSafeInteger(priceCents) || priceCents < 1 || priceCents > 100_000_000)
     throw new DomainError("O valor da pizza ultrapassa o limite permitido.");
-  const summary = `${size.name} · ${size.diameterCm} cm · ${size.slices} fatias · ${flavors.map((f, i) => `${flavors.length > 1 ? `${weights[i]}/${denominator} ` : ""}${f.name}`).join(" + ")} · Massa: ${dough.name} · Borda: ${edge.name}${details.length ? " · " + details.join("; ") : ""}`;
+  const summary = `${size.name}${size.diameterCm ? ` · ${size.diameterCm} cm` : ""} · ${size.slices} fatias · ${flavors.map((f, i) => `${flavors.length > 1 ? `${weights[i]}/${denominator} ` : ""}${f.name}`).join(" + ")} · Massa: ${dough.name} · Borda: ${edge.name}${details.length ? " · " + details.join("; ") : ""}`;
   if (summary.length > 1000)
     throw new DomainError("Reduza a quantidade de personalizações da pizza.");
   return {
@@ -142,53 +152,101 @@ export function pricePizza(config: PizzaConfig, selection?: PizzaSelection) {
   };
 }
 
-export function minimumPizzaPrice(config: PizzaConfig) {
-  const prices: number[] = [];
-  for (const size of config.sizes.filter((v) => v.available)) {
-    const flavors = config.flavors
-      .filter((v) => pizzaFlavorAvailable(config, v, size.id))
-      .sort((a, b) => (a.prices[size.id] || 0) - (b.prices[size.id] || 0));
-    for (const dough of config.doughs.filter((v) => v.available))
-      for (const edge of config.edges.filter((v) => v.available))
-        for (const kind of ["all", "savory", "sweet"]) {
-          const allowed = flavors.filter(
-            (f) =>
-              (kind === "all" || (f.kind || "savory") === kind) &&
-              [dough, edge].every(
-                (o) =>
-                  (!o.allowedSizeIds || o.allowedSizeIds.includes(size.id)) &&
-                  (!o.allowedFlavorKinds || o.allowedFlavorKinds.includes(f.kind || "savory")),
-              ),
+export function pizzaFormatPrices(
+  config: PizzaConfig,
+  {
+    count: onlyCount,
+    requiredFlavorIds = [],
+    equalParts = false,
+    comboExtrasOnly = false,
+  }: {
+    count?: number;
+    requiredFlavorIds?: string[];
+    equalParts?: boolean;
+    comboExtrasOnly?: boolean;
+  } = {},
+) {
+  const groups: ("savory" | "sweet")[][] = [["savory"], ["sweet"]];
+  if (config.allowMixedKinds !== false) groups.push(["savory", "sweet"]);
+  const byCost = (a: { priceCents: number }, b: { priceCents: number }) =>
+    a.priceCents - b.priceCents;
+  const doughs = config.doughs.filter((option) => option.available).sort(byCost);
+  const edges = config.edges.filter((option) => option.available).sort(byCost);
+
+  return config.sizes
+    .filter((size) => size.available)
+    .flatMap((size) => {
+      const flavorCost = (a: PizzaConfig["flavors"][number], b: PizzaConfig["flavors"][number]) =>
+        (a.prices[size.id] || 0) - (b.prices[size.id] || 0);
+      const flavors = config.flavors
+        .filter((flavor) => pizzaFlavorAvailable(config, flavor, size.id))
+        .sort(flavorCost);
+      const minimums = new Map<number, { priceCents: number; selection: PizzaSelection }>();
+      const counts = pizzaFlavorCounts(size);
+      for (const kinds of groups) {
+        const allowed = flavors.filter((flavor) => kinds.includes(flavor.kind || "savory"));
+        const required = allowed.filter((flavor) => requiredFlavorIds.includes(flavor.id));
+        if (required.length !== requiredFlavorIds.length) continue;
+        const compatible = (option: PizzaConfig["doughs"][number]) =>
+          (!option.allowedSizeIds || option.allowedSizeIds.includes(size.id)) &&
+          kinds.every(
+            (kind) => !option.allowedFlavorKinds || option.allowedFlavorKinds.includes(kind),
           );
-          for (let count = 1; count <= Math.min(size.maxFlavors, allowed.length); count++) {
-            try {
-              prices.push(
-                pricePizza(config, {
-                  sizeId: size.id,
-                  flavorIds: allowed.slice(0, count).map((f) => f.id),
-                  flavorCount: count,
-                  doughId: dough.id,
-                  edgeId: edge.id,
-                }).priceCents,
-              );
-              if (config.allowUnequalParts && count > 1 && count < 4)
-                prices.push(
-                  pricePizza(config, {
-                    sizeId: size.id,
-                    flavorIds: allowed.slice(0, count).map((f) => f.id),
-                    flavorCount: count,
-                    doughId: dough.id,
-                    edgeId: edge.id,
-                    portions: allowed.slice(0, count).map((_, i) => (i === 0 ? 5 - count : 1)),
-                  }).priceCents,
-                );
-            } catch (error) {
-              // A combination beyond the monetary limit cannot be the advertised minimum.
-              if (!(error instanceof DomainError)) throw error;
+        const dough = doughs.find(compatible);
+        const edge = edges.find(compatible);
+        if (!dough || !edge) continue;
+        const remaining = allowed.filter((flavor) => !requiredFlavorIds.includes(flavor.id));
+        for (const count of counts) {
+          if (
+            count < required.length ||
+            count > allowed.length ||
+            (onlyCount != null && count !== onlyCount)
+          )
+            continue;
+          const picked = [...required, ...remaining.slice(0, count - required.length)].sort(
+            flavorCost,
+          );
+          const selection = {
+            sizeId: size.id,
+            flavorIds: picked.map((flavor) => flavor.id),
+            flavorCount: count,
+            doughId: dough.id,
+            edgeId: edge.id,
+          };
+          try {
+            const priced = pricePizza(config, selection);
+            let best: { priceCents: number; selection: PizzaSelection } = {
+              priceCents: comboExtrasOnly ? dough.priceCents + edge.priceCents : priced.priceCents,
+              selection,
+            };
+            if (
+              !comboExtrasOnly &&
+              !equalParts &&
+              config.allowUnequalParts &&
+              (count === 2 || count === 3)
+            ) {
+              const unequal = { ...selection, portions: count === 2 ? [3, 1] : [2, 1, 1] };
+              const priceCents = pricePizza(config, unequal).priceCents;
+              if (priceCents < best.priceCents) best = { priceCents, selection: unequal };
             }
+            if (best.priceCents < (minimums.get(count)?.priceCents ?? Infinity))
+              minimums.set(count, best);
+          } catch (error) {
+            if (!(error instanceof DomainError)) throw error;
           }
         }
-  }
+      }
+      const formats = [...minimums]
+        .sort(([a], [b]) => a - b)
+        .map(([count, best]) => ({ count, ...best }));
+      return formats.length ? [{ size, formats }] : [];
+    });
+}
+
+export function minimumPizzaPrice(config: PizzaConfig) {
+  const prices = pizzaFormatPrices(config).flatMap(({ formats }) =>
+    formats.map(({ priceCents }) => priceCents),
+  );
   if (!prices.length) throw new DomainError("Cadastre uma combinação disponível para a pizza.");
   return Math.min(...prices);
 }

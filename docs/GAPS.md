@@ -1,3 +1,7 @@
+## Escolha de tamanho e preço da pizza
+
+A etapa de tamanhos aparece quando há um montador ativo com formatos válidos. A vitrine usa a configuração salva para cada loja. Os cadastros de demonstração e seus preços pertencem ao ambiente local.
+
 ## Pedido de pizza simplificado — 08/11/2026
 
 Disponível em produção e na `main` do GitHub. O atalho de combinação em uma pizza inteira depende de um sabor vinculado a um montador que aceite múltiplos sabores.

@@ -23,7 +23,12 @@ const icons = {
   pastel: CookingPot,
 };
 
-export default function StoreHero({ products, description, segment = "burger" }) {
+export default function StoreHero({
+  products,
+  description,
+  segment = "burger",
+  orderHref = "#cardapio",
+}) {
   const template = getStorefrontTemplate(segment);
   const Icon = icons[template.icon] || UtensilsCrossed;
   const eligible = products.filter(
@@ -100,10 +105,10 @@ export default function StoreHero({ products, description, segment = "burger" })
               <strong>{money(startingPrice / 100)}</strong>
             </div>
           )}
-          <a className="burger-hero-cta" href="#cardapio">
+          <a className="burger-hero-cta" href={orderHref}>
             {ctaContent}
           </a>
-          <a className="hero-explore" href="#cardapio">
+          <a className="hero-explore" href={orderHref}>
             Encontre seu favorito <ArrowRight size={15} />
           </a>
         </div>

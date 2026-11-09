@@ -1,7 +1,7 @@
 import { restaurantSchema, type Restaurant } from "./restaurantModel.ts";
 import type { CartLine, Product, Tenant, Order } from "./model.ts";
 import { DomainError } from "./errors.ts";
-import { pricePizza, pizzaFlavorAvailable } from "./pizza.ts";
+import { pricePizza, pizzaFlavorAvailable, pizzaFormatPrices } from "./pizza.ts";
 import { paymentLedger } from "./payments.ts";
 import { pizzaSnapshot, assertOvenCapacity } from "./pizzeriaOperations.ts";
 export function extraCostCents(
@@ -37,6 +37,18 @@ export function comboOptionState(option: ComboOption, products: Product[]) {
   if (!size) return unavailable("Tamanho indisponível");
   if (!option.customizePizza && config.flavors.length !== 1)
     return unavailable("Ative a montagem de sabores neste combo");
+  if (option.customizePizza && size.allowedFlavorCounts && !size.allowedFlavorCounts.includes(1)) {
+    const formats = pizzaFormatPrices({ ...config, sizes: [size] }, { comboExtrasOnly: true });
+    const best = formats[0]?.formats.reduce((a, b) => (a.priceCents <= b.priceCents ? a : b));
+    return best
+      ? {
+          available: true,
+          reason: "",
+          initialPizza: best.selection,
+          minimumExtraCents: best.priceCents,
+        }
+      : unavailable("Sem massa, borda ou sabores compatíveis");
+  }
   let best: { selection: import("./pizza.ts").PizzaSelection; extra: number } | undefined;
   for (const f of config.flavors.filter((f) => pizzaFlavorAvailable(config, f, size.id)))
     for (const d of config.doughs.filter((d) => d.available))

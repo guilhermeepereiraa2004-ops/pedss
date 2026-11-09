@@ -1,10 +1,13 @@
 import MoneyInput from "./MoneyInput";
 import { uuid } from "../core/domain.ts";
-import { pizzaPricingLabels } from "../core/pizza.ts";
+import { pizzaFlavorCounts, pizzaPricingLabels } from "../core/pizza.ts";
 import "./PizzaBuilder.css";
 import { pizzaAppearances } from "../lib/pizzaAppearance";
 import { createPizzaConfig } from "../application/pizzaDraft.ts";
+import { pizzaFormatLabel } from "../application/productSelections";
 import PizzaAdvancedEditor from "./PizzaAdvancedEditor";
+
+const pizzaFormats = [1, 2, 3, 4];
 
 export default function PizzaConfigEditor({ product, catalog = [], onChange, section = "all" }) {
   const config = product.pizza;
@@ -20,6 +23,13 @@ export default function PizzaConfigEditor({ product, catalog = [], onChange, sec
       key,
       config[key].filter((v) => v.id !== id),
     );
+  const toggleFormat = (size, count, checked) => {
+    const counts = pizzaFlavorCounts(size);
+    update("sizes", size.id, {
+      allowedFlavorCounts: checked ? [...counts, count] : counts.filter((item) => item !== count),
+      maxFlavors: Math.max(size.maxFlavors, count),
+    });
+  };
   return (
     <section className="pizza-config">
       <label className="checkbox-field">
@@ -110,7 +120,8 @@ export default function PizzaConfigEditor({ product, catalog = [], onChange, sec
                         }
                       />
                       <small>
-                        {size.slices} fatias · até {size.maxFlavors} sabores
+                        {size.slices} fatias ·{" "}
+                        {pizzaFlavorCounts(size).map(pizzaFormatLabel).join(" · ")}
                       </small>
                     </label>
                   ))}
@@ -128,101 +139,113 @@ export default function PizzaConfigEditor({ product, catalog = [], onChange, sec
             <div>
               <h3>Tamanhos</h3>
               <p className="small-copy muted">
-                Defina a quantidade de fatias de cada pizza (por exemplo, 3 ou 4 fatias) e quantos
-                sabores o cliente pode combinar. Fatias e sabores são configurações diferentes.
+                Defina o tamanho, quantas fatias serão cortadas e os formatos que o cliente pode
+                pedir. Para definir os valores, use Como cobrar, Preços por tamanho ou Preços por
+                sabores.
               </p>
-              {config.sizes.map((size, index) => (
-                <div className="pizza-config-row" key={size.id}>
-                  <label className="field">
-                    Nome do tamanho
-                    <input
-                      required
-                      maxLength={60}
-                      value={size.name}
-                      onChange={(e) => update("sizes", size.id, { name: e.target.value })}
-                    />
-                  </label>
-                  {[
-                    ["diameterCm", "Diâmetro (cm)", 200],
-                    ["slices", "Fatias", 64],
-                    ["maxFlavors", "Máximo de sabores", 4],
-                  ].map(([key, label, max]) => (
-                    <label className="field" key={key}>
-                      {label}
+              {config.sizes.map((size, index) => {
+                const counts = pizzaFlavorCounts(size);
+                return (
+                  <div className="pizza-config-row" key={size.id}>
+                    <label className="field">
+                      Nome do tamanho
                       <input
-                        type="number"
                         required
-                        min="1"
-                        max={max}
-                        step="1"
-                        value={size[key]}
-                        onChange={(e) => {
-                          const value = Number(e.target.value);
-                          update("sizes", size.id, {
-                            [key]: value,
-                            ...(key === "maxFlavors" && size.flavorCountPricing
-                              ? {
-                                  flavorCountPricing: {
-                                    ...size.flavorCountPricing,
-                                    prices: Object.fromEntries(
-                                      Object.entries(size.flavorCountPricing.prices).filter(
-                                        ([count]) => Number(count) <= value,
-                                      ),
-                                    ),
-                                  },
-                                }
-                              : {}),
-                          });
-                        }}
+                        maxLength={60}
+                        value={size.name}
+                        onChange={(e) => update("sizes", size.id, { name: e.target.value })}
                       />
                     </label>
-                  ))}
-                  <label className="checkbox-field">
-                    <input
-                      type="checkbox"
-                      checked={size.available}
-                      onChange={(e) => update("sizes", size.id, { available: e.target.checked })}
-                    />{" "}
-                    Disponível
-                  </label>
-                  <label className="field">
-                    Tempo de forno (minutos)
-                    <input
-                      type="number"
-                      min="1"
-                      max="120"
-                      value={size.ovenMinutes ?? 10}
-                      onChange={(e) =>
-                        update("sizes", size.id, { ovenMinutes: Number(e.target.value) })
-                      }
-                    />
-                    <small>Reserva antes do horário agendado.</small>
-                  </label>
-                  <label className="field">
-                    Espaços ocupados no forno
-                    <input
-                      type="number"
-                      min="0.25"
-                      max="20"
-                      step="0.25"
-                      value={size.ovenUnits ?? 1}
-                      onChange={(e) =>
-                        update("sizes", size.id, { ovenUnits: Number(e.target.value) })
-                      }
-                    />
-                    <small>Ex.: grande ocupa 2; brotinho ocupa 0,5.</small>
-                  </label>
-                  <button
-                    className="button button-outline button-small"
-                    type="button"
-                    disabled={config.sizes.length === 1}
-                    aria-label={`Excluir tamanho ${index + 1}`}
-                    onClick={() => remove("sizes", size.id)}
-                  >
-                    Excluir
-                  </button>
-                </div>
-              ))}
+                    {[
+                      ["diameterCm", "Diâmetro (cm)", 200],
+                      ["slices", "Fatias", 64],
+                    ].map(([key, label, max]) => (
+                      <label className="field" key={key}>
+                        {label}
+                        <input
+                          type="number"
+                          required={key === "slices"}
+                          min="1"
+                          max={max}
+                          step="1"
+                          value={size[key] ?? ""}
+                          onChange={(e) =>
+                            update("sizes", size.id, {
+                              [key]: e.target.value ? Number(e.target.value) : undefined,
+                            })
+                          }
+                        />
+                      </label>
+                    ))}
+                    <label className="checkbox-field">
+                      <input
+                        type="checkbox"
+                        checked={size.available}
+                        onChange={(e) => update("sizes", size.id, { available: e.target.checked })}
+                      />{" "}
+                      Disponível
+                    </label>
+                    <label className="field">
+                      Tempo de forno (minutos)
+                      <input
+                        type="number"
+                        min="1"
+                        max="120"
+                        value={size.ovenMinutes ?? 10}
+                        onChange={(e) =>
+                          update("sizes", size.id, { ovenMinutes: Number(e.target.value) })
+                        }
+                      />
+                      <small>Reserva antes do horário agendado.</small>
+                    </label>
+                    <label className="field">
+                      Espaços ocupados no forno
+                      <input
+                        type="number"
+                        min="0.25"
+                        max="20"
+                        step="0.25"
+                        value={size.ovenUnits ?? 1}
+                        onChange={(e) =>
+                          update("sizes", size.id, { ovenUnits: Number(e.target.value) })
+                        }
+                      />
+                      <small>Ex.: grande ocupa 2; brotinho ocupa 0,5.</small>
+                    </label>
+                    <button
+                      className="button button-outline button-small"
+                      type="button"
+                      disabled={config.sizes.length === 1}
+                      aria-label={`Excluir tamanho ${index + 1}`}
+                      onClick={() => remove("sizes", size.id)}
+                    >
+                      Excluir
+                    </button>
+                    <fieldset className="pizza-size-formats">
+                      <legend>Formatos de {size.name || "novo tamanho"}</legend>
+                      <div className="pizza-size-format-choices">
+                        {pizzaFormats.map((count) => {
+                          const checked = counts.includes(count);
+                          return (
+                            <label className="checkbox-field" key={count}>
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                disabled={checked && counts.length === 1}
+                                onChange={(event) =>
+                                  toggleFormat(size, count, event.target.checked)
+                                }
+                              />
+                              {pizzaFormatLabel(count)}
+                            </label>
+                          );
+                        })}
+                      </div>
+                      <small>Marque pelo menos um formato por tamanho.</small>
+                    </fieldset>
+                  </div>
+                );
+              })}
               <button
                 className="button button-outline button-small"
                 type="button"
@@ -270,8 +293,8 @@ export default function PizzaConfigEditor({ product, catalog = [], onChange, sec
                   <span>02 · SUBSTITUIR</span>
                   <h4>Preço fixo por quantidade de sabores</h4>
                   <p>
-                    Você define o valor da pizza inteira para 1, 2, 3 ou 4 sabores, dentro do limite
-                    do tamanho. Esse valor substitui o cálculo principal.
+                    Você define o valor total para cada formato habilitado no tamanho. Esse valor
+                    substitui o cálculo principal.
                   </p>
                   <small>
                     Exemplo: 3 sabores por R$ 59,90 → a pizza custa R$ 59,90, qualquer que seja a
@@ -328,12 +351,12 @@ export default function PizzaConfigEditor({ product, catalog = [], onChange, sec
                   </p>
                   {size.flavorCountPricing && (
                     <div className="pizza-count-price-fields">
-                      {Array.from({ length: size.maxFlavors }, (_, i) => i + 1).map((count) => (
+                      {pizzaFlavorCounts(size).map((count) => (
                         <label
                           className="field"
                           key={`${size.id}-${size.flavorCountPricing.mode}-${count}`}
                         >
-                          {count} {count === 1 ? "sabor" : "sabores"} ·{" "}
+                          {pizzaFormatLabel(count)} ·{" "}
                           {size.flavorCountPricing.mode === "fixed"
                             ? "Preço (R$)"
                             : "Acréscimo (R$)"}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowUpRight,
@@ -29,6 +29,7 @@ import ProductOptions from "../components/ProductOptions";
 import Checkout from "../components/Checkout";
 import CouponOffers from "../components/CouponOffers";
 import StoreHero from "../components/StoreHero";
+import PizzaFormatMenu, { PizzaFormatCatalog } from "../components/PizzaFormatMenu";
 import { useStore, useAction } from "../hooks/useApplication";
 import { DEFAULT_STORE_DESCRIPTION } from "../core/domain.ts";
 import { menuCatalog } from "../core/menuCatalog.ts";
@@ -38,7 +39,11 @@ import useToast from "../hooks/useToast";
 import { categories, money } from "../lib/data";
 import { storeColors } from "../lib/storeColors";
 import { storeHref } from "../application/storeAddress";
-import { linkedPizzaBuilder, pizzaCombinationDraft } from "../application/productSelections";
+import {
+  linkedPizzaBuilder,
+  pizzaCombinationDraft,
+  storefrontPizzaFormats,
+} from "../application/productSelections";
 import { getStorefrontTemplate } from "../lib/storefrontTemplates";
 import "./Storefront.css";
 import "./Operations.css";
@@ -76,8 +81,31 @@ function StoreExperience({ slug }) {
     [productId, setProductId] = useState(null);
   const [editingCartKey, setEditingCartKey] = useState(null);
   const [combinationDraft, setCombinationDraft] = useState(null);
+  const [pizzaFormat, setPizzaFormat] = useState(null);
+  const formatHeading = useRef(null);
+  const moveToFormatStep = useRef(false);
   const [checkoutDraft, setCheckoutDraft] = useState(null);
   const [toast, notify] = useToast();
+  const catalog = useMemo(() => menuCatalog(tenant?.products || []), [tenant?.products]);
+  const formatGroups = useMemo(
+    () => (tenant?.settings.heroSegment === "pizza" ? storefrontPizzaFormats(catalog) : []),
+    [catalog, tenant?.settings.heroSegment],
+  );
+  const formatProduct = formatGroups.find(
+    ({ product, sizes }) =>
+      product.id === pizzaFormat?.productId &&
+      sizes.some(
+        ({ size, formats }) =>
+          size.id === pizzaFormat.sizeId &&
+          formats.some(({ count }) => count === pizzaFormat.count),
+      ),
+  )?.product;
+  useEffect(() => {
+    if (!moveToFormatStep.current || !formatHeading.current) return;
+    moveToFormatStep.current = false;
+    formatHeading.current.focus({ preventScroll: true });
+    formatHeading.current.closest("section")?.scrollIntoView?.({ block: "start" });
+  }, [pizzaFormat]);
   if (!company || !tenant)
     return (
       <div className="store-not-found">
@@ -92,7 +120,7 @@ function StoreExperience({ slug }) {
       </div>
     );
   const settings = tenant.settings,
-    { availableProducts, products, pizzaBuilders } = menuCatalog(tenant.products),
+    { availableProducts, products, pizzaBuilders } = catalog,
     filtered = products.filter(
       (p) =>
         (category === "Todos" || p.category === category) &&
@@ -101,6 +129,8 @@ function StoreExperience({ slug }) {
   const count = tenant.cart.lines.reduce((s, l) => s + l.quantity, 0);
   const selected = availableProducts.find((p) => p.id === productId);
   const combination = !editingCartKey && linkedPizzaBuilder(selected, pizzaBuilders);
+  const showCatalog = !formatGroups.length || Boolean(formatProduct);
+  const orderHref = showCatalog ? "#cardapio" : "#tamanhos-pizza";
   const canBuild = Boolean(availability.open || availability.canSchedule);
   const closeProduct = () => {
     setProductId(null);
@@ -130,7 +160,7 @@ function StoreExperience({ slug }) {
           </div>
         </Link>
         <nav className="store-hero-nav" aria-label="Navegação da loja">
-          <a href="#cardapio">{template.navigation}</a>
+          <a href={orderHref}>{template.navigation}</a>
           <a href="#como-pedir">Como pedir</a>
         </nav>
         <div className="store-header-actions">
@@ -148,6 +178,7 @@ function StoreExperience({ slug }) {
       <main className="store-container">
         <StoreHero
           products={products}
+          orderHref={orderHref}
           description={
             settings.description === DEFAULT_STORE_DESCRIPTION ? undefined : settings.description
           }
@@ -213,186 +244,236 @@ function StoreExperience({ slug }) {
               : "Você pode explorar o cardápio."}
           </div>
         )}
-        <section className="store-menu" id="cardapio">
-          <CouponOffers tenant={tenant} now={now} />
-          <div className="store-section-head">
-            <div>
-              <span className="eyebrow">O CARDÁPIO DA CASA</span>
-              <h2>
-                <span className="store-menu-title-intro">Escolha o seu</span>{" "}
-                <span className="store-menu-title-focus">
-                  próximo <span className="store-menu-title-highlight">favorito.</span>
-                </span>
-              </h2>
-              <p>Um cardápio cheio de possibilidades. Qual combina com a sua vontade de hoje?</p>
-            </div>
-            <label className="search-field">
-              <Search size={16} />
-              <input
-                type="search"
-                aria-label="Buscar no cardápio"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="O que deu vontade?"
-              />
-            </label>
-          </div>
-          {pizzaBuilders.length > 0 && (
-            <aside
-              className="store-pizza-invitation"
-              aria-label="Monte uma pizza com vários sabores"
-            >
+        {formatGroups.length > 0 && !formatProduct && (
+          <PizzaFormatMenu
+            groups={formatGroups}
+            headingRef={formatHeading}
+            canOrder={canBuild}
+            onChoose={(product, size, count, startingPriceCents) => {
+              action.setError("");
+              moveToFormatStep.current = true;
+              setSearch("");
+              setCategory("Todos");
+              setPizzaFormat({
+                productId: product.id,
+                sizeId: size.id,
+                sizeName: size.name,
+                count,
+                startingPriceCents,
+              });
+            }}
+          />
+        )}
+        {formatProduct && (
+          <PizzaFormatCatalog
+            format={pizzaFormat}
+            headingRef={formatHeading}
+            hasCatalog={products.length > 0}
+            onBack={() => {
+              action.setError("");
+              moveToFormatStep.current = true;
+              setPizzaFormat(null);
+            }}
+          >
+            <ProductOptions
+              key={`${formatProduct.id}-${pizzaFormat.sizeId}-${pizzaFormat.count}`}
+              product={formatProduct}
+              quickOrder
+              pizzaFormat={pizzaFormat}
+              canOrder={canBuild}
+              busy={action.busy}
+              error={action.error}
+              onAdd={(line) =>
+                action.run(
+                  () => services.addToCart(company.id, line),
+                  () => notify("Adicionado à sua sacola."),
+                )
+              }
+            />
+          </PizzaFormatCatalog>
+        )}
+        {showCatalog && (!formatProduct || products.length > 0) && (
+          <section className="store-menu" id={formatProduct ? "cardapio-completo" : "cardapio"}>
+            <CouponOffers tenant={tenant} now={now} />
+            <div className="store-section-head">
               <div>
-                <strong>Quer mais de um sabor?</strong>
-                <p>Combine seus favoritos em uma pizza do seu jeito.</p>
+                <span className="eyebrow">O CARDÁPIO DA CASA</span>
+                <h2>
+                  <span className="store-menu-title-intro">Escolha o seu</span>{" "}
+                  <span className="store-menu-title-focus">
+                    próximo <span className="store-menu-title-highlight">favorito.</span>
+                  </span>
+                </h2>
+                <p>Um cardápio cheio de possibilidades. Qual combina com a sua vontade de hoje?</p>
               </div>
-              <div className="store-pizza-invitation-actions">
-                {pizzaBuilders.map((builder) => (
-                  <button
-                    type="button"
-                    className="button button-dark"
-                    key={builder.id}
-                    disabled={!canBuild}
-                    onClick={() => {
-                      action.setError("");
-                      setProductId(builder.id);
-                    }}
-                  >
-                    {pizzaBuilders.length === 1 ? "Monte sua pizza" : `Montar ${builder.name}`}{" "}
-                    <ArrowUpRight size={17} />
-                  </button>
-                ))}
-              </div>
-            </aside>
-          )}
-          <div className="store-menu-layout">
-            <div className="store-menu-categories">
-              <nav className="store-categories" aria-label="Categorias do cardápio">
-                {categories
-                  .filter(
-                    ([value]) => value === "Todos" || products.some((p) => p.category === value),
-                  )
-                  .map(([value, label]) => {
-                    const CategoryIcon = categoryIcons[value] || UtensilsCrossed;
-                    return (
-                      <button
-                        key={value}
-                        className={category === value ? "active" : ""}
-                        aria-pressed={category === value}
-                        onClick={() => setCategory(value)}
-                      >
-                        <span className="store-category-icon" aria-hidden="true">
-                          <CategoryIcon size={23} />
-                        </span>
-                        <span className="store-category-name">{label}</span>
-                        <span className="store-category-count">
-                          {value === "Todos"
-                            ? products.length
-                            : products.filter((p) => p.category === value).length}
-                        </span>
-                      </button>
-                    );
-                  })}
-              </nav>
+              <label className="search-field">
+                <Search size={16} />
+                <input
+                  type="search"
+                  aria-label="Buscar no cardápio"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="O que deu vontade?"
+                />
+              </label>
             </div>
-            <div className="store-menu-list">
-              <div className="catalog-photo-controls">
-                <p role="status">
-                  <strong>{filtered.length}</strong>{" "}
-                  {filtered.length === 1 ? "sabor para escolher" : "sabores para escolher"}
-                </p>
-              </div>
-              <div className="store-products">
-                {filtered.map((product, index) =>
-                  product.combo ? (
-                    <ComboMenuCard
-                      key={product.id}
-                      product={product}
-                      products={tenant.products}
-                      priority={index < 2}
-                      canOrder={canBuild}
-                      onOpen={() => {
+            {!formatGroups.length && pizzaBuilders.length > 0 && (
+              <aside
+                className="store-pizza-invitation"
+                aria-label="Monte uma pizza com vários sabores"
+              >
+                <div>
+                  <strong>Quer mais de um sabor?</strong>
+                  <p>Combine seus favoritos em uma pizza do seu jeito.</p>
+                </div>
+                <div className="store-pizza-invitation-actions">
+                  {pizzaBuilders.map((builder) => (
+                    <button
+                      type="button"
+                      className="button button-dark"
+                      key={builder.id}
+                      disabled={!canBuild}
+                      onClick={() => {
                         action.setError("");
-                        setProductId(product.id);
+                        setProductId(builder.id);
                       }}
-                    />
-                  ) : (
-                    <article
-                      className="store-product"
-                      data-category={product.category}
-                      key={product.id}
                     >
-                      <div className="store-product-photo">
+                      {pizzaBuilders.length === 1 ? "Monte sua pizza" : `Montar ${builder.name}`}{" "}
+                      <ArrowUpRight size={17} />
+                    </button>
+                  ))}
+                </div>
+              </aside>
+            )}
+            <div className="store-menu-layout">
+              <div className="store-menu-categories">
+                <nav className="store-categories" aria-label="Categorias do cardápio">
+                  {categories
+                    .filter(
+                      ([value]) => value === "Todos" || products.some((p) => p.category === value),
+                    )
+                    .map(([value, label]) => {
+                      const CategoryIcon = categoryIcons[value] || UtensilsCrossed;
+                      return (
                         <button
-                          type="button"
-                          className="product-photo-button"
-                          aria-label={`Ver ${product.name}`}
-                          onClick={() => {
-                            action.setError("");
-                            setProductId(product.id);
-                          }}
+                          key={value}
+                          className={category === value ? "active" : ""}
+                          aria-pressed={category === value}
+                          onClick={() => setCategory(value)}
                         >
-                          <ProductVisual product={product} motion priority={index < 2} />
-                        </button>
-                        {product.featured && (
-                          <span className="product-featured">
-                            <Flame size={11} /> FAVORITO DA CASA
+                          <span className="store-category-icon" aria-hidden="true">
+                            <CategoryIcon size={23} />
                           </span>
-                        )}
-                      </div>
-                      <div className="store-product-body">
-                        <span className="product-category">
-                          {categories.find(([v]) => v === product.category)?.[1]}
-                        </span>
-                        <h3>{product.name}</h3>
-                        <p>{product.description}</p>
-                        <div className="product-actions">
-                          <strong>
-                            {(product.pizza || product.combo) && <small>A partir de </small>}
-                            {money(comboStartingPrice(product, tenant.products) / 100)}
-                          </strong>
+                          <span className="store-category-name">{label}</span>
+                          <span className="store-category-count">
+                            {value === "Todos"
+                              ? products.length
+                              : products.filter((p) => p.category === value).length}
+                          </span>
+                        </button>
+                      );
+                    })}
+                </nav>
+              </div>
+              <div className="store-menu-list">
+                <div className="catalog-photo-controls">
+                  <p role="status">
+                    <strong>{filtered.length}</strong>{" "}
+                    {filtered.length === 1 ? "sabor para escolher" : "sabores para escolher"}
+                  </p>
+                </div>
+                <div className="store-products">
+                  {filtered.map((product, index) =>
+                    product.combo ? (
+                      <ComboMenuCard
+                        key={product.id}
+                        product={product}
+                        products={tenant.products}
+                        priority={index < 2}
+                        canOrder={canBuild}
+                        onOpen={() => {
+                          action.setError("");
+                          setProductId(product.id);
+                        }}
+                      />
+                    ) : (
+                      <article
+                        className="store-product"
+                        data-category={product.category}
+                        key={product.id}
+                      >
+                        <div className="store-product-photo">
                           <button
                             type="button"
-                            className="product-add"
-                            disabled={!canBuild}
-                            aria-label={`Escolher ${product.name}`}
+                            className="product-photo-button"
+                            aria-label={`Ver ${product.name}`}
                             onClick={() => {
                               action.setError("");
                               setProductId(product.id);
                             }}
                           >
-                            <span>Escolher</span> <ArrowUpRight size={16} />
+                            <ProductVisual product={product} motion priority={index < 2} />
                           </button>
+                          {product.featured && (
+                            <span className="product-featured">
+                              <Flame size={11} /> FAVORITO DA CASA
+                            </span>
+                          )}
                         </div>
-                      </div>
-                    </article>
-                  ),
+                        <div className="store-product-body">
+                          <span className="product-category">
+                            {categories.find(([v]) => v === product.category)?.[1]}
+                          </span>
+                          <h3>{product.name}</h3>
+                          <p>{product.description}</p>
+                          <div className="product-actions">
+                            <strong>
+                              {(product.pizza || product.combo) && <small>A partir de </small>}
+                              {money(comboStartingPrice(product, tenant.products) / 100)}
+                            </strong>
+                            <button
+                              type="button"
+                              className="product-add"
+                              disabled={!canBuild}
+                              aria-label={`Escolher ${product.name}`}
+                              onClick={() => {
+                                action.setError("");
+                                setProductId(product.id);
+                              }}
+                            >
+                              <span>Escolher</span> <ArrowUpRight size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    ),
+                  )}
+                </div>
+                {!filtered.length && (
+                  <div className="empty-state">
+                    <Search size={30} />
+                    <h3>Nenhum sabor encontrado.</h3>
+                    <p>
+                      {products.length
+                        ? "Experimente outra busca ou categoria."
+                        : "O cardápio está sendo preparado."}
+                    </p>
+                    <button
+                      className="button button-outline button-small"
+                      style={{ marginTop: 15 }}
+                      onClick={() => {
+                        setSearch("");
+                        setCategory("Todos");
+                      }}
+                    >
+                      Ver todo o cardápio
+                    </button>
+                  </div>
                 )}
               </div>
-              {!filtered.length && (
-                <div className="empty-state">
-                  <Search size={30} />
-                  <h3>Nenhum sabor encontrado.</h3>
-                  <p>
-                    {products.length
-                      ? "Experimente outra busca ou categoria."
-                      : "O cardápio está sendo preparado."}
-                  </p>
-                  <button
-                    className="button button-outline button-small"
-                    style={{ marginTop: 15 }}
-                    onClick={() => {
-                      setSearch("");
-                      setCategory("Todos");
-                    }}
-                  >
-                    Ver todo o cardápio
-                  </button>
-                </div>
-              )}
             </div>
-          </div>
-        </section>
+          </section>
+        )}
         <section className="store-how" id="como-pedir" aria-labelledby="store-how-title">
           <div className="store-how-heading">
             <span className="eyebrow">BATEU A VONTADE?</span>
@@ -400,7 +481,7 @@ function StoreExperience({ slug }) {
               Seu pedido.
               <br /> <span>Sem complicar.</span>
             </h2>
-            <a href="#cardapio">
+            <a href={orderHref}>
               Explorar o cardápio <ArrowUpRight size={18} />
             </a>
           </div>

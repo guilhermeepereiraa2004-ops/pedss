@@ -6,7 +6,7 @@ import { isIllustrativeProductPhoto } from "../lib/productPhotography";
 import "./ProductOptions.css";
 import PizzaBuilder from "./PizzaBuilder";
 import PizzaPriceBreakdown from "./PizzaPriceBreakdown";
-import { minimumPizzaPrice, pricePizza } from "../core/pizza.ts";
+import { initialPizzaSelection, minimumPizzaPrice, pricePizza } from "../core/pizza.ts";
 import {
   globalProductIngredients,
   pizzaWithAvailableOptions,
@@ -28,6 +28,7 @@ function SingleProductOptions({
   initialDraft,
   submitLabel,
   quickOrder = false,
+  pizzaFormat,
   onCombine,
 }) {
   const fastPizza = quickOrder && Boolean(product.pizza);
@@ -44,6 +45,16 @@ function SingleProductOptions({
     ),
     [notes, setNotes] = useState(saved?.notes || "");
   const [pizza, setPizza] = useState(() => {
+    if (pizzaFormat) {
+      return pizzaWithAvailableOptions(
+        product.pizza,
+        productPizzaSelection(product, {
+          ...initialPizzaSelection(product.pizza),
+          sizeId: pizzaFormat.sizeId,
+          flavorCount: pizzaFormat.count,
+        }),
+      );
+    }
     const selection = productPizzaSelection(product, saved?.pizza, saved?.removedIngredients);
     return fastPizza ? pizzaWithAvailableOptions(product.pizza, selection) : selection;
   });
@@ -60,17 +71,21 @@ function SingleProductOptions({
     .filter((e) => extras.includes(e.id))
     .reduce((s, e) => s + e.priceCents, 0);
   const total = ((pizzaPrice?.priceCents ?? product.priceCents) + extrasCents) * quantity;
-  const awaitingFlavor = fastPizza && !pizza.flavorIds.length;
+  const missingFlavors = pizzaFormat ? pizzaFormat.count - pizza.flavorIds.length : 0;
+  const awaitingFlavor = fastPizza && (!pizza.flavorIds.length || missingFlavors > 0);
   const sizeId = pizza?.sizeId;
+  const formatCount = pizzaFormat?.count;
+  const formatStartingPrice = pizzaFormat?.startingPriceCents;
   const startingPrice = useMemo(() => {
     if (!awaitingFlavor) return null;
+    if (formatStartingPrice != null) return formatStartingPrice;
     const sizes = product.pizza.sizes.filter((size) => size.id === sizeId);
     try {
       return minimumPizzaPrice({ ...product.pizza, sizes });
     } catch {
       return null;
     }
-  }, [awaitingFlavor, product.pizza, sizeId]);
+  }, [awaitingFlavor, product.pizza, sizeId, formatStartingPrice]);
   const draft = () => ({
     productId: product.id,
     quantity,
@@ -145,6 +160,7 @@ function SingleProductOptions({
   return (
     <form
       className={`product-options${fastPizza ? " pizza-quick-order" : ""}`}
+      data-pizza-format={formatCount || undefined}
       onSubmit={(e) => {
         e.preventDefault();
         if (!busy && canOrder && !pizzaError) onAdd(draft());
@@ -166,7 +182,7 @@ function SingleProductOptions({
         )}
         {product.pizza && onBack && (
           <button type="button" className="pizza-back-link" onClick={onBack}>
-            ← Voltar ao cardápio
+            {pizzaFormat ? "← Voltar aos tamanhos" : "← Voltar ao cardápio"}
           </button>
         )}
         {!product.pizza && (
@@ -201,6 +217,7 @@ function SingleProductOptions({
               config={product.pizza}
               value={pizza}
               quickOrder={fastPizza}
+              formatCount={formatCount}
               customOptions={customOptions}
               onCombine={onCombine ? () => onCombine(draft()) : undefined}
               onChange={(next) =>
@@ -294,7 +311,11 @@ function SingleProductOptions({
                     (initialLine
                       ? "Salvar alterações"
                       : awaitingFlavor
-                        ? "Escolha um sabor"
+                        ? missingFlavors > 1
+                          ? `Escolha ${missingFlavors} sabores`
+                          : pizzaFormat && pizza.flavorIds.length
+                            ? "Falta 1 sabor"
+                            : "Escolha um sabor"
                         : "Adicionar à sacola")
                   : `${submitLabel || (initialLine ? "Salvar alterações" : "Adicionar")} · ${money(total / 100)}`}
           </button>

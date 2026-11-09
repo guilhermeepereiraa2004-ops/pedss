@@ -1,0 +1,265 @@
+.pizza-formats,
+.pizza-format-catalog {
+  --pizza-rule: color-mix(in srgb, var(--store-accent) 23%, #e6e0d7);
+  margin-block: clamp(30px, 6vw, 74px) 0;
+  scroll-margin-top: 24px;
+}
+.pizza-formats {
+  margin-block-end: clamp(24px, 4vw, 48px);
+}
+.pizza-formats-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px 24px;
+  margin-bottom: 22px;
+}
+.pizza-formats-heading .eyebrow {
+  color: var(--store-accent-text);
+}
+.pizza-formats-heading h2 {
+  font-size: clamp(27px, 4vw, 48px);
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+  margin: 6px 0;
+}
+.pizza-formats-heading p {
+  margin: 0;
+  color: #6a6058;
+}
+.pizza-formats-heading a,
+.pizza-format-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-block: 10px;
+  color: var(--store-accent-text);
+  font-weight: 750;
+}
+.pizza-format-back {
+  border: 0;
+  background: transparent;
+  padding-inline: 0;
+  margin-bottom: 8px;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+.pizza-format-back + .eyebrow {
+  display: block;
+}
+.pizza-format-group + .pizza-format-group {
+  margin-top: 24px;
+}
+.pizza-format-group > h3 {
+  margin: 0 0 10px;
+}
+.pizza-format-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 248px), 1fr));
+  gap: clamp(14px, 2vw, 22px);
+}
+.pizza-format-card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 14px;
+  min-width: 0;
+  padding: clamp(14px, 1.6vw, 22px);
+  background: white;
+  border: 1px solid #e8e2dc;
+  border-radius: 18px;
+}
+.pizza-format-card-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(68px, 43%);
+  align-items: center;
+  gap: 8px;
+}
+.pizza-format-card-info {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  min-width: 0;
+}
+.pizza-format-photo {
+  display: grid;
+  place-items: center;
+  width: min(100%, 126px);
+  aspect-ratio: 1;
+  justify-self: end;
+}
+.pizza-format-photo img {
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 5px #432a1626);
+}
+.pizza-format-slices {
+  color: #625851;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.pizza-format-size {
+  margin: 0;
+  font-size: clamp(22px, 2.1vw, 30px);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
+}
+.pizza-format-price {
+  display: grid;
+  gap: 2px;
+  margin: 6px 0 0;
+  color: #625851;
+  font-size: 11px;
+  line-height: 1.18;
+}
+.pizza-format-price strong {
+  color: var(--store-accent-text);
+  font-size: clamp(19px, 2vw, 24px);
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.pizza-format-actions {
+  display: grid;
+  align-self: start;
+  padding-inline: 10px;
+  border-radius: 10px;
+  background: #f8f7f5;
+}
+.pizza-format-actions button {
+  min-height: 44px;
+  padding: 6px 4px;
+  border: 0;
+  background: transparent;
+  color: #30231d;
+  text-align: left;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.pizza-format-actions button + button {
+  border-top: 1px solid #eae4df;
+}
+.pizza-format-actions button:hover {
+  background: color-mix(in srgb, var(--store-accent) 8%, white);
+}
+.pizza-format-actions button:focus-visible {
+  outline: 2px solid var(--store-accent-text);
+  outline-offset: -2px;
+  border-radius: 8px;
+}
+.pizza-format-catalog .product-options {
+  gap: 18px;
+}
+.pizza-format-catalog .product-option-actions {
+  position: sticky;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  z-index: 4;
+  padding: 14px;
+  border: 1px solid var(--pizza-rule);
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 6px 24px #432a1620;
+}
+.pizza-format-catalog .pizza-builder-visual {
+  top: 12px;
+}
+.pizza-flavor-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 13px;
+  color: #625851;
+}
+.pizza-flavor-progress strong {
+  color: var(--store-accent-text);
+}
+.pizza-format-catalog .pizza-flavor-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 244px), 1fr));
+  gap: 14px;
+}
+.pizza-format-catalog .pizza-flavor-grid .pizza-choice {
+  --flavor-photo-size: 104px;
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--flavor-photo-size) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 132px;
+  padding: 12px 32px 12px 12px;
+  border-radius: 16px;
+}
+.pizza-format-catalog .pizza-choice-photo {
+  display: block;
+  width: var(--flavor-photo-size);
+  height: var(--flavor-photo-size);
+  object-fit: contain;
+  filter: drop-shadow(0 4px 5px #432a1620);
+}
+.pizza-format-catalog .pizza-flavor-grid .pizza-choice strong {
+  font-size: clamp(16px, 1.7vw, 19px);
+  line-height: 1.22;
+  overflow-wrap: anywhere;
+}
+.pizza-format-catalog .pizza-flavor-grid .pizza-choice:has(input:disabled) {
+  opacity: 1;
+  color: #625851;
+  background: #faf8f5;
+}
+.pizza-format-catalog .pizza-flavor-grid .pizza-choice:has(input:enabled):hover {
+  border-color: var(--store-accent);
+}
+.pizza-format-catalog .pizza-flavor-grid input {
+  position: absolute;
+  inset-block-start: 12px;
+  inset-inline-end: 12px;
+  margin: 0;
+  scroll-margin-block: 192px 130px;
+}
+@container pizza-options (max-width: 600px) {
+  .pizza-format-catalog .pizza-builder[data-format] .pizza-builder-controls > fieldset {
+    padding-inline: 10px;
+  }
+  .pizza-format-catalog .pizza-flavor-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .pizza-format-catalog .pizza-flavor-grid .pizza-choice {
+    --flavor-photo-size: clamp(84px, 26cqw, 110px);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    justify-items: center;
+    align-items: start;
+    gap: 8px;
+    min-height: 152px;
+    padding: 26px 10px 12px;
+    text-align: center;
+  }
+  .pizza-format-catalog .pizza-flavor-grid input {
+    inset-block-start: 8px;
+    inset-inline-end: 8px;
+  }
+}
+@container pizza-options (max-width: 275px) {
+  .pizza-format-catalog .pizza-flavor-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pizza-format-catalog .pizza-flavor-grid .pizza-choice {
+    grid-template-columns: var(--flavor-photo-size) minmax(0, 1fr);
+    grid-template-rows: auto;
+    justify-items: start;
+    align-items: center;
+    min-height: 108px;
+    padding: 10px 28px 10px 10px;
+    text-align: left;
+  }
+}
+@media (max-width: 1400px) {
+  .store-page.has-cart .pizza-format-catalog .product-option-actions {
+    bottom: max(92px, calc(env(safe-area-inset-bottom) + 73px));
+  }
+}

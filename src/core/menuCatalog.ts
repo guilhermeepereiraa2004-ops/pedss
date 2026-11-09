@@ -1,5 +1,5 @@
 import type { Product } from "./model.ts";
-import { pizzaFlavorAvailable } from "./pizza.ts";
+import { pizzaFlavorAvailable, pizzaFlavorCounts } from "./pizza.ts";
 import { comboStartingPrice } from "./restaurant.ts";
 
 // Storefront and staff sales use the same catalog, including separately promoted builders.
@@ -16,8 +16,12 @@ export function menuCatalog(catalog: Product[]) {
         p.pizza?.sizes.some(
           (size) =>
             size.available &&
-            size.maxFlavors > 1 &&
-            p.pizza!.flavors.filter((f) => pizzaFlavorAvailable(p.pizza!, f, size.id)).length > 1,
+            pizzaFlavorCounts(size).some(
+              (count) =>
+                count > 1 &&
+                count <=
+                  p.pizza!.flavors.filter((f) => pizzaFlavorAvailable(p.pizza!, f, size.id)).length,
+            ),
         ),
     ),
   };

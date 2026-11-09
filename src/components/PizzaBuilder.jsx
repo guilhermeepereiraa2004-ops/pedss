@@ -1,14 +1,22 @@
-import { pizzaPricingLabels, pizzaFlavorAvailable, pricePizza } from "../core/pizza.ts";
+import {
+  pizzaPricingLabels,
+  pizzaFlavorAvailable,
+  pizzaFlavorCounts,
+  pizzaFormatPrices,
+  pricePizza,
+} from "../core/pizza.ts";
 import {
   pizzaAtSize,
+  pizzaFormatLabel,
   pizzaWithAvailableOptions,
   pizzaWithFlavors,
 } from "../application/productSelections";
 import { money } from "../lib/data";
+import { pizzaIllustration } from "../lib/pizzaPhotography";
 import "./PizzaBuilder.css";
 import "./PizzaRefinements.css";
 import PizzaPreview from "./PizzaPreview";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import PizzaPriceBreakdown from "./PizzaPriceBreakdown";
 
 const customerPriceRules = {
@@ -37,6 +45,7 @@ export default function PizzaBuilder({
   onChange: onSelectionChange,
   includedInCombo = false,
   quickOrder = false,
+  formatCount,
   onCombine,
   customOptions,
 }) {
@@ -69,8 +78,27 @@ export default function PizzaBuilder({
   const selectedFlavors = value.flavorIds
     .map((id) => config.flavors.find((f) => f.id === id))
     .filter(Boolean);
-  const maxFlavors = Math.min(size?.maxFlavors || 1, flavors.length);
-  const selectionLimit = quickOrder ? maxFlavors : count;
+  const counts = size ? pizzaFlavorCounts(size).filter((count) => count <= flavors.length) : [];
+  const maxFlavors = counts.at(-1) || 1;
+  const selectionLimit = formatCount || (quickOrder ? maxFlavors : count);
+  const canCompleteWith = useMemo(() => {
+    if (!formatCount || value.flavorIds.length >= formatCount) return null;
+    const sizedConfig = { ...config, sizes: config.sizes.filter((s) => s.id === value.sizeId) };
+    return new Set(
+      config.flavors
+        .filter((flavor) => pizzaFlavorAvailable(config, flavor, value.sizeId))
+        .filter(
+          (flavor) =>
+            value.flavorIds.includes(flavor.id) ||
+            pizzaFormatPrices(sizedConfig, {
+              count: formatCount,
+              requiredFlavorIds: [...value.flavorIds, flavor.id],
+              equalParts: true,
+            }).length,
+        )
+        .map((flavor) => flavor.id),
+    );
+  }, [config, formatCount, value.flavorIds, value.sizeId]);
   const showSearch = !quickOrder || flavors.length >= 7 || Boolean(search);
   const showFlavorFilter =
     !quickOrder ||
@@ -82,7 +110,7 @@ export default function PizzaBuilder({
       : value.flavorIds.filter((item) => item !== id);
     onChange(
       quickOrder
-        ? pizzaWithFlavors(value, flavorIds)
+        ? pizzaWithFlavors(value, flavorIds, formatCount)
         : { ...value, portions: undefined, customizations: undefined, flavorIds },
     );
   };
@@ -94,7 +122,7 @@ export default function PizzaBuilder({
       onChange({
         ...value,
         sizeId: nextSize.id,
-        flavorCount: 1,
+        flavorCount: pizzaFlavorCounts(nextSize)[0],
         flavorIds: [],
         portions: undefined,
         customizations: undefined,
@@ -131,6 +159,7 @@ export default function PizzaBuilder({
     <div
       className="pizza-builder"
       data-order={quickOrder ? "quick" : undefined}
+      data-format={formatCount || undefined}
       data-step={quickOrder ? undefined : step}
       data-preview={showPreview ? "shown" : "hidden"}
     >
@@ -159,35 +188,40 @@ export default function PizzaBuilder({
         </button>
       )}
       <div className="pizza-builder-visual">
-        <PizzaPreview config={config} value={value} />
+        <PizzaPreview config={config} value={value} doughBase={Boolean(formatCount)} />
       </div>
       <div className="pizza-builder-controls">
-        <fieldset data-pizza-step="0">
-          <legend>{!quickOrder && <b>01</b>} Escolha o tamanho</legend>
-          <div className="pizza-choice-grid pizza-size-grid">
-            {config.sizes
-              .filter((s) => s.available)
-              .map((s) => (
-                <label className="pizza-choice" key={s.id}>
-                  <input
-                    type="radio"
-                    name="pizza-size"
-                    checked={s.id === value.sizeId}
-                    onChange={() => changeSize(s)}
-                  />
-                  <span>
-                    <strong>{s.name}</strong>
-                    <small>
-                      {s.diameterCm} cm · {s.slices} fatias
-                      {!wholePizza &&
-                        ` · até ${quickOrder ? Math.min(s.maxFlavors, config.flavors.filter((f) => pizzaFlavorAvailable(config, f, s.id)).length) : s.maxFlavors} sabores`}
-                    </small>
-                    {quickOrder && <span className="pizza-size-price">{sizePrice(s)}</span>}
-                  </span>
-                </label>
-              ))}
-          </div>
-        </fieldset>
+        {!formatCount && (
+          <fieldset data-pizza-step="0">
+            <legend>{!quickOrder && <b>01</b>} Escolha o tamanho</legend>
+            <div className="pizza-choice-grid pizza-size-grid">
+              {config.sizes
+                .filter((s) => s.available)
+                .map((s) => (
+                  <label className="pizza-choice" key={s.id}>
+                    <input
+                      type="radio"
+                      name="pizza-size"
+                      checked={s.id === value.sizeId}
+                      onChange={() => changeSize(s)}
+                    />
+                    <span>
+                      <strong>{s.name}</strong>
+                      <small>
+                        {s.diameterCm ? `${s.diameterCm} cm · ` : ""}
+                        {s.slices} fatias
+                        {!wholePizza &&
+                          (s.allowedFlavorCounts
+                            ? ` · ${pizzaFlavorCounts(s).map(pizzaFormatLabel).join(" / ")}`
+                            : ` · até ${quickOrder ? Math.min(s.maxFlavors, config.flavors.filter((f) => pizzaFlavorAvailable(config, f, s.id)).length) : s.maxFlavors} sabores`)}
+                      </small>
+                      {quickOrder && <span className="pizza-size-price">{sizePrice(s)}</span>}
+                    </span>
+                  </label>
+                ))}
+            </div>
+          </fieldset>
+        )}
         {sizeNotice && (
           <p className="pizza-size-notice" role="status">
             {sizeNotice}
@@ -208,10 +242,7 @@ export default function PizzaBuilder({
               <b>02</b> Quantos sabores?
             </legend>
             <div className="pizza-count-choices">
-              {Array.from(
-                { length: Math.min(size?.maxFlavors || 1, flavors.length) },
-                (_, i) => i + 1,
-              ).map((n) => (
+              {counts.map((n) => (
                 <label className="pizza-choice" key={n}>
                   <input
                     type="radio"
@@ -229,7 +260,9 @@ export default function PizzaBuilder({
                   />
                   <span>
                     <strong>
-                      {n} {n === 1 ? "sabor" : "sabores"}
+                      {size?.allowedFlavorCounts
+                        ? pizzaFormatLabel(n)
+                        : `${n} ${n === 1 ? "sabor" : "sabores"}`}
                     </strong>
                     {!includedInCombo && size?.flavorCountPricing?.prices[n] != null && (
                       <small>
@@ -252,7 +285,15 @@ export default function PizzaBuilder({
             <p className="small-copy muted">
               {quickOrder ? (
                 <>
-                  {maxFlavors === 1 ? "Escolha 1 sabor." : `Escolha até ${maxFlavors} sabores.`}{" "}
+                  {formatCount === 1
+                    ? "Escolha o sabor da pizza inteira."
+                    : formatCount
+                      ? `Escolha ${formatCount} sabores para preencher a pizza.`
+                      : size?.allowedFlavorCounts
+                        ? `Formatos disponíveis: ${counts.map(pizzaFormatLabel).join(" ou ")}.`
+                        : maxFlavors === 1
+                          ? "Escolha 1 sabor."
+                          : `Escolha até ${maxFlavors} sabores.`}{" "}
                   {fixedPrice
                     ? "O preço é fixo para esta quantidade de sabores."
                     : customerPriceRules[config.pricing]}
@@ -328,7 +369,18 @@ export default function PizzaBuilder({
                 ))}
               </ul>
             )}
-            <div className="pizza-choice-grid">
+            {formatCount && (
+              <p className="pizza-flavor-progress" aria-live="polite">
+                <strong>
+                  {value.flavorIds.length} de {formatCount}{" "}
+                  {formatCount === 1 ? "sabor" : "sabores"}
+                </strong>
+                {value.flavorIds.length === formatCount && (
+                  <span>Para trocar, desmarque um sabor escolhido.</span>
+                )}
+              </p>
+            )}
+            <div className="pizza-choice-grid pizza-flavor-grid">
               {flavors.filter(matchesFilter).map((f) => {
                 const selected = value.flavorIds.includes(f.id);
                 const incompatible =
@@ -337,27 +389,48 @@ export default function PizzaBuilder({
                   selectedFlavors.some(
                     (flavor) => (flavor.kind || "savory") !== (f.kind || "savory"),
                   );
+                const unavailableForFormat = canCompleteWith && !canCompleteWith.has(f.id);
                 return (
                   <label className="pizza-choice" key={f.id}>
                     <input
                       type="checkbox"
                       checked={selected}
                       disabled={
-                        !selected && (value.flavorIds.length >= selectionLimit || incompatible)
+                        !selected &&
+                        (value.flavorIds.length >= selectionLimit ||
+                          incompatible ||
+                          unavailableForFormat)
                       }
                       onChange={(e) => toggleFlavor(f.id, e.target.checked)}
                     />
+                    {formatCount && (
+                      <img
+                        className="pizza-choice-photo"
+                        src={f.previewImage || pizzaIllustration(f)}
+                        alt=""
+                        width={104}
+                        height={104}
+                        loading="lazy"
+                        onError={(event) => {
+                          const image = event.currentTarget;
+                          const fallback = pizzaIllustration(f);
+                          if (image.getAttribute("src") !== fallback) image.src = fallback;
+                        }}
+                      />
+                    )}
                     <span>
                       <strong>{f.name}</strong>
-                      {(!quickOrder || incompatible) && (
+                      {(!quickOrder || incompatible || unavailableForFormat) && (
                         <small>
                           {incompatible
                             ? "Não combina com os sabores escolhidos"
-                            : includedInCombo
-                              ? "Incluído no combo"
-                              : baseFixedPrice != null
-                                ? "Incluído no preço da combinação"
-                                : `${money(f.prices[value.sizeId] / 100)} · pizza inteira`}
+                            : unavailableForFormat
+                              ? "Indisponível nesta divisão"
+                              : includedInCombo
+                                ? "Incluído no combo"
+                                : baseFixedPrice != null
+                                  ? "Incluído no preço da combinação"
+                                  : `${money(f.prices[value.sizeId] / 100)} · pizza inteira`}
                         </small>
                       )}
                       {f.allergens?.length > 0 && <small>Contém: {f.allergens.join(", ")}</small>}
@@ -369,15 +442,17 @@ export default function PizzaBuilder({
             {!flavors.some(matchesFilter) && (
               <p role="status">Nenhum sabor encontrado. Tente outro nome ou tipo.</p>
             )}
-            <small aria-live="polite">
-              {quickOrder
-                ? `${value.flavorIds.length} de até ${selectionLimit} ${selectionLimit === 1 ? "sabor" : "sabores"}`
-                : `${value.flavorIds.length} de ${count} ${count === 1 ? "sabor selecionado" : "sabores selecionados"}`}
-            </small>
+            {!formatCount && (
+              <small aria-live="polite">
+                {quickOrder
+                  ? `${value.flavorIds.length} de até ${selectionLimit} ${selectionLimit === 1 ? "sabor" : "sabores"}`
+                  : `${value.flavorIds.length} de ${count} ${count === 1 ? "sabor selecionado" : "sabores selecionados"}`}
+              </small>
+            )}
           </fieldset>
         )}
         <PizzaCustomization quickOrder={quickOrder}>
-          {config.allowUnequalParts && value.flavorIds.length > 1 && (
+          {!formatCount && config.allowUnequalParts && value.flavorIds.length > 1 && (
             <fieldset data-pizza-step="1">
               <legend>Proporção dos sabores</legend>
               <label className="field">

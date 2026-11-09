@@ -247,7 +247,7 @@ export default function PizzaManagement({ company, products, services, onSaved }
       <div className="pizza-management-guide">
         <div>
           <strong>01 · Tamanhos e fatias</strong>
-          <p>Cadastre brotinho, pequena, média ou grande, com 3, 4 ou quantas fatias precisar.</p>
+          <p>Cadastre tamanhos, defina as fatias e escolha os formatos disponíveis em cada um.</p>
         </div>
         <div>
           <strong>02 · Valores por tamanho</strong>
@@ -255,7 +255,7 @@ export default function PizzaManagement({ company, products, services, onSaved }
         </div>
         <div>
           <strong>03 · Combinações</strong>
-          <p>Preço fixo ou acréscimo para pizzas com 2, 3 ou 4 sabores.</p>
+          <p>Defina um preço ou acréscimo para cada formato, da inteira à pizza de 4 sabores.</p>
         </div>
       </div>
       <div className="pizza-management-picker">

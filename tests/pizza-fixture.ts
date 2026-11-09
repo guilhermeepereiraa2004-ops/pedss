@@ -35,6 +35,42 @@ export const pizzaProduct = productSchema.parse({
   status: "Disponível",
   pizza: pizzaConfig,
 });
+export const pizzaFormatsDemo = productSchema.parse({
+  ...pizzaProduct,
+  priceCents: 6500,
+  pizza: {
+    ...pizzaConfig,
+    menuPlacement: "builder",
+    allowMixedKinds: false,
+    sizes: [
+      { id: "small", name: "Pequena", diameterCm: 25, slices: 4, maxFlavors: 2, available: true },
+      { id: "medium", name: "Média", diameterCm: 30, slices: 6, maxFlavors: 3, available: true },
+      { id: "family", name: "Família", diameterCm: 40, slices: 10, maxFlavors: 3, available: true },
+    ],
+    flavors: [
+      {
+        id: "cheese",
+        name: "Mussarela",
+        available: true,
+        prices: { small: 6500, medium: 7500, family: 9500 },
+      },
+      {
+        id: "pepper",
+        name: "Calabresa",
+        available: true,
+        prices: { small: 6700, medium: 7900, family: 9900 },
+      },
+      { id: "chicken", name: "Frango", available: true, prices: { medium: 8200, family: 10500 } },
+      {
+        id: "chocolate",
+        name: "Chocolate com Morango",
+        available: true,
+        kind: "sweet",
+        prices: { small: 7000, medium: 8000, family: 9900 },
+      },
+    ],
+  },
+});
 export const pizzaLine = {
   key: "pizza-line",
   productId: "pizza",

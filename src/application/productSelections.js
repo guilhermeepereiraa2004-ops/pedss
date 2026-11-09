@@ -1,4 +1,9 @@
-import { initialPizzaSelection, pizzaFlavorAvailable } from "../core/pizza.ts";
+import {
+  initialPizzaSelection,
+  pizzaFlavorAvailable,
+  pizzaFlavorCounts,
+  pizzaFormatPrices,
+} from "../core/pizza.ts";
 
 const onlyFlavor = (product) =>
   product.pizza?.flavors.length === 1 ? product.pizza.flavors[0] : null;
@@ -55,7 +60,11 @@ export function pizzaWithAvailableOptions(config, selection) {
   return next;
 }
 
-export function pizzaWithFlavors(selection, flavorIds) {
+export function pizzaWithFlavors(
+  selection,
+  flavorIds,
+  flavorCount = Math.max(1, flavorIds.length),
+) {
   const { customizations, portions, ...base } = selection;
   const retained = customizations?.filter((option) => flavorIds.includes(option.flavorId));
   const sameFlavors =
@@ -64,10 +73,30 @@ export function pizzaWithFlavors(selection, flavorIds) {
   return {
     ...base,
     flavorIds,
-    flavorCount: Math.max(1, flavorIds.length),
+    flavorCount,
     ...(retained?.length ? { customizations: retained } : {}),
     ...(sameFlavors && portions ? { portions } : {}),
   };
+}
+
+export function pizzaFormatLabel(count) {
+  if (count === 1) return "Inteira";
+  if (count === 2) return "Meio a meio";
+  return `${count} sabores`;
+}
+
+export function storefrontPizzaFormats({ availableProducts, pizzaBuilders }) {
+  const groups = (products) =>
+    products.flatMap((product) => {
+      const sizes = pizzaFormatPrices(product.pizza, { equalParts: true });
+      return sizes.length ? [{ product, sizes }] : [];
+    });
+  const dedicated = groups(
+    availableProducts.filter(
+      (product) => product.category === "Pizza" && product.pizza?.menuPlacement === "builder",
+    ),
+  );
+  return dedicated.length ? dedicated : groups(pizzaBuilders);
 }
 
 export function pizzaAtSize(config, selection, size) {
@@ -81,7 +110,7 @@ export function pizzaAtSize(config, selection, size) {
       { ...selection, sizeId: size.id },
       config.flavors.length === 1
         ? available.map((flavor) => flavor.id)
-        : retained.slice(0, size.maxFlavors),
+        : retained.slice(0, pizzaFlavorCounts(size).at(-1)),
     ),
   );
 }
@@ -98,16 +127,10 @@ export function linkedPizzaBuilder(product, builders) {
       (size) => size.available && pizzaFlavorAvailable(config, flavor, size.id),
     );
     if (
-      sizes.some(
-        (size) =>
-          size.maxFlavors > 1 &&
-          config.flavors.some(
-            (item) =>
-              item.id !== flavor.id &&
-              pizzaFlavorAvailable(config, item, size.id) &&
-              (config.allowMixedKinds !== false ||
-                (item.kind || "savory") === (flavor.kind || "savory")),
-          ),
+      sizes.some((size) =>
+        pizzaFormatPrices({ ...config, sizes: [size] }, { requiredFlavorIds: [flavor.id] }).some(
+          ({ formats }) => formats.some(({ count }) => count > 1),
+        ),
       )
     )
       return { builder, flavor, sizes };

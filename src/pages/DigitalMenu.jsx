@@ -21,7 +21,8 @@ import { categories, money } from "../lib/data";
 import { matchesMenuSearch } from "../lib/menu";
 import { storeHref } from "../application/storeAddress";
 import { isIllustrativeProductPhoto } from "../lib/productPhotography";
-import { pizzaPricingLabels, pizzaFlavorAvailable } from "../core/pizza.ts";
+import { pizzaPricingLabels, pizzaFlavorAvailable, pizzaFlavorCounts } from "../core/pizza.ts";
+import { pizzaFormatLabel } from "../application/productSelections";
 import "./DigitalMenu.css";
 const days = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 export default function DigitalMenu({ manualStoreId }) {
@@ -278,54 +279,64 @@ export default function DigitalMenu({ manualStoreId }) {
                 </p>
                 {selected.pizza.sizes
                   .filter((s) => s.available)
-                  .map((size) => (
-                    <section key={size.id}>
-                      <h4>
-                        {size.name} · {size.diameterCm} cm · {size.slices} fatias · até{" "}
-                        {size.maxFlavors} sabores
-                      </h4>
-                      {selected.pizza.pricing === "fixed" && (
-                        <div>
-                          <span>Preço fixo da pizza inteira</span>
-                          <strong>{money(size.fixedPriceCents / 100)}</strong>
-                        </div>
-                      )}
-                      {size.flavorCountPricing && (
-                        <div className="notice">
-                          {Object.entries(size.flavorCountPricing.prices).map(([count, price]) => (
-                            <div key={count}>
-                              <span>
-                                {count} {count === "1" ? "sabor" : "sabores"} ·{" "}
-                                {size.flavorCountPricing.mode === "fixed"
-                                  ? "Preço fixo da pizza"
-                                  : "Acréscimo à regra dos sabores"}
-                              </span>
+                  .map((size) => {
+                    const counts = pizzaFlavorCounts(size);
+                    const countPrices = Object.entries(
+                      size.flavorCountPricing?.prices || {},
+                    ).filter(([count]) => counts.includes(Number(count)));
+                    return (
+                      <section key={size.id}>
+                        <h4>
+                          {size.name}
+                          {size.diameterCm ? ` · ${size.diameterCm} cm` : ""} · {size.slices} fatias
+                          ·{" "}
+                          {size.allowedFlavorCounts
+                            ? counts.map(pizzaFormatLabel).join(" / ")
+                            : `até ${size.maxFlavors} sabores`}
+                        </h4>
+                        {selected.pizza.pricing === "fixed" && (
+                          <div>
+                            <span>Preço fixo da pizza inteira</span>
+                            <strong>{money(size.fixedPriceCents / 100)}</strong>
+                          </div>
+                        )}
+                        {countPrices.length > 0 && (
+                          <div className="notice">
+                            {countPrices.map(([count, price]) => (
+                              <div key={count}>
+                                <span>
+                                  {pizzaFormatLabel(Number(count))} ·{" "}
+                                  {size.flavorCountPricing.mode === "fixed"
+                                    ? "Preço fixo da pizza"
+                                    : "Acréscimo à regra dos sabores"}
+                                </span>
+                                <strong>
+                                  {size.flavorCountPricing.mode === "extra" ? "+ " : ""}
+                                  {money(price / 100)}
+                                </strong>
+                              </div>
+                            ))}
+                            <small>
+                              Massa, borda e adicionais à parte. Combinações sem valor específico
+                              seguem a regra dos sabores.
+                            </small>
+                          </div>
+                        )}
+                        {selected.pizza.flavors
+                          .filter((f) => pizzaFlavorAvailable(selected.pizza, f, size.id))
+                          .map((f) => (
+                            <div key={f.id}>
+                              <span>{f.name}</span>
                               <strong>
-                                {size.flavorCountPricing.mode === "extra" ? "+ " : ""}
-                                {money(price / 100)}
+                                {selected.pizza.pricing === "fixed"
+                                  ? "Incluído"
+                                  : money(f.prices[size.id] / 100)}
                               </strong>
                             </div>
                           ))}
-                          <small>
-                            Massa, borda e adicionais à parte. Combinações sem valor específico
-                            seguem a regra dos sabores.
-                          </small>
-                        </div>
-                      )}
-                      {selected.pizza.flavors
-                        .filter((f) => pizzaFlavorAvailable(selected.pizza, f, size.id))
-                        .map((f) => (
-                          <div key={f.id}>
-                            <span>{f.name}</span>
-                            <strong>
-                              {selected.pizza.pricing === "fixed"
-                                ? "Incluído"
-                                : money(f.prices[size.id] / 100)}
-                            </strong>
-                          </div>
-                        ))}
-                    </section>
-                  ))}
+                      </section>
+                    );
+                  })}
                 {[
                   ["doughs", "Massas"],
                   ["edges", "Bordas"],

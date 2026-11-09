@@ -1,6 +1,8 @@
 import { ArrowUpRight, Check, Package } from "lucide-react";
 import { comboGroups, comboArtworkItems, comboUnitsLabel } from "../application/comboPresentation";
 import { comboStartingPrice } from "../core/restaurant.ts";
+import { pizzaFlavorCounts } from "../core/pizza.ts";
+import { pizzaFormatLabel } from "../application/productSelections";
 import { money } from "../lib/data";
 import ProductVisual from "./ProductVisual";
 import PizzaPreview from "./PizzaPreview";
@@ -55,8 +57,12 @@ function GroupContent({ group }) {
         <strong>{child?.name || group.name}</strong>
         {size && (
           <small>
-            {size.name} · {size.diameterCm} cm
-            {option.customizePizza ? ` · até ${size.maxFlavors} sabores` : ""}
+            {size.name}
+            {size.diameterCm ? ` · ${size.diameterCm} cm` : ""}
+            {option.customizePizza &&
+              (size.allowedFlavorCounts
+                ? ` · ${pizzaFlavorCounts(size).map(pizzaFormatLabel).join(" / ")}`
+                : ` · até ${size.maxFlavors} sabores`)}
           </small>
         )}
         {names?.length > 0 ? (

@@ -1,14 +1,16 @@
 // @vitest-environment jsdom
 import React from "react";
 import { afterEach, expect, it, vi } from "vitest";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";
 import { webcrypto } from "node:crypto";
 import PizzaManagement from "../src/components/PizzaManagement";
 import ProductOptions from "../src/components/ProductOptions";
+import { pizzaFormatPrices, pricePizza } from "../src/core/pizza.ts";
+import { comboOptionState } from "../src/core/restaurant.ts";
 import { fixture, company } from "./fixtures.ts";
-import { pizzaProduct, pizzaConfig } from "./pizza-fixture.ts";
+import { pizzaProduct, pizzaConfig, pizzaSelection } from "./pizza-fixture.ts";
 vi.stubGlobal("crypto", webcrypto);
 afterEach(cleanup);
 it("PIZZA-ADMIN-04 três regras acessíveis e preço fixo por tamanho salvo no serviço", async () => {
@@ -115,6 +117,52 @@ it("PIZZA-ADMIN-02 descarte recupera campos monetários e não altera o catálog
   expect(screen.getByRole("textbox", { name: "Nome da pizza ou montador" })).toHaveValue(
     pizzaProduct.name,
   );
+});
+
+it("PIZZA-ADMIN formatos por tamanho preservam os preços e limitam cardápio, pedidos e combos", async () => {
+  const f = await fixture();
+  await f.services.saveProduct(company.id, pizzaProduct);
+  await f.services.linkPizzaCatalog(company.id, pizzaProduct.id);
+  const readProducts = () => f.repo.getSnapshot().tenants[company.id].products;
+  const user = userEvent.setup();
+  render(<PizzaManagement company={company} products={readProducts()} services={f.services} />);
+  await user.click(screen.getByRole("tab", { name: "Tamanhos e fatias" }));
+  const medium = within(screen.getByRole("group", { name: "Formatos de Média" }));
+  await user.click(medium.getByRole("checkbox", { name: "Inteira" }));
+  expect(medium.getByRole("checkbox", { name: "Meio a meio" })).toBeDisabled();
+  const large = within(screen.getByRole("group", { name: "Formatos de Grande" }));
+  await user.click(large.getByRole("checkbox", { name: "Meio a meio" }));
+  await user.click(large.getByRole("checkbox", { name: "4 sabores" }));
+  await user.click(screen.getByRole("tab", { name: "Preços por sabores" }));
+  await user.selectOptions(
+    screen.getByRole("combobox", { name: "Cobrança por quantidade em Média" }),
+    "fixed",
+  );
+  expect(screen.queryByRole("textbox", { name: "Preço fixo de 1 sabor em Média" })).toBeNull();
+  await user.type(
+    screen.getByRole("textbox", { name: "Preço fixo de 2 sabores em Média" }),
+    "65,00",
+  );
+  await user.click(screen.getByRole("button", { name: "Salvar tamanhos e preços" }));
+  expect(await screen.findByRole("status")).toHaveTextContent("salvos");
+
+  const products = readProducts();
+  const saved = products.find((item) => item.id === pizzaProduct.id);
+  expect(
+    pizzaFormatPrices(saved.pizza).map(({ formats }) => formats.map(({ count }) => count)),
+  ).toEqual([[2], [1, 3]]);
+  expect(pricePizza(saved.pizza, pizzaSelection).priceCents).toBe(7500);
+  expect(() => pricePizza(saved.pizza, { ...pizzaSelection, flavorIds: ["cheese"] })).toThrow(
+    /não é oferecido/,
+  );
+  const combo = comboOptionState(
+    { productId: saved.id, sizeId: "medium", customizePizza: true, surchargeCents: 0 },
+    products,
+  );
+  expect(combo.initialPizza?.flavorCount).toBe(2);
+  expect(combo.minimumExtraCents).toBe(0);
+  const cheese = products.find((item) => item.id === saved.pizza.flavors[0].sourceProductId);
+  expect(pizzaFormatPrices(cheese.pizza)[0].formats[0].count).toBe(1);
 });
 
 it("PIZZA-ADMIN-03 cliente vê preço da quantidade escolhida e soma massa/borda uma vez", async () => {

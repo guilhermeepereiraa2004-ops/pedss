@@ -162,11 +162,12 @@ export const pizzaConfigSchema = z
         z.object({
           id,
           name: text.min(1).max(60),
-          diameterCm: z.number().int().min(1).max(200),
+          diameterCm: z.number().int().min(1).max(200).optional(),
           ovenMinutes: z.number().int().min(1).max(120).optional(),
           ovenUnits: z.number().min(0.25).max(20).optional(),
           slices: z.number().int().min(1).max(64),
           maxFlavors: z.number().int().min(1).max(4),
+          allowedFlavorCounts: z.array(z.number().int().min(1).max(4)).min(1).max(4).optional(),
           available: z.boolean(),
           fixedPriceCents: cents.optional(),
           flavorCountPricing: z
@@ -216,6 +217,16 @@ export const pizzaConfigSchema = z
   })
   .superRefine((config, ctx) => {
     config.sizes.forEach((size, index) => {
+      if (
+        size.allowedFlavorCounts &&
+        (new Set(size.allowedFlavorCounts).size !== size.allowedFlavorCounts.length ||
+          size.allowedFlavorCounts.some((count) => count > size.maxFlavors))
+      )
+        ctx.addIssue({
+          code: "custom",
+          message: `Revise os formatos de ${size.name}: escolha quantidades diferentes dentro do limite de sabores.`,
+          path: ["sizes", index, "allowedFlavorCounts"],
+        });
       if (
         config.pricing === "fixed" &&
         size.available &&

@@ -11,7 +11,7 @@ import Tracking from "../src/pages/Tracking";
 import ProductOptions from "../src/components/ProductOptions";
 import Checkout from "../src/components/Checkout";
 import { fixture, company, cartLine, checkout } from "./fixtures.ts";
-import { pizzaProduct, pizzaLine } from "./pizza-fixture.ts";
+import { pizzaProduct, pizzaLine, pizzaFormatsDemo } from "./pizza-fixture.ts";
 import { shippingRuleKey } from "../src/core/shipping.ts";
 
 afterEach(cleanup);
@@ -169,6 +169,83 @@ it("pede uma pizza inteira direto pelo tamanho e combina a partir do sabor já e
   await user.click(edit.getByText("Personalizar pizza"));
   expect(edit.getByRole("checkbox", { name: "Sem Cebola" })).toBeChecked();
   expect(edit.getByRole("radio", { name: /Requeijão/ })).toBeChecked();
+});
+
+it("mostra os tamanhos antes do cardápio e preenche apenas a parte escolhida da pizza", async () => {
+  const f = await fixture();
+  await f.repo.transact((state) => {
+    state.tenants[company.id].settings.heroSegment = "pizza";
+  });
+  await f.services.saveProduct(company.id, pizzaFormatsDemo);
+  site(f);
+  const user = userEvent.setup();
+  const options = await screen.findByRole("region", { name: "Qual vai ser o tamanho?" });
+  expect(screen.queryByRole("region", { name: "Cardápio de sabores" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("searchbox", { name: "Buscar no cardápio" })).not.toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Escolher minha pizza" })).toHaveAttribute(
+    "href",
+    "#tamanhos-pizza",
+  );
+  for (const [name, slices, price] of [
+    ["Pequena", 4, "65"],
+    ["Média", 6, "75"],
+    ["Família", 10, "95"],
+  ]) {
+    const card = within(options).getByRole("heading", { name }).closest("article");
+    expect(card).toHaveTextContent(`${slices} fatias`);
+    expect(card).toHaveTextContent(`A partir de R$ ${price},00`);
+    expect(
+      within(card).getByRole("img", { name: `Foto ilustrativa de uma pizza tamanho ${name}` }),
+    ).toHaveAttribute("src", expect.stringContaining("/images/pizzas/"));
+    expect(within(card).getByRole("button", { name: `Inteira — ${name}` })).toBeEnabled();
+    for (const format of within(card).getAllByRole("button")) {
+      expect(format).not.toHaveTextContent(/R\$/);
+      expect(format).not.toHaveAccessibleDescription();
+    }
+  }
+  expect(
+    within(options).queryByRole("button", { name: "3 sabores — Pequena" }),
+  ).not.toBeInTheDocument();
+
+  await user.click(within(options).getByRole("button", { name: "Meio a meio — Pequena" }));
+  const half = within(screen.getByRole("region", { name: "Cardápio de sabores" }));
+  expect(half.getByText("Pequena · Meio a meio")).toBeVisible();
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(screen.queryByRole("region", { name: "Qual vai ser o tamanho?" })).not.toBeInTheDocument();
+  const halfPreview = half.getByRole("img", { name: /Pizza Pequena/ });
+  expect(halfPreview).toHaveAccessibleName(/1\/2: só massa; 1\/2: só massa/);
+  const halfPrice = half.getByText("A partir de", { selector: "span", exact: true }).parentElement;
+  expect(halfPrice).toHaveTextContent("R$ 65,00");
+  await user.click(half.getByRole("checkbox", { name: "Calabresa" }));
+  expect(halfPreview).toHaveAccessibleName(/1\/2: Calabresa; 1\/2: só massa/);
+  expect(half.getByRole("button", { name: "Falta 1 sabor" })).toBeDisabled();
+  expect(halfPrice).toHaveTextContent("R$ 65,00");
+  await user.click(half.getByRole("checkbox", { name: "Mussarela" }));
+  expect(within(halfPrice).getByText("Total da pizza")).toBeVisible();
+  expect(halfPrice).toHaveTextContent("R$ 67,00");
+  await user.click(half.getByRole("button", { name: /Voltar aos tamanhos/ }));
+
+  const sizesAgain = screen.getByRole("region", { name: "Qual vai ser o tamanho?" });
+  await user.click(within(sizesAgain).getByRole("button", { name: "3 sabores — Família" }));
+  const family = within(screen.getByRole("region", { name: "Cardápio de sabores" }));
+  expect(family.getByText("Família · 3 sabores")).toBeVisible();
+  const preview = family.getByRole("img", { name: /Pizza Família/ });
+  expect(preview).toHaveAccessibleName(/1\/3: só massa; 1\/3: só massa; 1\/3: só massa/);
+  expect(family.getByRole("checkbox", { name: /Chocolate com Morango/ })).toBeDisabled();
+  await user.click(family.getByRole("checkbox", { name: "Calabresa" }));
+  await user.click(family.getByRole("checkbox", { name: "Mussarela" }));
+  expect(preview).toHaveAccessibleName(/1\/3: Calabresa; 1\/3: Mussarela; 1\/3: só massa/);
+  expect(family.getByRole("button", { name: "Falta 1 sabor" })).toBeDisabled();
+  await user.click(family.getByRole("checkbox", { name: "Frango" }));
+  expect(family.getByText("Total da pizza", { selector: "span" }).parentElement).toHaveTextContent(
+    "R$ 105,00",
+  );
+  await user.click(family.getByRole("button", { name: "Adicionar à sacola" }));
+  expect(f.repo.getSnapshot().tenants[company.id].cart.lines[0]?.pizza).toMatchObject({
+    sizeId: "family",
+    flavorCount: 3,
+    flavorIds: ["pepper", "cheese", "chicken"],
+  });
 });
 
 it("AUDIT-FIX-03 pedir novamente abre a sacola da loja correta sem enviar outro pedido", async () => {

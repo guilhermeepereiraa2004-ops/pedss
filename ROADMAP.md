@@ -1,3 +1,7 @@
+## Escolha de tamanho e preço da pizza
+
+A vitrine da pizzaria começa pela escolha do tamanho e da divisão. Cada tamanho mostra um preço inicial. A massa recebe os sabores à medida que o cliente escolhe e o montador mostra o total calculado ao completar a seleção. Os formatos disponíveis são configuráveis no painel.
+
 ## Pedido de pizza simplificado — 08/11/2026
 
 Publicado na Vercel e integrado à `main` do GitHub junto com o frete por CEP e as notificações de novos pedidos. Inclui caminho curto para pizza inteira, combinação direta de sabores com prévia e preço junto da ação, e resumo editável na sacola.

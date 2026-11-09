@@ -153,7 +153,8 @@ export default function Checkout({
                 {pizza ? (
                   <div className="cart-pizza-details">
                     <small>
-                      {pizza.diameterCm} cm · Massa {pizza.dough} · Borda: {pizza.edge}
+                      {pizza.diameterCm ? `${pizza.diameterCm} cm · ` : ""}Massa {pizza.dough} ·
+                      Borda: {pizza.edge}
                     </small>
                     {line.pizza?.customizations?.some(
                       (item) => item.extraIds.length || item.removedIngredients.length,

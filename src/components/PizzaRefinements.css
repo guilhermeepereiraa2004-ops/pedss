@@ -90,6 +90,19 @@
   .pizza-builder[data-order="quick"] .pizza-live-preview {
     grid-template-columns: 88px minmax(0, 1fr);
   }
+  .pizza-builder[data-format] .pizza-live-preview {
+    grid-template-columns: clamp(76px, 26cqw, 112px) minmax(0, 1fr);
+  }
+  .pizza-builder[data-format] .pizza-builder-visual {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+}
+@media (max-width: 1000px) {
+  .product-options[data-pizza-format] .product-options-body {
+    scroll-padding-top: 175px;
+  }
 }
 @container pizza-options (min-width: 290px) and (max-width: 879px) {
   .pizza-builder[data-order="quick"] .pizza-size-grid {

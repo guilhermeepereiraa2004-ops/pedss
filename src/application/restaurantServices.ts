@@ -30,6 +30,7 @@ function singleFlavorConfig(
     menuPlacement: "catalog" as const,
     sizes: config.sizes.map((s) => ({
       ...structuredClone(s),
+      allowedFlavorCounts: undefined,
       available:
         s.available &&
         (config.pricing === "fixed" ? flavor.prices[s.id] !== 0 : (flavor.prices[s.id] || 0) > 0),
