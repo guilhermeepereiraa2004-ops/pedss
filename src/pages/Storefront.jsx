@@ -38,6 +38,7 @@ import useToast from "../hooks/useToast";
 import { categories, money } from "../lib/data";
 import { storeColors } from "../lib/storeColors";
 import { storeHref } from "../application/storeAddress";
+import { linkedPizzaBuilder, pizzaCombinationDraft } from "../application/productSelections";
 import { getStorefrontTemplate } from "../lib/storefrontTemplates";
 import "./Storefront.css";
 import "./Operations.css";
@@ -74,6 +75,7 @@ function StoreExperience({ slug }) {
     ),
     [productId, setProductId] = useState(null);
   const [editingCartKey, setEditingCartKey] = useState(null);
+  const [combinationDraft, setCombinationDraft] = useState(null);
   const [checkoutDraft, setCheckoutDraft] = useState(null);
   const [toast, notify] = useToast();
   if (!company || !tenant)
@@ -98,9 +100,11 @@ function StoreExperience({ slug }) {
     );
   const count = tenant.cart.lines.reduce((s, l) => s + l.quantity, 0);
   const selected = availableProducts.find((p) => p.id === productId);
+  const combination = !editingCartKey && linkedPizzaBuilder(selected, pizzaBuilders);
   const canBuild = Boolean(availability.open || availability.canSchedule);
   const closeProduct = () => {
     setProductId(null);
+    setCombinationDraft(null);
     if (editingCartKey) setCartOpen(true);
     setEditingCartKey(null);
   };
@@ -439,14 +443,30 @@ function StoreExperience({ slug }) {
       </footer>
       {selected && (
         <Modal
-          title={selected.name}
+          key={selected.id}
+          title={
+            combinationDraft?.productId === selected.id ? "Combine seus sabores" : selected.name
+          }
           className={selected.pizza || selected.combo ? "pizza-builder-modal" : ""}
           onClose={closeProduct}
         >
           <ProductOptions
             products={tenant.products}
-            key={selected.id}
             product={selected}
+            quickOrder
+            initialDraft={
+              combinationDraft?.productId === selected.id ? combinationDraft : undefined
+            }
+            onCombine={
+              combination
+                ? (line) => {
+                    const draft = pizzaCombinationDraft(combination, line);
+                    setCombinationDraft(draft);
+                    setProductId(draft.productId);
+                    action.setError("");
+                  }
+                : undefined
+            }
             initialLine={tenant.cart.lines.find((l) => l.key === editingCartKey)}
             onBack={closeProduct}
             canOrder={canBuild}

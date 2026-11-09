@@ -8,6 +8,21 @@ import { applyCoupon } from "../core/coupons.ts";
 import { shippingMode, shippingRuleKey, deliveryConfigured } from "../core/shipping.ts";
 import { useAction } from "../hooks/useApplication";
 import "./Checkout.css";
+
+const pizzaFractions = new Map([
+  [1 / 2, "½"],
+  [1 / 3, "⅓"],
+  [1 / 4, "¼"],
+  [3 / 4, "¾"],
+]);
+function pizzaCartTitle(pizza) {
+  const flavors = pizza.flavors.map(
+    (flavor) =>
+      `${flavor.share === 1 ? "" : `${pizzaFractions.get(flavor.share) || `${Math.round(flavor.share * 100)}%`} `}${flavor.name}`,
+  );
+  return `${pizza.sizeName} · ${flavors.join(" + ")}`;
+}
+
 export default function Checkout({
   tenant,
   availability,
@@ -129,12 +144,29 @@ export default function Checkout({
             image: "",
             category: "Hamburguer",
           };
+          const pizza = product.pizza && priced?.pizzaDetails?.[0];
           return (
             <div className="cart-product" key={line.key}>
               <FoodImage product={product} />
               <div>
-                <h3>{priced?.name || product.name}</h3>
-                {priced?.pizzaSummary && <small>{priced.pizzaSummary}</small>}
+                <h3>{pizza ? pizzaCartTitle(pizza) : priced?.name || product.name}</h3>
+                {pizza ? (
+                  <div className="cart-pizza-details">
+                    <small>
+                      {pizza.diameterCm} cm · Massa {pizza.dough} · Borda: {pizza.edge}
+                    </small>
+                    {line.pizza?.customizations?.some(
+                      (item) => item.extraIds.length || item.removedIngredients.length,
+                    ) && (
+                      <details>
+                        <summary>Personalização dos sabores</summary>
+                        <small>{priced.pizzaSummary}</small>
+                      </details>
+                    )}
+                  </div>
+                ) : (
+                  priced?.pizzaSummary && <small>{priced.pizzaSummary}</small>
+                )}
                 <span>{priced ? money(priced.totalCents / 100) : "Revise este item"}</span>
                 {priced?.extras.length > 0 && (
                   <small>+ {priced.extras.map((e) => e.name).join(", ")}</small>

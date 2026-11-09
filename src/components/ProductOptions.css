@@ -69,6 +69,35 @@
 .product-option-footer .button {
   font-size: 12px;
 }
+.pizza-quick-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--ink, #282820);
+}
+.pizza-quick-total span {
+  font-size: 13px;
+  color: var(--muted);
+}
+.pizza-quick-total strong {
+  font-size: clamp(19px, 3vw, 25px);
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+.pizza-quick-order .product-option-footer {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+.pizza-quick-order .product-option-footer .button {
+  padding-inline: 12px;
+}
+.pizza-quick-order .product-options-body {
+  gap: 15px;
+}
+.pizza-quick-order .product-options-body > p {
+  margin: 0;
+}
 
 @media (max-width: 550px) {
   .product-option-footer {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Plus, Minus, ShoppingBag } from "lucide-react";
 import ProductVisual from "./ProductVisual";
 import { money } from "../lib/data";
@@ -6,8 +6,12 @@ import { isIllustrativeProductPhoto } from "../lib/productPhotography";
 import "./ProductOptions.css";
 import PizzaBuilder from "./PizzaBuilder";
 import PizzaPriceBreakdown from "./PizzaPriceBreakdown";
-import { pricePizza } from "../core/pizza.ts";
-import { globalProductIngredients, productPizzaSelection } from "../application/productSelections";
+import { minimumPizzaPrice, pricePizza } from "../core/pizza.ts";
+import {
+  globalProductIngredients,
+  pizzaWithAvailableOptions,
+  productPizzaSelection,
+} from "../application/productSelections";
 import ComboOptions from "./ComboOptions";
 import { replacesPizzaOption } from "../core/catalogRules.ts";
 export default function ProductOptions(props) {
@@ -21,22 +25,28 @@ function SingleProductOptions({
   error,
   canOrder = true,
   initialLine,
+  initialDraft,
   submitLabel,
+  quickOrder = false,
+  onCombine,
 }) {
+  const fastPizza = quickOrder && Boolean(product.pizza);
+  const saved = initialLine || initialDraft;
   const globalIngredients = globalProductIngredients(product);
-  const [quantity, setQuantity] = useState(initialLine?.quantity || 1),
+  const [quantity, setQuantity] = useState(saved?.quantity || 1),
     [extras, setExtras] = useState(
-      (initialLine?.extraIds || []).filter((id) =>
+      (saved?.extraIds || []).filter((id) =>
         product.extras.some((e) => e.id === id && e.available && !replacesPizzaOption(product, e)),
       ),
     ),
     [removed, setRemoved] = useState(
-      (initialLine?.removedIngredients || []).filter((name) => globalIngredients.includes(name)),
+      (saved?.removedIngredients || []).filter((name) => globalIngredients.includes(name)),
     ),
-    [notes, setNotes] = useState(initialLine?.notes || "");
-  const [pizza, setPizza] = useState(() =>
-    productPizzaSelection(product, initialLine?.pizza, initialLine?.removedIngredients),
-  );
+    [notes, setNotes] = useState(saved?.notes || "");
+  const [pizza, setPizza] = useState(() => {
+    const selection = productPizzaSelection(product, saved?.pizza, saved?.removedIngredients);
+    return fastPizza ? pizzaWithAvailableOptions(product.pizza, selection) : selection;
+  });
   let pizzaPrice = null,
     pizzaError = "";
   if (product.pizza) {
@@ -46,36 +56,113 @@ function SingleProductOptions({
       pizzaError = e.message;
     }
   }
-  const total =
-    ((pizzaPrice?.priceCents ?? product.priceCents) +
-      product.extras.filter((e) => extras.includes(e.id)).reduce((s, e) => s + e.priceCents, 0)) *
-    quantity;
+  const extrasCents = product.extras
+    .filter((e) => extras.includes(e.id))
+    .reduce((s, e) => s + e.priceCents, 0);
+  const total = ((pizzaPrice?.priceCents ?? product.priceCents) + extrasCents) * quantity;
+  const awaitingFlavor = fastPizza && !pizza.flavorIds.length;
+  const sizeId = pizza?.sizeId;
+  const startingPrice = useMemo(() => {
+    if (!awaitingFlavor) return null;
+    const sizes = product.pizza.sizes.filter((size) => size.id === sizeId);
+    try {
+      return minimumPizzaPrice({ ...product.pizza, sizes });
+    } catch {
+      return null;
+    }
+  }, [awaitingFlavor, product.pizza, sizeId]);
+  const draft = () => ({
+    productId: product.id,
+    quantity,
+    extraIds: extras,
+    removedIngredients: removed,
+    notes,
+    ...(pizza ? { pizza } : {}),
+  });
+  const customOptions = (
+    <>
+      {product.extras.some((e) => e.available && !replacesPizzaOption(product, e)) && (
+        <fieldset>
+          <legend>Um pouco mais do seu jeito</legend>
+          {product.extras
+            .filter((e) => e.available && !replacesPizzaOption(product, e))
+            .map((extra) => (
+              <label className="option-row" key={extra.id}>
+                <span>
+                  <input
+                    type="checkbox"
+                    checked={extras.includes(extra.id)}
+                    onChange={(e) =>
+                      setExtras(
+                        e.target.checked
+                          ? [...extras, extra.id]
+                          : extras.filter((id) => id !== extra.id),
+                      )
+                    }
+                  />
+                  {extra.name}
+                </span>
+                <strong>+ {money(extra.priceCents / 100)}</strong>
+              </label>
+            ))}
+        </fieldset>
+      )}
+      {globalIngredients.length > 0 && (
+        <fieldset>
+          <legend>Prefere sem algum ingrediente?</legend>
+          {globalIngredients.map((ingredient) => (
+            <label className="option-row" key={ingredient}>
+              <span>
+                <input
+                  type="checkbox"
+                  checked={removed.includes(ingredient)}
+                  onChange={(e) =>
+                    setRemoved(
+                      e.target.checked
+                        ? [...removed, ingredient]
+                        : removed.filter((i) => i !== ingredient),
+                    )
+                  }
+                />
+                Sem {ingredient}
+              </span>
+              <small>Sem custo</small>
+            </label>
+          ))}
+        </fieldset>
+      )}
+      <label className="field">
+        Observações deste item
+        <textarea
+          maxLength={250}
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Algum cuidado no preparo?"
+        />
+      </label>
+    </>
+  );
   return (
     <form
-      className="product-options"
+      className={`product-options${fastPizza ? " pizza-quick-order" : ""}`}
       onSubmit={(e) => {
         e.preventDefault();
-        onAdd({
-          productId: product.id,
-          quantity,
-          extraIds: extras,
-          removedIngredients: removed,
-          notes,
-          ...(pizza ? { pizza } : {}),
-        });
+        if (!busy && canOrder && !pizzaError) onAdd(draft());
       }}
     >
       <div className="product-options-body">
-        {initialLine?.extraIds.some(
+        {saved?.extraIds.some(
           (id) =>
             !product.extras.some(
               (e) => e.id === id && e.available && !replacesPizzaOption(product, e),
             ),
         ) && (
           <p className="notice">
-            Opções antigas ou indisponíveis foram retiradas desta edição. Tamanho e borda são
-            escolhidos no montador; confira o novo total antes de salvar.
+            Alguns adicionais não estão disponíveis nesta pizza. Confira as opções e o novo total.
           </p>
+        )}
+        {initialDraft?.removedIngredients.some((name) => !globalIngredients.includes(name)) && (
+          <p className="notice">Confira as retiradas disponíveis em Personalizar pizza.</p>
         )}
         {product.pizza && onBack && (
           <button type="button" className="pizza-back-link" onClick={onBack}>
@@ -99,7 +186,7 @@ function SingleProductOptions({
           </div>
         )}
         {product.description && <p className="small-copy muted">{product.description}</p>}
-        {product.ingredients.length > 0 && (
+        {!fastPizza && product.ingredients.length > 0 && (
           <p className="small-copy">Ingredientes: {product.ingredients.join(", ")}</p>
         )}
         {product.allergens?.length > 0 && (
@@ -113,92 +200,64 @@ function SingleProductOptions({
             <PizzaBuilder
               config={product.pizza}
               value={pizza}
+              quickOrder={fastPizza}
+              customOptions={customOptions}
+              onCombine={onCombine ? () => onCombine(draft()) : undefined}
               onChange={(next) =>
                 setPizza(
-                  productPizzaSelection(product, {
-                    ...next,
-                    ...(product.pizza.flavors.length === 1 && next.sizeId !== pizza.sizeId
-                      ? { customizations: pizza.customizations }
-                      : {}),
-                  }),
+                  fastPizza
+                    ? next
+                    : productPizzaSelection(product, {
+                        ...next,
+                        ...(product.pizza.flavors.length === 1 && next.sizeId !== pizza.sizeId
+                          ? { customizations: pizza.customizations }
+                          : {}),
+                      }),
                 )
               }
             />
-            <div className="pizza-order-summary" aria-live="polite">
-              {pizzaPrice?.summary || pizzaError}
-            </div>
+            {fastPizza ? (
+              <PizzaPriceBreakdown
+                config={product.pizza}
+                selection={pizza}
+                quantity={quantity}
+                extrasCents={extrasCents}
+              />
+            ) : (
+              <div className="pizza-order-summary" aria-live="polite">
+                {pizzaPrice?.summary || pizzaError}
+              </div>
+            )}
           </>
         )}
-        {product.extras.some((e) => e.available && !replacesPizzaOption(product, e)) && (
-          <fieldset>
-            <legend>Um pouco mais do seu jeito</legend>
-            {product.extras
-              .filter((e) => e.available && !replacesPizzaOption(product, e))
-              .map((extra) => (
-                <label className="option-row" key={extra.id}>
-                  <span>
-                    <input
-                      type="checkbox"
-                      checked={extras.includes(extra.id)}
-                      onChange={(e) =>
-                        setExtras(
-                          e.target.checked
-                            ? [...extras, extra.id]
-                            : extras.filter((id) => id !== extra.id),
-                        )
-                      }
-                    />
-                    {extra.name}
-                  </span>
-                  <strong>+ {money(extra.priceCents / 100)}</strong>
-                </label>
-              ))}
-          </fieldset>
-        )}
-        {globalIngredients.length > 0 && (
-          <fieldset>
-            <legend>Prefere sem algum ingrediente?</legend>
-            {globalIngredients.map((ingredient) => (
-              <label className="option-row" key={ingredient}>
-                <span>
-                  <input
-                    type="checkbox"
-                    checked={removed.includes(ingredient)}
-                    onChange={(e) =>
-                      setRemoved(
-                        e.target.checked
-                          ? [...removed, ingredient]
-                          : removed.filter((i) => i !== ingredient),
-                      )
-                    }
-                  />
-                  Sem {ingredient}
-                </span>
-                <small>Sem custo</small>
-              </label>
-            ))}
-          </fieldset>
-        )}
-        <label className="field">
-          Observações deste item
-          <textarea
-            maxLength={250}
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Algum cuidado no preparo?"
-          />
-        </label>
+        {!fastPizza && customOptions}
       </div>
       <div className="product-option-actions">
-        {product.pizza && (
+        {product.pizza && !fastPizza && (
           <PizzaPriceBreakdown
             config={product.pizza}
             selection={pizza}
             quantity={quantity}
-            extrasCents={product.extras
-              .filter((e) => extras.includes(e.id))
-              .reduce((sum, e) => sum + e.priceCents, 0)}
+            extrasCents={extrasCents}
           />
+        )}
+        {fastPizza && (
+          <div className="pizza-quick-total" aria-live="polite" aria-atomic="true">
+            <span>
+              {awaitingFlavor
+                ? "A partir de"
+                : quantity > 1
+                  ? `Total · ${quantity} pizzas`
+                  : "Total da pizza"}
+            </span>
+            <strong>
+              {pizzaPrice
+                ? money(total / 100)
+                : startingPrice != null
+                  ? money(((startingPrice + extrasCents) * quantity) / 100)
+                  : "—"}
+            </strong>
+          </div>
         )}
         <div className="product-option-footer">
           <div className="quantity-control">
@@ -230,9 +289,21 @@ function SingleProductOptions({
               ? "Loja fechada para pedidos"
               : busy
                 ? "Adicionando…"
-                : `${submitLabel || (initialLine ? "Salvar alterações" : "Adicionar")} · ${money(total / 100)}`}
+                : fastPizza
+                  ? submitLabel ||
+                    (initialLine
+                      ? "Salvar alterações"
+                      : awaitingFlavor
+                        ? "Escolha um sabor"
+                        : "Adicionar à sacola")
+                  : `${submitLabel || (initialLine ? "Salvar alterações" : "Adicionar")} · ${money(total / 100)}`}
           </button>
         </div>
+        {fastPizza && pizzaError && !awaitingFlavor && (
+          <p className="form-error" role="status">
+            {pizzaError}
+          </p>
+        )}
         {error && (
           <p className="form-error" role="alert">
             {error}

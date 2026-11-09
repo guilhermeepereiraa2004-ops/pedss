@@ -9,6 +9,98 @@
   gap: 12px;
   margin: 14px 0;
 }
+.pizza-flavor-tools[data-fields="1"] {
+  grid-template-columns: 1fr;
+}
+.pizza-builder[data-order="quick"] .pizza-builder-controls {
+  gap: 15px;
+}
+.pizza-builder[data-order="quick"] .pizza-builder-controls > fieldset {
+  padding: 12px 16px;
+}
+.pizza-builder[data-order="quick"] .pizza-choice-grid {
+  margin-block: 4px;
+}
+.pizza-builder[data-order="quick"] .pizza-choice {
+  min-height: 48px;
+}
+.pizza-builder[data-order="quick"] .pizza-size-price {
+  display: block;
+  color: var(--store-accent-ink, #50662f);
+  font-weight: 750;
+  font-size: 13px;
+}
+.pizza-builder[data-order="quick"] .pizza-live-preview {
+  border-color: color-mix(in srgb, var(--store-accent, #d5f36b) 28%, #e5d7c0);
+}
+.pizza-size-notice {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.pizza-combine-link {
+  justify-self: start;
+  min-height: 44px;
+}
+.pizza-selected-flavors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+}
+.pizza-selected-flavors button {
+  min-height: 38px;
+  padding: 7px 12px;
+  border-radius: 99px;
+  border: 1px solid color-mix(in srgb, var(--store-accent, #d5f36b) 36%, #e1e6d8);
+  background: color-mix(in srgb, var(--store-accent, #d5f36b) 14%, white);
+  color: var(--ink, #282820);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+}
+.pizza-selected-flavors span {
+  margin-inline-start: 4px;
+}
+.pizza-customization {
+  border: 1px solid #e5e9de;
+  border-radius: 14px;
+  background: #fff;
+}
+.pizza-customization > summary {
+  padding: 13px 15px;
+  cursor: pointer;
+}
+.pizza-customization > summary small {
+  display: block;
+  margin: 3px 0 0 17px;
+  color: var(--muted);
+}
+.pizza-customization-fields {
+  display: grid;
+  gap: 20px;
+  padding: 12px 15px 18px;
+}
+@container pizza-options (max-width: 879px) {
+  .pizza-builder[data-order="quick"] .pizza-builder-visual {
+    margin-bottom: 15px;
+  }
+  .pizza-builder[data-order="quick"] .pizza-live-preview {
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
+}
+@container pizza-options (min-width: 290px) and (max-width: 879px) {
+  .pizza-builder[data-order="quick"] .pizza-size-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .pizza-builder[data-order="quick"] .pizza-size-grid .pizza-choice {
+    padding: 10px;
+    gap: 8px;
+  }
+}
 .pizza-price-breakdown {
   padding: 12px 14px;
   border: 1px solid #e2e7da;

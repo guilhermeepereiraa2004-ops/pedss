@@ -103,6 +103,74 @@ it("AUDIT-FIX-02 pizza individual migra retiradas antigas sem duplicar controles
   );
 });
 
+it("pede uma pizza inteira direto pelo tamanho e combina a partir do sabor já escolhido", async () => {
+  const f = await fixture();
+  const calabresa = structuredClone(pizzaProduct);
+  calabresa.id = "calabresa-individual";
+  calabresa.name = "Calabresa";
+  const pepper = {
+    ...calabresa.pizza.flavors[1],
+    sourceProductId: calabresa.id,
+    ingredients: ["Cebola"],
+  };
+  calabresa.pizza.flavors = [pepper];
+  const builder = structuredClone(pizzaProduct);
+  builder.pizza.menuPlacement = "builder";
+  builder.pizza.flavors[1] = pepper;
+  await f.services.saveProduct(company.id, calabresa);
+  await f.services.saveProduct(company.id, builder);
+  site(f);
+  const user = userEvent.setup();
+  await user.click(await screen.findByRole("button", { name: "Escolher Calabresa" }));
+  let whole = within(screen.getByRole("dialog", { name: "Calabresa" }));
+  expect(whole.queryByRole("searchbox", { name: "Buscar sabor" })).not.toBeInTheDocument();
+  expect(whole.getByRole("radio", { name: /^Grande.*50,00/ })).toBeInTheDocument();
+  expect(whole.getByRole("button", { name: "Adicionar à sacola" })).toBeEnabled();
+  await user.click(whole.getByRole("button", { name: "Adicionar à sacola" }));
+  expect(f.repo.getSnapshot().tenants[company.id].cart.lines[0]).toMatchObject({
+    productId: calabresa.id,
+    pizza: { sizeId: "medium", flavorIds: ["pepper"] },
+  });
+
+  await user.click(screen.getByRole("button", { name: "Escolher Calabresa" }));
+  whole = within(screen.getByRole("dialog", { name: "Calabresa" }));
+  await user.click(whole.getByRole("radio", { name: /^Grande/ }));
+  await user.click(whole.getByText("Personalizar pizza"));
+  await user.click(whole.getByRole("checkbox", { name: "Sem Cebola" }));
+  await user.click(whole.getByRole("radio", { name: /Requeijão/ }));
+  await user.click(whole.getByRole("button", { name: "Combinar com outro sabor" }));
+  const combo = within(screen.getByRole("dialog", { name: "Combine seus sabores" }));
+  expect(combo.queryByRole("radio", { name: /2 sabores$/ })).not.toBeInTheDocument();
+  expect(combo.getByRole("checkbox", { name: "Calabresa" })).toBeChecked();
+  await user.click(combo.getByRole("checkbox", { name: "Mussarela" }));
+  await user.click(combo.getByRole("checkbox", { name: "Frango" }));
+  expect(combo.getByRole("img", { name: /Pizza Grande/ })).toHaveAccessibleName(/1\/3: Calabresa/);
+  await user.click(combo.getByRole("radio", { name: /^Média/ }));
+  expect(combo.getByText(/Sabores removidos.*Frango/)).toBeVisible();
+  expect(combo.getByRole("img", { name: /Pizza Média/ })).toHaveAccessibleName(
+    /1\/2: Calabresa; 1\/2: Mussarela/,
+  );
+  expect(combo.getByText("Total da pizza", { selector: "span" }).parentElement).toHaveTextContent(
+    "R$ 48,01",
+  );
+  await user.click(combo.getByRole("button", { name: "Adicionar à sacola" }));
+
+  await user.click(await screen.findByRole("button", { name: "Abrir sacola com 2 itens" }));
+  const cart = within(screen.getByRole("dialog"));
+  expect(cart.getByRole("heading", { name: "Média · Calabresa" })).toBeInTheDocument();
+  expect(
+    cart.getByRole("heading", { name: "Média · ½ Calabresa + ½ Mussarela" }),
+  ).toBeInTheDocument();
+  expect(cart.getByText("30 cm · Massa Tradicional · Borda: Requeijão")).toBeVisible();
+  await user.click(cart.getByRole("button", { name: "Editar Monte sua pizza" }));
+  const edit = within(screen.getByRole("dialog"));
+  expect(edit.getByRole("checkbox", { name: "Calabresa" })).toBeChecked();
+  expect(edit.getByRole("checkbox", { name: "Mussarela" })).toBeChecked();
+  await user.click(edit.getByText("Personalizar pizza"));
+  expect(edit.getByRole("checkbox", { name: "Sem Cebola" })).toBeChecked();
+  expect(edit.getByRole("radio", { name: /Requeijão/ })).toBeChecked();
+});
+
 it("AUDIT-FIX-03 pedir novamente abre a sacola da loja correta sem enviar outro pedido", async () => {
   const f = await fixture();
   await f.services.addToCart(company.id, cartLine);
