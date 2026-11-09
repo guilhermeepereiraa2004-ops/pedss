@@ -1,3 +1,27 @@
+## Pedido de pizza simplificado — 08/11/2026
+
+Prévia isolada com loja fictícia no navegador, a 390 × 844 px. Conferidos tamanhos lado a lado, pizza inteira, combinação de dois sabores, total de R$ 49,90 visível durante a rolagem e resumo da sacola com tamanho e frações. Ao editar, a montagem reabriu com os dois sabores e salvou a seleção. Sem pedidos reais ou validação desta versão em produção. A regressão automatizada também cobre a troca para tamanho com limite menor de sabores e a preservação de borda e personalização compatíveis.
+
+`npm run check` aprovado: 427 testes e 245/245 critérios de aceitação. O lint mantém um aviso no hook de notificações push, fora desta alteração.
+
+Na publicação, a Vercel compilou e promoveu `dpl_2pNMaHAB9Qk8bfCiXT97YGZmYxG6`. Os três domínios serviram o mesmo checkout, e as leituras confirmaram os mesmos 15 produtos, configurações da Cia da Pizza e código do worker de notificações. No navegador, a pizza Grande de Calabresa abriu o montador com esse sabor selecionado. A seleção de Mussarela habilitou a ação com total de R$ 49,90. O teste em produção terminou na prévia, e a edição da sacola foi testada no ambiente local. A leitura dos logs de execução da nova versão retornou zero erros na janela consultada.
+
+## Push de novos pedidos
+
+O navegador integrado exibiu **Ativar notificações push** em Visão geral e Pedidos, num painel com API simulada. Testes automatizados validam o cadastro e a remoção do dispositivo, o isolamento por loja e o envio após o commit no PostgreSQL descartável. A execução do service worker em um contexto sem abas abertas confirmou a exibição e a abertura da rota de Pedidos no clique. A biblioteca gerou uma requisição VAPID autenticada com conteúdo criptografado.
+
+Produção `dpl_4CpGW6ASw9VEJ6gEcAKiVEXva2kg` validada após promover. Os três endereços servem a mesma versão do worker. O manifesto respondeu, a API rejeitou inscrição sem login e o cardápio e as configurações da Cia da Pizza conservaram os hashes anteriores. A conexão com o papel `pedss_api` leu a tabela com RLS ativo. A sessão do navegador integrado chegou à tela de login. A entrega em um dispositivo real fica para a verificação após inscrição no painel.
+
+## Avisos de novos pedidos — 08/11/2026
+
+No navegador integrado, o painel local de demonstração exibiu o controle de notificações para o gestor. Um pedido fictício confirmado pelo cardápio em outra aba apareceu na lista de Pedidos sem recarga, com o aviso “Novo pedido recebido”. O navegador integrado deixou a permissão pendente. Os testes automatizados usam uma simulação da API do navegador para validar o envio ao service worker, a ativação e desativação, a persistência da preferência após reabrir o painel, o bloqueio pelo navegador e o acesso de atendente. A exibição pelo sistema operacional não foi confirmada nessa sessão.
+
+## Frete por CEP para todos os segmentos — 05/11/2026
+
+Navegador integrado confirmou a loja publicada com hero e 14 sabores visíveis, sem avisos/erros no console; captura .quality/shipping-production-ready.png.
+
+Integração global ativada localmente e na Vercel (dpl_J3MEWQVtJ8yC5zj89LfoGfe3Hrd2). Chave configurada somente no servidor/Secret de Production, fora do Git. Novo endpoint HeiGIT, caches de CEP/rotas e deduplicação. Gate aprovado: 420 testes/60 arquivos, 245/245 critérios. Rota real entre dois CEPs públicos retornou 1.155 m; simulador local em memória mostrou 1,16 km e respeitou mínimo de teste, sem alterar lojas reais. Catálogo/configurações da Cia preservados na publicação; três domínios com HTTP/API 200. A Cia continua com frete fixo: ativar Por quilômetro, origem, taxas e limite em cada loja é configuração comercial do administrador. Cotação real em loja de produção não executada para preservar essas regras. Painel autenticado exigiu login nesta sessão. Sem novo commit/push; documentação operacional completa em plan/STATUS.md, log/devlog.md e docs/SHIPPING.md.
+
 ## Correções da auditoria de pizzaria publicadas — 04/11/2026
 
 Pedido atual autoriza executar as recomendações da auditoria, incluindo a publicação. Finalização mantém nome, telefone, modalidade, endereço, pagamento, observações e rascunho de cupom durante edição/cancelamento/reabertura da sacola. Estado somente em memória da página; cupom e cotação continuam sujeitos à validade, telefone, sacola e regras atuais. Nenhum preço enviado pelo navegador passa a ser confiado.

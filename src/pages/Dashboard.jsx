@@ -51,6 +51,7 @@ import { CATALOG_TEMPLATE_URL, downloadCurrentCatalog } from "../application/cat
 import useApplication, { useAction, useStore } from "../hooks/useApplication";
 import { trialState } from "../core/trials.ts";
 import useToast from "../hooks/useToast";
+import useOrderAlerts from "../hooks/useOrderAlerts";
 import { finance } from "../core/domain.ts";
 import { currentStoreAddress, storeHref } from "../application/storeAddress";
 import { categories, money, burgerPhoto } from "../lib/data";
@@ -59,6 +60,13 @@ import "./Dashboard.css";
 import "./Operations.css";
 
 const EMPTY = [];
+const PUSH_HELP = {
+  loading: "Verificando notificações neste dispositivo…",
+  unavailable: "Este navegador não oferece notificações push aqui.",
+  unconfigured: "As notificações push ainda estão indisponíveis neste servidor.",
+  install: "No iPhone ou iPad, adicione o painel à Tela de Início e abra pelo ícone.",
+  error: "Não foi possível verificar as notificações. Reabra o painel para tentar novamente.",
+};
 export default function Dashboard() {
   const [params, setParams] = useSearchParams();
   const account = useApplication();
@@ -69,6 +77,15 @@ export default function Dashboard() {
     "demo";
   const app = useStore(slug);
   const { company, tenant, identity, services, availability, now } = app;
+  const remote = app.mode === "remote";
+  useEffect(() => {
+    if (!remote) return;
+    const manifest = document.createElement("link");
+    manifest.rel = "manifest";
+    manifest.href = "/manifest.webmanifest";
+    document.head.append(manifest);
+    return () => manifest.remove();
+  }, [remote]);
   const action = useAction(),
     detailAction = useAction(),
     exportAction = useAction(),
@@ -124,42 +141,22 @@ export default function Dashboard() {
     [productModal, setProductModal] = useState(false),
     [deleting, setDeleting] = useState(null),
     [selectedId, setSelectedId] = useState(null),
-    [itemChange, setItemChange] = useState(null),
-    [sound, setSound] = useState(false);
+    [itemChange, setItemChange] = useState(null);
   const [from, setFrom] = useState(""),
     [to, setTo] = useState("");
-  const previous = useRef(null),
-    audio = useRef(null);
   const orders = tenant?.orders || EMPTY,
     products = tenant?.products || EMPTY;
-  useEffect(() => {
-    const ids = new Set(orders.map((o) => o.id));
-    if (previous.current) {
-      const fresh = orders.filter((o) => !previous.current.has(o.id) && o.status === "Pendente");
-      if (fresh.length) {
-        queueMicrotask(() => notify(`${fresh.length} novo(s) pedido(s) recebido(s).`));
-        if (sound && audio.current) {
-          const context = audio.current,
-            osc = context.createOscillator(),
-            gain = context.createGain();
-          osc.connect(gain);
-          gain.connect(context.destination);
-          osc.frequency.value = 660;
-          gain.gain.setValueAtTime(0.08, context.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.4);
-          osc.start();
-          osc.stop(context.currentTime + 0.4);
-        }
-      }
-    }
-    previous.current = ids;
-  }, [orders, sound, notify]);
-  useEffect(
-    () => () => {
-      audio.current?.close();
-    },
-    [],
-  );
+  const wrongStore = identity?.role !== "admin" && identity?.storeId !== company?.id;
+  const trialExpired = company && identity?.role !== "admin" && trialState(company, now)?.expired;
+  const { sound, toggleSound, notificationStatus, notificationBusy, toggleNotifications } =
+    useOrderAlerts({
+      company: tenant && !wrongStore && !trialExpired ? company : null,
+      orders,
+      identity,
+      canManage,
+      notify,
+      remote,
+    });
   if (!company || !tenant)
     return (
       <div className="store-not-found">
@@ -170,7 +167,7 @@ export default function Dashboard() {
         </Link>
       </div>
     );
-  if (identity.role !== "admin" && identity.storeId !== company.id)
+  if (wrongStore)
     return (
       <div className="store-not-found">
         <h1>Este acesso pertence a outra loja.</h1>
@@ -179,7 +176,7 @@ export default function Dashboard() {
         </Link>
       </div>
     );
-  if (identity.role !== "admin" && trialState(company, now)?.expired)
+  if (trialExpired)
     return (
       <AdminShell
         storeName={company.name}
@@ -422,21 +419,40 @@ export default function Dashboard() {
         <div className="notification-setting">
           <button
             className="button button-outline button-small"
-            onClick={() => {
-              if (!sound) {
-                const Audio = window.AudioContext || window.webkitAudioContext;
-                if (Audio) {
-                  audio.current = audio.current || new Audio();
-                  audio.current.resume();
-                  setSound(true);
-                }
-              } else setSound(false);
-            }}
+            aria-pressed={sound}
+            onClick={toggleSound}
           >
             {sound ? <Bell size={13} /> : <BellOff size={13} />}{" "}
             {sound ? "Som de novos pedidos ativo" : "Ativar som de novos pedidos"}
           </button>
-          <span>Alertas neste navegador e entre abas.</span>
+          {canManage && (
+            <>
+              <button
+                className="button button-outline button-small"
+                aria-describedby="order-notification-help"
+                disabled={notificationBusy || !["on", "off"].includes(notificationStatus)}
+                onClick={toggleNotifications}
+              >
+                <Bell size={13} aria-hidden="true" />
+                {remote
+                  ? notificationStatus === "on"
+                    ? "Desativar notificações push"
+                    : "Ativar notificações push"
+                  : notificationStatus === "on"
+                  ? "Desativar notificações do navegador"
+                  : "Ativar notificações do navegador"}
+              </button>
+              <span id="order-notification-help">
+                {notificationStatus === "blocked"
+                  ? "Notificações bloqueadas. Permita os avisos nas configurações do site."
+                  : remote
+                    ? PUSH_HELP[notificationStatus] || "Receba avisos neste dispositivo mesmo com o painel fechado."
+                    : notificationStatus === "unavailable"
+                      ? "Este navegador não oferece notificações do sistema aqui."
+                      : "Demonstração local. Receba avisos enquanto este painel estiver aberto."}
+              </span>
+            </>
+          )}
         </div>
       )}
       {active === "overview" && (

@@ -1,0 +1,13 @@
+{
+  "id": "/dashboard",
+  "name": "Peds's — Gestão",
+  "short_name": "Peds's",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#d5f36b",
+  "background_color": "#f6f6f2",
+  "icons": [
+    { "src": "/brand/peds-icon-180-v1.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

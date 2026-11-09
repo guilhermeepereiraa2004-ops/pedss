@@ -1,6 +1,21 @@
 {
-  "floor": 224,
+  "floor": 245,
   "items": [
+    {
+      "id": "FREIGHT-07",
+      "title": "consulta de rota compartilha cache de CEP e requisições simultâneas sem misturar preços entre lojas",
+      "source": "tests/shipping.test.ts"
+    },
+    {
+      "id": "FREIGHT-08",
+      "title": "erros e limite do provedor não viram frete gratuito nem impedem nova tentativa",
+      "source": "tests/shipping.test.ts"
+    },
+    {
+      "id": "FREIGHT-09",
+      "title": "frete por CEP funciona nos seis segmentos de estabelecimento com cotação validada no pedido",
+      "source": "tests/shipping.test.ts"
+    },
     {
       "id": "COUNTER-MENU-01",
       "title": "balcão e telefone montam e editam pizza completa com bebida sem alterar a sacola pública",

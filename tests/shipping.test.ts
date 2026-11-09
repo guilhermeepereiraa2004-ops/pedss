@@ -146,6 +146,9 @@ it("FREIGHT-06 consulta somente CEPs e coordenadas, com cache e sem aceitar coor
   await router("01001000", "01310100");
   expect(fetcher).toHaveBeenCalledTimes(3);
   expect(fetcher.mock.calls[0][0]).toContain("/01001000");
+  expect(fetcher.mock.calls[2][0]).toBe(
+    "https://api.heigit.org/openrouteservice/v2/directions/driving-car/geojson",
+  );
   expect(fetcher.mock.calls[2][1].body).toBe(
     JSON.stringify({
       coordinates: [
@@ -164,3 +167,106 @@ it("FREIGHT-06 consulta somente CEPs e coordenadas, com cache e sem aceitar coor
     "indisponível",
   );
 });
+
+const postalResponse = {
+  street: "Rua de teste",
+  city: "São Paulo",
+  state: "SP",
+  location: { coordinates: { latitude: "-23.55", longitude: "-46.63" } },
+};
+const routeResponse = { features: [{ properties: { summary: { distance: 3210 } } }] };
+
+it("FREIGHT-07 consultas simultâneas compartilham rota e CEP, sem misturar preços de lojas", async () => {
+  const fetcher = vi.fn(async (url: string) => ({
+    ok: true,
+    json: async () => (url.includes("brasilapi") ? postalResponse : routeResponse),
+  }));
+  const router = createPostalRouting({ fetcher, key: () => "test-key" });
+  const gateway = createShippingGateway({ route: router, secret: () => "only-for-tests" });
+  const f = await fixture();
+  const settings = { ...f.repo.getSnapshot().tenants[company.id].settings, shipping: rule };
+  const [first, second] = await Promise.all([
+    gateway.quote("first-store", settings, "01310100"),
+    gateway.quote(
+      "second-store",
+      { ...settings, shipping: { ...rule, perKmCents: 500 } },
+      "01310100",
+    ),
+  ]);
+  expect(fetcher).toHaveBeenCalledTimes(3);
+  expect(first.feeCents).toBe(942);
+  expect(second.feeCents).toBe(1905);
+  expect(() => gateway.verify(first.token, "second-store", settings, "01310100")).toThrow(
+    "novamente",
+  );
+  await router("01001000", "01310200");
+  expect(fetcher).toHaveBeenCalledTimes(5); // The same store origin is not looked up again.
+  vi.useFakeTimers();
+  vi.setSystemTime(Date.now() + 16 * 60_000);
+  await router("01001000", "01310100");
+  expect(fetcher).toHaveBeenCalledTimes(6); // Expired route, postal locations still valid.
+});
+
+it("FREIGHT-08 erro de rede ou limite não vira frete grátis nem fica preso no cache", async () => {
+  let failure = true;
+  const fetcher = vi.fn(async (url: string) => ({
+    ok: url.includes("brasilapi") || !failure,
+    status: url.includes("brasilapi") || !failure ? 200 : 429,
+    json: async () => (url.includes("brasilapi") ? postalResponse : routeResponse),
+  }));
+  const router = createPostalRouting({ fetcher, key: () => "test-key" });
+  await expect(router("01001000", "01310100")).rejects.toThrow("muitas consultas");
+  failure = false;
+  await expect(router("01001000", "01310100")).resolves.toMatchObject({ distanceMeters: 3210 });
+  expect(fetcher).toHaveBeenCalledTimes(4);
+  const offline = createPostalRouting({
+    fetcher: async () => {
+      throw new TypeError("Network credentials must not be echoed");
+    },
+    key: () => "test-key",
+  });
+  await expect(offline("01001000", "01310100")).rejects.toThrow(
+    "serviço de CEP ou rotas está indisponível",
+  );
+  const invalidPostal = createPostalRouting({
+    fetcher: async () => ({ ok: false, status: 404 }),
+    key: () => "test-key",
+  });
+  await expect(invalidPostal("01001000", "01310100")).rejects.toThrow("CEP não encontrado");
+  const malformed = createPostalRouting({
+    fetcher: async () => ({
+      ok: true,
+      json: async () => {
+        throw new SyntaxError("bad JSON");
+      },
+    }),
+    key: () => "test-key",
+  });
+  await expect(malformed("01001000", "01310100")).rejects.toThrow("indisponível");
+});
+
+it.each(["burger", "pizza", "acai", "icecream", "snacks", "pastel"] as const)(
+  "FREIGHT-09 frete por CEP é compartilhado pelo segmento %s e aplicado no pedido",
+  async (segment) => {
+    const f = await fixture();
+    await f.repo.transact((state) => {
+      state.tenants[company.id].settings.heroSegment = segment;
+    });
+    const gateway = createShippingGateway({ route, secret: () => "only-for-tests" });
+    const services = createServices(f.repo, f.auth, gateway);
+    const s = f.repo.getSnapshot().tenants[company.id].settings;
+    await services.saveShipping(company.id, { ...s, shipping: rule });
+    await services.addToCart(company.id, cartLine);
+    const q = await services.quoteShipping(company.id, "01310100");
+    const cart = f.repo.getSnapshot().tenants[company.id].cart;
+    const order = await services.checkout(company.id, cart.requestId, {
+      ...checkout,
+      postalCode: "01310100",
+      shippingQuoteToken: q.token,
+      expectedTotalCents: 7722,
+    });
+    expect(order.deliveryFeeCents).toBe(942);
+    expect(order.deliveryDistanceMeters).toBe(3210);
+    expect(order.paymentStatus).toBe("Pendente");
+  },
+);

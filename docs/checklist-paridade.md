@@ -2,10 +2,13 @@
 
 Gerado por `npm run check`. Fonte: `docs/acceptance.json`.
 
-Total: 242 | Verificados: 242 | Progresso: 100%
+Total: 245 | Verificados: 245 | Progresso: 100%
 
 | ID | Critério | Estado | Evidência |
 | --- | --- | --- | --- |
+| FREIGHT-07 | consulta de rota compartilha cache de CEP e requisições simultâneas sem misturar preços entre lojas | Verificado | FREIGHT-07 consultas simultâneas compartilham rota e CEP, sem misturar preços de lojas |
+| FREIGHT-08 | erros e limite do provedor não viram frete gratuito nem impedem nova tentativa | Verificado | FREIGHT-08 erro de rede ou limite não vira frete grátis nem fica preso no cache |
+| FREIGHT-09 | frete por CEP funciona nos seis segmentos de estabelecimento com cotação validada no pedido | Verificado | FREIGHT-09 frete por CEP é compartilhado pelo segmento burger e aplicado no pedido; FREIGHT-09 frete por CEP é compartilhado pelo segmento pizza e aplicado no pedido; FREIGHT-09 frete por CEP é compartilhado pelo segmento acai e aplicado no pedido; FREIGHT-09 frete por CEP é compartilhado pelo segmento icecream e aplicado no pedido; FREIGHT-09 frete por CEP é compartilhado pelo segmento snacks e aplicado no pedido; FREIGHT-09 frete por CEP é compartilhado pelo segmento pastel e aplicado no pedido |
 | COUNTER-MENU-01 | balcão e telefone montam e editam pizza completa com bebida sem alterar a sacola pública | Verificado | COUNTER-MENU-01 counter monta, edita e registra pizza completa com bebida, sem alterar a sacola pública; COUNTER-MENU-01 phone monta, edita e registra pizza completa com bebida, sem alterar a sacola pública |
 | COUNTER-MENU-02 | catálogo do atendimento oferece busca, categorias, combos e acesso separado ao montador | Verificado | COUNTER-MENU-02 busca e categorias preservam o acesso ao montador e oferecem combos completos |
 | AUTH-06 | sair limpa identidade mesmo quando falha a gravação compartilhada | Verificado | acesso local AUTH-06 sair limpa identidade mesmo quando falha a gravação compartilhada |

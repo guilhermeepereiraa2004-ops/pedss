@@ -1,6 +1,10 @@
 import { beforeAll, afterAll, beforeEach, it, expect, vi } from "vitest";
 import { PGlite } from "@electric-sql/pglite";
+import { readFile } from "node:fs/promises";
+import { randomBytes } from "node:crypto";
+import webPush from "web-push";
 import { createPostgresStore } from "../server/database.mjs";
+import { createOrderPush } from "../server/order-push.mjs";
 import { createHandler } from "../server/api.mjs";
 import { fixture, cartLine, checkout } from "./fixtures.ts";
 import { tokenDigest } from "../src/adapters/localAuth.ts";
@@ -150,6 +154,72 @@ async function request(
   );
   return result;
 }
+
+it("salva a inscrição privada e envia push somente após gravar um novo pedido da loja", async () => {
+  await db.exec("CREATE ROLE pedss_api; CREATE ROLE anon;");
+  await db.exec(await readFile(new URL("../migrations/002_order_push.sql", import.meta.url), "utf8"));
+  await db.exec("TRUNCATE pedss.order_push_subscriptions");
+  const grants = await db.query(`SELECT
+    has_table_privilege('pedss_api', 'pedss.order_push_subscriptions', 'INSERT') AS api_insert,
+    has_table_privilege('anon', 'pedss.order_push_subscriptions', 'SELECT') AS public_read`);
+  expect(grants.rows).toEqual([{ api_insert: true, public_read: false }]);
+  const state = structuredClone(seed);
+  state.sessions.forEach((session: { demo: boolean }) => { session.demo = false; });
+  await db.query("UPDATE pedss.workspace SET data = $1 WHERE id = 1", [JSON.stringify(state)]);
+  const vapid = { ...webPush.generateVAPIDKeys(), subject: "https://www.pedss.com.br" };
+  const endpoint = "https://fcm.googleapis.com/fcm/send/dispositivo-de-teste";
+  const device = {
+    endpoint,
+    keys: { p256dh: webPush.generateVAPIDKeys().publicKey, auth: randomBytes(16).toString("base64url") },
+  };
+  const background: Promise<unknown>[] = [];
+  const committedBeforeSend: boolean[] = [];
+  const send = vi.fn(async (_target, raw: string, _options) => {
+    const { rows } = await db.query<{ data: typeof seed }>("SELECT data FROM pedss.workspace");
+    committedBeforeSend.push(rows[0].data.tenants["store-one"].orders.some((o: { id: string }) =>
+      JSON.parse(raw).tag.endsWith(o.id),
+    ));
+  });
+  const push = createOrderPush({ getDatabase: () => db, config: () => vapid, send });
+  const options = { push, defer: (job: Promise<unknown>) => background.push(job) };
+  const view = { kind: "dashboard", store: "demo" };
+  const subscribe = { kind: "order-push", command: "subscribe", args: ["store-one", device, vapid.publicKey] };
+  const call = (body: unknown, credential = token) =>
+    request(view, credential, "", store, body, { "x-real-ip": "192.0.2.10" }, options);
+
+  expect((await call(subscribe, "")).statusCode).toBe(401);
+  expect((await call({ ...subscribe, args: ["store-two", device, vapid.publicKey] })).statusCode).toBe(403);
+  expect((await call({
+    ...subscribe, args: ["store-one", { ...device, endpoint: "https://127.0.0.1/secret" }, vapid.publicKey],
+  })).statusCode).toBe(400);
+  expect((await call(subscribe)).body).toEqual({ result: { subscribed: true } });
+  await call({
+    ...subscribe, args: ["store-two", { ...device, endpoint: endpoint + "-other" }, vapid.publicKey],
+  }, "master-test-token");
+  const purchase = { kind: "checkout", command: "create", args: [
+    "store-one", { requestId: "push-new-order", lines: [{ ...cartLine, key: "line" }] }, checkout,
+  ] };
+  expect((await call(purchase, "")).statusCode).toBe(200);
+  await Promise.all(background);
+  expect(committedBeforeSend).toEqual([true]);
+  expect(send).toHaveBeenCalledTimes(1);
+  expect(send.mock.calls[0][0]).toEqual(device);
+  expect(JSON.parse(send.mock.calls[0][1])).toEqual(expect.objectContaining({
+    kind: "pedss-order", store: "demo", body: expect.stringContaining("Pedido"),
+  }));
+  expect(send.mock.calls[0][1]).not.toContain(checkout.phone);
+  expect((await call(purchase, "")).statusCode).toBe(200);
+  expect(background).toHaveLength(1);
+
+  send.mockRejectedValueOnce(Object.assign(new Error("Expired"), { statusCode: 410 }));
+  const nextPurchase = { ...purchase, args: [
+    "store-one", { requestId: "push-next-order", lines: [{ ...cartLine, key: "line" }] }, checkout,
+  ] };
+  expect((await call(nextPurchase, "")).statusCode).toBe(200);
+  await Promise.all(background);
+  expect((await call({ kind: "order-push", command: "status", args: ["store-one", endpoint] })).body)
+    .toEqual({ result: { publicKey: vapid.publicKey, subscribed: false } });
+});
 
 it("DATA-01 PostgreSQL returns only the selected shop; public reads exclude all order history", async () => {
   const access = await store.access("");

@@ -7,7 +7,8 @@ import { DomainError } from "../src/core/errors.ts";
 import { quote } from "../src/core/domain.ts";
 import { applyCoupon } from "../src/core/coupons.ts";
 import { createShippingGateway } from "./shipping.mjs";
-import { createPostgresStore } from "./database.mjs";
+import { createPostgresStore, database } from "./database.mjs";
+import { createOrderPush } from "./order-push.mjs";
 import { projectState, publicOrder } from "./projection.mjs";
 import { requestScope, scopeState } from "./read-model.mjs";
 import { remoteServiceCommands, operationCommands } from "../src/application/remoteCommands.js";
@@ -82,6 +83,8 @@ export function createHandler({
   getStore = () => createPostgresStore(),
   setupToken = () => process.env.PEDSS_SETUP_TOKEN,
   shipping = createShippingGateway(),
+  push = createOrderPush({ getDatabase: database }),
+  defer = () => {},
 } = {}) {
   return async function handler(req, res) {
     const requestId = randomUUID();
@@ -197,6 +200,11 @@ export function createHandler({
       if (!Array.isArray(args) || args.length > 6) throw httpError("Comando inválido.", 400);
       if (!(await store.limit(`write:${digest(String(ip))}`, 90)))
         throw httpError("Muitas solicitações. Aguarde.", 429);
+      if (kind === "order-push") {
+        const access = token && store.access ? await store.access(digest(token)) : null;
+        const result = await push.command(command, access?.identity, args);
+        return res.status(200).json({ result });
+      }
       if (kind === "auth" && !(await store.limit(`auth:${digest(String(ip))}`, 15, 300)))
         throw httpError("Muitas tentativas. Aguarde cinco minutos.", 429);
       if (
@@ -220,6 +228,7 @@ export function createHandler({
           .status(200)
           .json({ ...view(ctx), result: await ctx.services.quoteShipping(args[0], args[1]) });
       }
+      let newOrder;
       const payload = await store.transact(
         async (draft) => {
           const ctx = await context(draft, token, shipping);
@@ -280,7 +289,9 @@ export function createHandler({
               result = publicOrder(existing);
             } else {
               tenant.cart = cart;
-              result = publicOrder(await ctx.services.checkout(storeId, cart.requestId, customer));
+              const order = await ctx.services.checkout(storeId, cart.requestId, customer);
+              result = publicOrder(order);
+              newOrder = { storeId, orderId: order.id, number: order.number };
               ctx.repo.getSnapshot().checkoutRequests[`${storeId}:${cart.requestId}`] = fingerprint;
             }
           } else throw httpError("Comando não encontrado.", 400);
@@ -304,6 +315,17 @@ export function createHandler({
                       : null,
             },
       );
+      if (newOrder && push.enabled()) {
+        // Checkout has committed. A failure to notify must not turn a saved order into an error.
+        const send = Promise.resolve().then(() => push.notify(newOrder)).catch(() => {
+          console.warn(JSON.stringify({ requestId, event: "order_push_unavailable" }));
+        });
+        try {
+          defer(send);
+        } catch {
+          console.warn(JSON.stringify({ requestId, event: "order_push_schedule_failed" }));
+        }
+      }
       if (updatedToken !== token) {
         const secure = process.env.VERCEL || req.headers["x-forwarded-proto"] === "https";
         res.setHeader(

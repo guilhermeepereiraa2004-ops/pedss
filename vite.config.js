@@ -64,7 +64,10 @@ export default defineConfig(({ mode, command }) => ({
             );
           return;
         }
-        for (const name of ["DATABASE_URL", "DATABASE_SSL_CA", "PEDSS_SETUP_TOKEN"])
+        for (const name of [
+          "DATABASE_URL", "DATABASE_SSL_CA", "PEDSS_SETUP_TOKEN",
+          "PEDSS_PUSH_PUBLIC_KEY", "PEDSS_PUSH_PRIVATE_KEY", "PEDSS_PUSH_SUBJECT",
+        ])
           if (env[name]) process.env[name] = env[name];
         const { createHandler } = await import("./server/api.mjs");
         const handler = createHandler();

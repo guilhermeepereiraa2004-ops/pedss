@@ -1,3 +1,19 @@
+## Pedido de pizza simplificado — 08/11/2026
+
+Disponível em produção e na `main` do GitHub. O atalho de combinação em uma pizza inteira depende de um sabor vinculado a um montador que aceite múltiplos sabores.
+
+## Push de novos pedidos
+
+O push está publicado com migração e chaves de envio configuradas. Falta confirmar a entrega nativa após o gestor ativar a permissão em um dispositivo e receber um pedido com o painel fechado. A demonstração local mantém o aviso que depende da aba aberta. Veja [como ativar](ORDER-PUSH.md).
+
+## Avisos de novos pedidos — 08/11/2026
+
+A demonstração local usa o aviso do navegador enquanto o painel está aberto. O modo conectado usa Web Push após a configuração do servidor.
+
+## Frete por CEP para todos os segmentos — 05/11/2026
+
+Integração global ativada localmente e na Vercel (dpl_J3MEWQVtJ8yC5zj89LfoGfe3Hrd2). Chave configurada somente no servidor/Secret de Production, fora do Git. Novo endpoint HeiGIT, caches de CEP/rotas e deduplicação. Gate aprovado: 420 testes/60 arquivos, 245/245 critérios. Rota real entre dois CEPs públicos retornou 1.155 m; simulador local em memória mostrou 1,16 km e respeitou mínimo de teste, sem alterar lojas reais. Catálogo/configurações da Cia preservados na publicação; três domínios com HTTP/API 200. A Cia continua com frete fixo: ativar Por quilômetro, origem, taxas e limite em cada loja é configuração comercial do administrador. Cotação real em loja de produção não executada para preservar essas regras. Painel autenticado exigiu login nesta sessão. Sem novo commit/push; documentação operacional completa em plan/STATUS.md, log/devlog.md e docs/SHIPPING.md.
+
 ## Correções da auditoria de pizzaria publicadas — 04/11/2026
 
 Pedido atual autoriza executar as recomendações da auditoria, incluindo a publicação. Finalização mantém nome, telefone, modalidade, endereço, pagamento, observações e rascunho de cupom durante edição/cancelamento/reabertura da sacola. Estado somente em memória da página; cupom e cotação continuam sujeitos à validade, telefone, sacola e regras atuais. Nenhum preço enviado pelo navegador passa a ser confiado.

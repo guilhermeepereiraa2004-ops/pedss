@@ -1,3 +1,11 @@
+## Pedido de pizza simplificado — 08/11/2026
+
+Publicado na Vercel e integrado à `main` do GitHub junto com o frete por CEP e as notificações de novos pedidos. Inclui caminho curto para pizza inteira, combinação direta de sabores com prévia e preço junto da ação, e resumo editável na sacola.
+
+## Frete por CEP para todos os segmentos — 05/11/2026
+
+Integração global ativada localmente e na Vercel (dpl_J3MEWQVtJ8yC5zj89LfoGfe3Hrd2). Chave configurada somente no servidor/Secret de Production, fora do Git. Novo endpoint HeiGIT, caches de CEP/rotas e deduplicação. Gate aprovado: 420 testes/60 arquivos, 245/245 critérios. Rota real entre dois CEPs públicos retornou 1.155 m; simulador local em memória mostrou 1,16 km e respeitou mínimo de teste, sem alterar lojas reais. Catálogo/configurações da Cia preservados na publicação; três domínios com HTTP/API 200. A Cia continua com frete fixo: ativar Por quilômetro, origem, taxas e limite em cada loja é configuração comercial do administrador. Cotação real em loja de produção não executada para preservar essas regras. Painel autenticado exigiu login nesta sessão. Sem novo commit/push; documentação operacional completa em plan/STATUS.md, log/devlog.md e docs/SHIPPING.md.
+
 ## Correções da auditoria de pizzaria publicadas — 04/11/2026
 
 Pedido atual autoriza executar as recomendações da auditoria, incluindo a publicação. Finalização mantém nome, telefone, modalidade, endereço, pagamento, observações e rascunho de cupom durante edição/cancelamento/reabertura da sacola. Estado somente em memória da página; cupom e cotação continuam sujeitos à validade, telefone, sacola e regras atuais. Nenhum preço enviado pelo navegador passa a ser confiado.
@@ -19,6 +27,14 @@ Evidências locais: .quality/pizzeria-audit-fixes-gate.log, .quality/audit-fixes
 Limites remanescentes: ficha técnica, custos e alergênicos precisam de dados reais da loja; não foram inventados. Impressora térmica física, câmera de QR, rede/aparelho independente e recuperação após interrupções prolongadas não foram homologados fisicamente. Não foi reproduzido o erro intermitente original em produção; as causas de recuperação cobertas por testes foram corrigidas, sem prometer ausência de qualquer indisponibilidade futura. Frete por rotas/CEP e ativação DNS de subdomínios permanecem conforme decisões anteriores, fora deste escopo.
 
 # Roadmap — Pedss
+
+## Push de novos pedidos
+
+O Web Push está publicado no Pedss. O gestor ativa os avisos em cada dispositivo pelo painel. A validação em produção confirmou a versão publicada, a proteção da API e o acesso da conta técnica à tabela. A entrega nativa ainda precisa ser confirmada em um dispositivo inscrito. Veja [a configuração](docs/ORDER-PUSH.md).
+
+## Avisos de novos pedidos — 08/11/2026
+
+Proprietários e administradores podem ativar notificações do navegador em Visão geral e Pedidos. A preferência é salva por conta e loja no navegador. O painel usa a sincronização de pedidos existente para emitir os avisos enquanto permanece aberto. A mudança está no ambiente local.
 
 ## Publicação autorizada da restauração de status — 03/11/2026
 

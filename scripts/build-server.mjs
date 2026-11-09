@@ -6,7 +6,7 @@ await build({
   platform: "node",
   format: "esm",
   target: "node24",
-  external: ["pg", "@vercel/functions"],
+  external: ["pg", "@vercel/functions", "web-push"],
   sourcemap: false,
 });
 const { default: handler } = await import("../.server/app.mjs");
