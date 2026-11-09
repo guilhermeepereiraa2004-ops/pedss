@@ -30,6 +30,8 @@ export function comboOptionState(option: ComboOption, products: Product[]) {
   });
   if (!product || product.status !== "Disponível" || product.combo)
     return unavailable("Produto indisponível");
+  if (product.extraSelection?.min)
+    return unavailable("O produto exige escolher opções fora do combo");
   if (!product.pizza)
     return { available: true, reason: "", initialPizza: undefined, minimumExtraCents: 0 };
   const config = product.pizza,

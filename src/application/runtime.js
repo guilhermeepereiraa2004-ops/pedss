@@ -22,14 +22,16 @@ export function getRuntime() {
       auth,
       services: createServices(repository, auth, createLocalShippingGateway()),
     };
-    if (import.meta.env.DEV && import.meta.env.VITE_LOCAL_CIA_PREVIEW === "true") {
+    if (import.meta.env.DEV && import.meta.env.VITE_LOCAL_CIA_PREVIEW !== "false") {
       runtime.refresh = async () => {
         await auth.ready;
         if (auth.current()?.role !== "admin") return;
         const { prepareLocalPizzaPreview } = await import("./localPizzaPreview.ts");
         await prepareLocalPizzaPreview(repository, auth);
-        const { repairLocalCiaCombo } = await import("./localCiaComboRepair.ts");
-        await repairLocalCiaCombo(repository, auth);
+        if (import.meta.env.VITE_LOCAL_CIA_PREVIEW === "true") {
+          const { repairLocalCiaCombo } = await import("./localCiaComboRepair.ts");
+          await repairLocalCiaCombo(repository, auth);
+        }
       };
     }
   }

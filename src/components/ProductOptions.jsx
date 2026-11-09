@@ -3,6 +3,7 @@ import { Plus, Minus, ShoppingBag } from "lucide-react";
 import ProductVisual from "./ProductVisual";
 import { money } from "../lib/data";
 import { isIllustrativeProductPhoto } from "../lib/productPhotography";
+import { isCiaMenuPhoto } from "../lib/pizzaPhotography";
 import "./ProductOptions.css";
 import PizzaBuilder from "./PizzaBuilder";
 import PizzaPriceBreakdown from "./PizzaPriceBreakdown";
@@ -67,9 +68,13 @@ function SingleProductOptions({
       pizzaError = e.message;
     }
   }
-  const extrasCents = product.extras
-    .filter((e) => extras.includes(e.id))
-    .reduce((s, e) => s + e.priceCents, 0);
+  const extrasCents = product.extras.reduce(
+    (sum, e) => sum + e.priceCents * extras.filter((id) => id === e.id).length,
+    0,
+  );
+  const selectionRule = product.extraSelection;
+  const selectionValid =
+    !selectionRule || (extras.length >= selectionRule.min && extras.length <= selectionRule.max);
   const total = ((pizzaPrice?.priceCents ?? product.priceCents) + extrasCents) * quantity;
   const missingFlavors = pizzaFormat ? pizzaFormat.count - pizza.flavorIds.length : 0;
   const awaitingFlavor = fastPizza && (!pizza.flavorIds.length || missingFlavors > 0);
@@ -98,28 +103,82 @@ function SingleProductOptions({
     <>
       {product.extras.some((e) => e.available && !replacesPizzaOption(product, e)) && (
         <fieldset>
-          <legend>Um pouco mais do seu jeito</legend>
+          <legend>{selectionRule?.label || "Um pouco mais do seu jeito"}</legend>
+          {selectionRule && selectionRule.max > 1 && (
+            <p className="small-copy muted" aria-live="polite">
+              {extras.length} de {selectionRule.max} selecionados
+            </p>
+          )}
           {product.extras
             .filter((e) => e.available && !replacesPizzaOption(product, e))
-            .map((extra) => (
-              <label className="option-row" key={extra.id}>
-                <span>
-                  <input
-                    type="checkbox"
-                    checked={extras.includes(extra.id)}
-                    onChange={(e) =>
-                      setExtras(
-                        e.target.checked
-                          ? [...extras, extra.id]
-                          : extras.filter((id) => id !== extra.id),
-                      )
-                    }
-                  />
-                  {extra.name}
-                </span>
-                <strong>+ {money(extra.priceCents / 100)}</strong>
-              </label>
-            ))}
+            .map((extra) => {
+              if (selectionRule?.max > 1) {
+                const count = extras.filter((id) => id === extra.id).length;
+                return (
+                  <div className="option-row" key={extra.id}>
+                    <span>
+                      {extra.name}
+                      {extra.priceCents > 0 && ` · + ${money(extra.priceCents / 100)}`}
+                    </span>
+                    <div className="quantity-control">
+                      <button
+                        type="button"
+                        disabled={!count}
+                        aria-label={`Diminuir ${extra.name}`}
+                        onClick={() =>
+                          setExtras((current) =>
+                            current.filter((_, index) => index !== current.indexOf(extra.id)),
+                          )
+                        }
+                      >
+                        <Minus size={13} />
+                      </button>
+                      <span aria-label={`Quantidade de ${extra.name}`}>{count}</span>
+                      <button
+                        type="button"
+                        disabled={extras.length >= selectionRule.max}
+                        aria-label={`Aumentar ${extra.name}`}
+                        onClick={() => setExtras((current) => [...current, extra.id])}
+                      >
+                        <Plus size={13} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <label className="option-row" key={extra.id}>
+                  <span>
+                    <input
+                      type={
+                        selectionRule?.min === 1 && selectionRule.max === 1 ? "radio" : "checkbox"
+                      }
+                      name={
+                        selectionRule?.min === 1 && selectionRule.max === 1
+                          ? "product-extra-selection"
+                          : undefined
+                      }
+                      checked={extras.includes(extra.id)}
+                      onChange={(e) =>
+                        setExtras(
+                          selectionRule?.max === 1 && e.target.checked
+                            ? [extra.id]
+                            : e.target.checked
+                              ? [...extras, extra.id]
+                              : extras.filter((id) => id !== extra.id),
+                        )
+                      }
+                    />
+                    {extra.name}
+                  </span>
+                  <strong>
+                    {selectionRule && !extra.priceCents
+                      ? "Incluso"
+                      : `+ ${money(extra.priceCents / 100)}`}
+                  </strong>
+                </label>
+              );
+            })}
         </fieldset>
       )}
       {globalIngredients.length > 0 && (
@@ -163,7 +222,7 @@ function SingleProductOptions({
       data-pizza-format={formatCount || undefined}
       onSubmit={(e) => {
         e.preventDefault();
-        if (!busy && canOrder && !pizzaError) onAdd(draft());
+        if (!busy && canOrder && !pizzaError && selectionValid) onAdd(draft());
       }}
     >
       <div className="product-options-body">
@@ -197,7 +256,9 @@ function SingleProductOptions({
             <small className="muted product-photo-note">
               {!product.model3dUrl && isIllustrativeProductPhoto(product)
                 ? "Imagem ilustrativa da categoria. A aparência do produto pode variar."
-                : "Foto do produto base. Adicionais e retiradas não alteram a foto."}
+                : isCiaMenuPhoto(product.cutoutImage || product.image)
+                  ? "Imagem ilustrativa. A aparência do produto pode variar."
+                  : "Foto do produto base. Adicionais e retiradas não alteram a foto."}
             </small>
           </div>
         )}
@@ -299,7 +360,7 @@ function SingleProductOptions({
           <button
             type="submit"
             className="button button-dark"
-            disabled={busy || !canOrder || !!pizzaError}
+            disabled={busy || !canOrder || !!pizzaError || !selectionValid}
           >
             <ShoppingBag size={15} />
             {!canOrder

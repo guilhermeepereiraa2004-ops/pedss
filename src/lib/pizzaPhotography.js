@@ -1,11 +1,16 @@
 import photos from "./pizzaPhotos.json";
+import ciaPhotos from "./ciaPizzaPhotos.json";
 import { pizzaAppearance } from "./pizzaAppearance";
 
 const bundledPhotoSources = new Set(Object.values(photos).map((photo) => photo.src));
+const ciaPhotoSources = new Set(Object.values(ciaPhotos));
 // These exact, versioned files ship with the app and were reviewed as alpha cutouts.
 // Never trust an arbitrary /images/ URL or a merchant's upload based on its filename.
 export function isBundledPizzaPhoto(src) {
   return bundledPhotoSources.has(src);
+}
+export function isCiaMenuPhoto(src) {
+  return ciaPhotoSources.has(src);
 }
 
 const normalize = (value) =>

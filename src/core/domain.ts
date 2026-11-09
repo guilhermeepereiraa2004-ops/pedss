@@ -160,15 +160,26 @@ export function priceLine(
     throw new DomainError("Um produto da sacola ficou indisponível. Remova-o para continuar.");
   if (!Number.isInteger(line.quantity) || line.quantity < 1 || line.quantity > 99)
     throw new DomainError("Quantidade deve ficar entre 1 e 99.");
-  const ids = [...new Set(line.extraIds)];
-  const extras = ids.map((id) => {
+  const rule = p.extraSelection;
+  const ids = rule ? line.extraIds : [...new Set(line.extraIds)];
+  if (rule && (ids.length < rule.min || ids.length > rule.max))
+    throw new DomainError(
+      `${rule.label}: selecione ${rule.min === rule.max ? rule.min : `${rule.min} a ${rule.max}`} opções.`,
+    );
+  const quantities = new Map<string, number>();
+  for (const id of ids) quantities.set(id, (quantities.get(id) || 0) + 1);
+  const extras = [...quantities].map(([id, quantity]) => {
     const extra = p.extras.find((e) => e.id === id && e.available);
     if (!extra) throw new DomainError(`Um adicional de ${p.name} não está mais disponível.`);
     if (replacesPizzaOption(p, extra))
       throw new DomainError(
         "Este adicional antigo foi substituído pelas escolhas de tamanho e borda. Revise a pizza.",
       );
-    return { id: extra.id, name: extra.name, priceCents: extra.priceCents };
+    return {
+      id: extra.id,
+      name: quantity > 1 ? `${quantity} × ${extra.name}` : extra.name,
+      priceCents: extra.priceCents * quantity,
+    };
   });
   if (line.removedIngredients.some((i) => !p.ingredients.includes(i)))
     throw new DomainError(`Revise as opções de ${p.name}.`);

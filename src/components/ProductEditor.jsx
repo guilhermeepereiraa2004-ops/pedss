@@ -194,6 +194,47 @@ export default function ProductEditor({
             <Plus size={13} /> Adicionar
           </button>
         </div>
+        {form.extraSelection && (
+          <div className="form-grid">
+            <label className="field">
+              Título das opções
+              <input
+                required
+                maxLength={60}
+                value={form.extraSelection.label}
+                onChange={(e) =>
+                  change("extraSelection", { ...form.extraSelection, label: e.target.value })
+                }
+              />
+            </label>
+            <label className="field">
+              Mínimo de escolhas
+              <input
+                type="number"
+                required
+                min={0}
+                max={form.extraSelection.max}
+                value={form.extraSelection.min}
+                onChange={(e) =>
+                  change("extraSelection", { ...form.extraSelection, min: Number(e.target.value) })
+                }
+              />
+            </label>
+            <label className="field">
+              Máximo de escolhas
+              <input
+                type="number"
+                required
+                min={Math.max(1, form.extraSelection.min)}
+                max={30}
+                value={form.extraSelection.max}
+                onChange={(e) =>
+                  change("extraSelection", { ...form.extraSelection, max: Number(e.target.value) })
+                }
+              />
+            </label>
+          </div>
+        )}
         {form.extras.map((extra, index) => (
           <div className="extra-editor cost-extra-editor" key={extra.id}>
             <label className="field">

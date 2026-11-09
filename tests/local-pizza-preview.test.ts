@@ -8,9 +8,12 @@ it("LOCAL-PIZZA-01 restores catalog and builder without replacing other shops or
   await prepareLocalPizzaPreview(f.repo, f.auth);
   const next = f.repo.getSnapshot();
   expect(next.companies.find((c) => c.id === LOCAL_CIA_ID)?.slug).toBe("cia-da-pizza");
-  expect(next.tenants[LOCAL_CIA_ID].products).toHaveLength(15);
-  expect(next.tenants[LOCAL_CIA_ID].products.filter((p) => !p.pizza)).toHaveLength(14);
-  expect(next.tenants[LOCAL_CIA_ID].products.find((p) => p.pizza)?.pizza?.flavors).toHaveLength(14);
+  expect(next.tenants[LOCAL_CIA_ID].products).toHaveLength(74);
+  expect(next.tenants[LOCAL_CIA_ID].products.filter((p) => !p.pizza)).toHaveLength(22);
+  expect(
+    next.tenants[LOCAL_CIA_ID].products.find((p) => p.pizza?.menuPlacement === "builder")?.pizza
+      ?.flavors,
+  ).toHaveLength(51);
   expect(next.tenants[LOCAL_CIA_ID].settings.heroSegment).toBe("pizza");
   expect(next.tenants[LOCAL_CIA_ID].orders).toEqual([]);
   for (const [id, tenant] of Object.entries(before.tenants))

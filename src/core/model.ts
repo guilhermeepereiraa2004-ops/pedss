@@ -321,6 +321,14 @@ export const productSchema = z.object({
   featured: z.boolean().default(false),
   ingredients: z.array(text.min(1).max(60)).max(30).default([]),
   extras: z.array(extraSchema).max(30).default([]),
+  extraSelection: z
+    .object({
+      label: text.min(1).max(60),
+      min: z.number().int().min(0).max(30),
+      max: z.number().int().min(1).max(30),
+    })
+    .refine((rule) => rule.max >= rule.min)
+    .optional(),
   pizza: pizzaConfigSchema.optional(),
   allergens: z.array(text.min(1).max(60)).max(30).optional(),
   recipe: recipeSchema.optional(),

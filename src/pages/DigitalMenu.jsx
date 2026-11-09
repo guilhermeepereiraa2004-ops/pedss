@@ -359,13 +359,17 @@ export default function DigitalMenu({ manualStoreId }) {
             )}
             {selected.extras.some((e) => e.available) && (
               <section>
-                <h3>Adicionais disponíveis</h3>
+                <h3>{selected.extraSelection?.label || "Adicionais disponíveis"}</h3>
                 {selected.extras
                   .filter((e) => e.available)
                   .map((e) => (
                     <div key={e.id}>
                       <span>{e.name}</span>
-                      <strong>+ {money(e.priceCents / 100)}</strong>
+                      <strong>
+                        {selected.extraSelection && !e.priceCents
+                          ? "Incluso"
+                          : `+ ${money(e.priceCents / 100)}`}
+                      </strong>
                     </div>
                   ))}
               </section>

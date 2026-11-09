@@ -3,7 +3,7 @@ import { Sandwich } from "lucide-react";
 import { isIllustrativeProductPhoto, productCutoutSources } from "../lib/productPhotography";
 import { hasImageTransparency } from "../application/imageEditing";
 import { PRODUCT_IMAGE_SIZES, storeImage } from "../lib/storeImages";
-import { isBundledPizzaPhoto } from "../lib/pizzaPhotography";
+import { isBundledPizzaPhoto, isCiaMenuPhoto } from "../lib/pizzaPhotography";
 import "./ProductCutout.css";
 
 function Photo({ product, className, motion, priority, sizes }) {
@@ -13,7 +13,7 @@ function Photo({ product, className, motion, priority, sizes }) {
   const illustrative = isIllustrativeProductPhoto(product);
   const artwork = useRef(null);
   const image = useRef(null);
-  const bundled = isBundledPizzaPhoto(src);
+  const bundled = isBundledPizzaPhoto(src) || isCiaMenuPhoto(src);
   const ready = !!src && verified === src;
   const rejectSource = useCallback(() => {
     setFailed((previous) => (previous.includes(src) ? previous : [...previous, src]));

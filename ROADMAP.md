@@ -1,3 +1,7 @@
+## Cardápio da Cia da Pizza
+
+O catálogo de referência contém 51 sabores de pizza, 7 petiscos e 15 bebidas, com 73 fotos e quatro tamanhos. O checkout valida seis recheios na porção de pastéis e um sabor em cada suco. A publicação do código disponibiliza as fotos e as regras. O cardápio da loja é carregado do cadastro de produção.
+
 ## Escolha de tamanho e preço da pizza
 
 A vitrine da pizzaria começa pela escolha do tamanho e da divisão. Cada tamanho mostra um preço inicial. A massa recebe os sabores à medida que o cliente escolhe e o montador mostra o total calculado ao completar a seleção. Os formatos disponíveis são configuráveis no painel.
